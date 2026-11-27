@@ -34,3 +34,16 @@ Icons made by Lorc, Delapouite and Skoll from Game-icons.net (CC BY 3.0). Indivi
 - アイコンライセンス: https://github.com/game-icons/icons/blob/master/license.txt
 - 取得時のblob SHAとコピー先SHAの一致を確認。出典と作者をゲーム内の設定から閲覧可能。
 - モンスターのフル立ち絵と戦闘スプライトは既存自作SVGを維持。追加した4点は種族の紋章。効果音は自作Web Audio合成。
+
+## v0.4.3 追加素材（6点、累計29点）
+
+画像はWesnoth (doofus-01)、個々のEXIFに記載されたCC BY-SA 4.0。ファイル自体は未変更、表示時の色調・トリミングはCSS。画像および画像の改変はCC BY-SA 4.0で提供。https://creativecommons.org/licenses/by-sa/4.0/ 。音源はSuperpowers Asset Packs (Pixel-boy / Sparklin Labs)、CC0。https://creativecommons.org/publicdomain/zero/1.0/ 。元のGit blob SHAと一致を確認。作品のコード・固有設定は取り込まない。モンスターの名称・種族・能力は従来のまま。立ち絵は暫定素材。
+
+| 保存先 | 作者 | ライセンス | 原典 | 表示時の変更 | SHA |
+|---|---|---|---|---|---|
+| assets/portraits/moss.webp | doofus-01 | CC BY-SA 4.0 | [原典](https://github.com/wesnoth/wesnoth/blob/260ce91478a5e39d949e63d24db4f45f00bb4f90/data/core/images/portraits/monsters/mudcrawler.webp) | Mudcrawler; CSS色調・トリミング | bf74d8050f69400b80155500ce148afaa787e10d |
+| assets/portraits/fang.webp | doofus-01 | CC BY-SA 4.0 | [原典](https://github.com/wesnoth/wesnoth/blob/260ce91478a5e39d949e63d24db4f45f00bb4f90/data/core/images/portraits/wolves/wolf-dark.webp) | Dark wolf; CSSトリミング | 3876d4c1b4f336660c3a2d640246a5029ac687fb |
+| assets/portraits/golem.webp | doofus-01 | CC BY-SA 4.0 | [原典](https://github.com/wesnoth/wesnoth/blob/260ce91478a5e39d949e63d24db4f45f00bb4f90/data/campaigns/Sceptre_of_Fire/images/portraits/monsters/snowgolem.webp) | Snow golem; CSS色調・トリミング | a4de3d4d3483a454bc9508a48e43b620015b57aa |
+| assets/portraits/wyrm.webp | doofus-01 | CC BY-SA 4.0 | [原典](https://github.com/wesnoth/wesnoth/blob/260ce91478a5e39d949e63d24db4f45f00bb4f90/data/core/images/portraits/monsters/wyvern.webp) | Wyvern; CSS色調・トリミング | 9dd96a094c3811703d095a3e7401806f5f2b11d8 |
+| assets/audio/guild.ogg | Pixel-boy / Sparklin Labs | CC0 | [原典](https://github.com/sparklinlabs/superpowers-asset-packs/blob/e8674a03ab4456802f71f848c4df79eccca23f7a/medieval-fantasy/music/theme-4.ogg) | Medieval Fantasy theme-4; ループ | 2d7053d207e0b241869008a22f68a8523c6e0e26 |
+| assets/audio/battle.ogg | Pixel-boy / Sparklin Labs | CC0 | [原典](https://github.com/sparklinlabs/superpowers-asset-packs/blob/e8674a03ab4456802f71f848c4df79eccca23f7a/rpg-battle-system/music/theme-5.ogg) | RPG Battle System theme-5; ループ | a34cfb1a868ee44949292733b842875a51c1e8d1 |

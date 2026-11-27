@@ -216,3 +216,14 @@ test('illustrated world, equipment and report preserve actual mission data',asyn
   assert.ok(e.get('result').innerHTML.includes('report-emblem rank-A'));
   const saved=JSON.parse(e.raw());assert.equal(saved.materials.soulFragment,3);assert.equal(saved.money,93);
 });
+
+test('large portrait card uses real local illustration without changing saved progress',async()=>{
+  const seed=freshSave();seed.monsters.moss.level=9;seed.money=812;
+  const e=environment({seed,reduced:true}),a=e.api;await a.enter();
+  const card=e.get('terminalMonster').innerHTML;
+  assert.ok(card.includes('assets/portraits/moss.webp'));
+  assert.ok(card.includes('contract-title'));assert.ok(card.includes('Lv.9'));
+  assert.ok(card.includes('装着魂'));assert.ok(card.includes('data-scene="build"'));
+  assert.equal(a.snapshot().state,JSON.stringify(seed));
+  await a.beginBattle();assert.ok(e.get('fighter').innerHTML.includes('assets/portraits/moss.webp'));
+});

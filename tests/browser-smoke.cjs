@@ -5,7 +5,7 @@ const profiles=fs.mkdtempSync(path.join(os.tmpdir(),'soul-rush-chrome-'));
 const execs=[process.env.CHROME_BIN,'google-chrome','google-chrome-stable','chromium','chromium-browser'].filter(Boolean);
 const chrome=execs.find(bin=>cp.spawnSync(bin,['--version'],{stdio:'ignore'}).status===0);
 if(!chrome)throw Error('Chrome/Chromium executable unavailable');
-const server=http.createServer((req,res)=>{try{const name=new URL(req.url,'http://127.0.0.1').pathname;const rel=name==='/'?'index.html':name.slice(1);if(!/^(?:index\.html|sw\.js|manifest\.webmanifest|icons\/[a-zA-Z0-9_.-]+|assets\/(?:CREDITS\.html|(?:art|icons)\/[a-zA-Z0-9_.-]+))$/.test(rel)){res.statusCode=404;return res.end('not found')}const ext=path.extname(rel),mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.webmanifest':'application/manifest+json','.svg':'image/svg+xml','.jpg':'image/jpeg','.png':'image/png'}[ext]||'application/octet-stream';const data=fs.readFileSync(path.join(root,rel));res.setHeader('Content-Type',mime);res.setHeader('Cache-Control','no-store');return res.end(data)}catch{res.statusCode=404;res.end('not found')}});
+const server=http.createServer((req,res)=>{try{const name=new URL(req.url,'http://127.0.0.1').pathname;const rel=name==='/'?'index.html':name.slice(1);if(!/^(?:index\.html|sw\.js|manifest\.webmanifest|icons\/[a-zA-Z0-9_.-]+|assets\/(?:CREDITS\.html|(?:art|icons|portraits|audio)\/[a-zA-Z0-9_.-]+))$/.test(rel)){res.statusCode=404;return res.end('not found')}const ext=path.extname(rel),mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.webmanifest':'application/manifest+json','.svg':'image/svg+xml','.jpg':'image/jpeg','.png':'image/png','.webp':'image/webp','.ogg':'audio/ogg'}[ext]||'application/octet-stream';const data=fs.readFileSync(path.join(root,rel));res.setHeader('Content-Type',mime);res.setHeader('Cache-Control','no-store');return res.end(data)}catch{res.statusCode=404;res.end('not found')}});
 let proc,ws;
 async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){let r;try{r=await fn()}catch(e){}if(r)return r;await sleep(60)}throw Error('condition timed out')}
 (async()=>{
@@ -19,16 +19,20 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   let seq=0;const wait=new Map(),errors=[];
   ws.addEventListener('message',e=>{const v=JSON.parse(e.data);if(v.id){const p=wait.get(v.id);if(p){wait.delete(v.id);v.error?p.reject(Error(v.error.message)):p.resolve(v.result)}}else if(v.method==='Runtime.exceptionThrown')errors.push(v.params.exceptionDetails.text+': '+(v.params.exceptionDetails.exception?.description||''))});
   const send=(method,params={})=>new Promise((resolve,reject)=>{const id=++seq;wait.set(id,{resolve,reject});ws.send(JSON.stringify({id,method,params}));setTimeout(()=>{if(wait.has(id)){wait.delete(id);reject(Error('CDP timeout '+method))}},8000).unref()});
-  async function evaluate(expression){const r=await send('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});if(r.exceptionDetails)throw Error(r.exceptionDetails.exception?.description||r.exceptionDetails.text);return r.result.value}
+  async function evaluate(expression){const r=await send('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true,userGesture:true});if(r.exceptionDetails)throw Error(r.exceptionDetails.exception?.description||r.exceptionDetails.text);return r.result.value}
   const click=async(selector)=>{assert.equal(await evaluate('(()=>{const el=document.querySelector('+JSON.stringify(selector)+');if(!el||el.disabled||el.closest("[hidden]"))return false;el.scrollIntoView({block:"nearest"});el.click();return true})()'),true,'missing enabled button '+selector);};
   const scene=async(name)=>until(()=>evaluate('document.getElementById("game").dataset.scene==='+JSON.stringify(name)+'&&!document.getElementById("game").hidden&&!document.getElementById("sceneTransition").hidden===false'));
   await send('Runtime.enable');await send('Page.enable');await send('Network.enable');await send('Network.setBypassServiceWorker',{bypass:true});
   await send('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
   await send('Page.navigate',{url});await until(()=>evaluate('document.getElementById("titleScreen")&&!document.getElementById("titleScreen").hidden'));
   await click('#enterBtn');await scene('terminal');
-  const assets=["assets/art/meadow.jpg","assets/art/desert.png","assets/art/mountain.png","assets/art/swamp.png","assets/art/tower.png","assets/art/parchment.png","assets/art/golden-border.png","assets/icons/might.svg","assets/icons/haste.svg","assets/icons/spark.svg","assets/icons/burst.svg","assets/icons/feast.svg","assets/icons/pierce.svg","assets/icons/pulse.svg","assets/icons/moss.svg","assets/icons/fang.svg","assets/icons/golem.svg","assets/icons/wyrm.svg","assets/icons/world.svg","assets/icons/build.svg","assets/icons/shop.svg","assets/icons/codex.svg","assets/icons/mission.svg"];
-  assert.equal(await evaluate('Promise.all('+JSON.stringify(assets)+'.map(async src=>{const img=new Image();img.src="./"+src;await img.decode();return img.naturalWidth>0})).then(v=>v.every(Boolean))'),true,'all 23 assets decode');
-  console.log('23 bundled images decoded');
+  const assets=["assets/art/meadow.jpg","assets/art/desert.png","assets/art/mountain.png","assets/art/swamp.png","assets/art/tower.png","assets/art/parchment.png","assets/art/golden-border.png","assets/icons/might.svg","assets/icons/haste.svg","assets/icons/spark.svg","assets/icons/burst.svg","assets/icons/feast.svg","assets/icons/pierce.svg","assets/icons/pulse.svg","assets/icons/moss.svg","assets/icons/fang.svg","assets/icons/golem.svg","assets/icons/wyrm.svg","assets/icons/world.svg","assets/icons/build.svg","assets/icons/shop.svg","assets/icons/codex.svg","assets/icons/mission.svg","assets/portraits/moss.webp","assets/portraits/fang.webp","assets/portraits/golem.webp","assets/portraits/wyrm.webp"];
+  assert.equal(await evaluate('Promise.all('+JSON.stringify(assets)+'.map(async src=>{const img=new Image();img.src="./"+src;await img.decode();return img.naturalWidth>0})).then(v=>v.every(Boolean))'),true,'all 27 assets decode');
+  console.log('27 bundled images decoded');
+  assert.ok(await evaluate('document.querySelector("#terminalMonster .monster-illustration").naturalWidth>0'));
+  assert.ok(await evaluate('document.querySelector("#terminalMonster .contract-title").textContent.includes("モス")'));
+  await until(()=>evaluate('musicPlayer&&musicTrack==="guild"&&musicPlayer.readyState>=2&&!musicPlayer.paused'),12000);
+  console.log('guild BGM playing');
   const sizes=[[390,844],[375,600],[320,568],[1280,800]];
   for(const [width,height] of sizes){
     await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<600});
@@ -52,6 +56,9 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   await click('#terminalStage [data-launch-battle]');await scene('battle');
   await until(()=>evaluate('running'));
   assert.equal(await evaluate('document.querySelector("#arena").dataset.regionArt'), 'forest');
+  assert.ok(await evaluate('document.querySelector("#fighter .monster-illustration").src.endsWith("moss.webp")'));
+  await until(()=>evaluate('musicTrack==="battle"&&musicPlayer.readyState>=2&&!musicPlayer.paused'),12000);
+  console.log('battle BGM playing');
   assert.ok(await evaluate('getComputedStyle(document.querySelector("#arena")).backgroundImage.includes("meadow.jpg")'));
   await evaluate('advanceBattle(battle,30);finishBattle()');await scene('result');
   assert.equal(await evaluate('JSON.parse(localStorage.getItem("soul_rush_prototype_v2")).money'),initial+75);
@@ -60,10 +67,11 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   await click('#result [data-scene="terminal"]');await scene('terminal');
   await click('#terminalScene [data-scene="settings"]');await scene('settings');
   await click('#soundToggle');assert.equal(await evaluate('localStorage.getItem("soul_rush_sound_v1")'),'off');
+  await click('#musicToggle');assert.equal(await evaluate('localStorage.getItem("soul_rush_music_v1")'),'off');assert.equal(await evaluate('musicPlayer.paused'),true);
   assert.equal(await evaluate('JSON.parse(localStorage.getItem("soul_rush_prototype_v2")).money'),initial+75);
   await click('#sceneBackBtn');await scene('terminal');
   await until(()=>evaluate('!!navigator.serviceWorker.controller'),15000);
-  assert.equal(await evaluate('Promise.all('+JSON.stringify([...assets,"assets/CREDITS.html"])+'.map(p=>caches.match("./"+p).then(Boolean))).then(v=>v.every(Boolean))'),true,'all assets cached');
+  assert.equal(await evaluate('Promise.all('+JSON.stringify([...assets,"assets/CREDITS.html","assets/audio/guild.ogg","assets/audio/battle.ogg"])+'.map(p=>caches.match("./"+p).then(Boolean))).then(v=>v.every(Boolean))'),true,'all assets cached');
   await send('Network.setBypassServiceWorker',{bypass:false});
   await send('Network.emulateNetworkConditions',{offline:true,latency:0,downloadThroughput:0,uploadThroughput:0});
   await send('Page.reload');await until(()=>evaluate('document.getElementById("titleScreen")&&!document.getElementById("titleScreen").hidden'),12000);
@@ -71,7 +79,23 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   assert.equal(await evaluate('JSON.parse(localStorage.getItem("soul_rush_prototype_v2")).money'),initial+75);
   assert.equal(await evaluate('Promise.all(Array.from(document.querySelectorAll("#terminalScene img")).map(img=>img.decode().then(()=>img.naturalWidth>0))).then(v=>v.every(Boolean))'),true,'offline images decode');
   assert.equal(await evaluate('localStorage.getItem("soul_rush_sound_v1")'),'off');
+  assert.equal(await evaluate('localStorage.getItem("soul_rush_music_v1")'),'off');
+  assert.equal(await evaluate('fetch("./assets/audio/guild.ogg",{headers:{Range:"bytes=0-15"}}).then(async r=>r.status===206&&(await r.arrayBuffer()).byteLength===16)'),true,'offline audio range');
   await send('Network.emulateNetworkConditions',{offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1});
+  // Synthetic funds in this isolated test profile, never user storage.
+  await evaluate('state.money=100000;save()');
+  await click('#terminalScene [data-scene="shop"]');await scene('shop');
+  const before=await evaluate('state.money');
+  const cost=await evaluate('mdef("fang").cost');
+  await click('[data-buy-monster="fang"]');
+  assert.equal(await evaluate('document.querySelector("#summonDialog").open'),true);
+  assert.ok(await evaluate('document.querySelector("#summonArt img").src.endsWith("fang.webp")'));
+  assert.equal(await evaluate('state.money'),before-cost);
+  assert.ok(await evaluate('JSON.parse(localStorage.getItem("soul_rush_prototype_v2")).monsters.fang'));
+  if(process.env.SCREENSHOT_DIR){const pic=await send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(process.env.SCREENSHOT_DIR,'summon-390x844.png'),Buffer.from(pic.data,'base64'))}
+  await click('#summonClose');assert.equal(await evaluate('document.querySelector("#summonDialog").open'),false);
+  assert.equal(await evaluate('document.querySelector("[data-buy-monster=fang]").disabled'),true);
+  console.log('summon reveal and one purchase persisted');
   assert.equal(errors.length,0,errors.join('\n'));
-  console.log('Illustrated browser smoke passed: 4 viewports, 23 image decodes, sound preference, cached offline reload, persistent reward');
+  console.log('Illustrated browser smoke passed: 4 viewports, 27 image decodes, sound preference, cached offline reload, persistent reward');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(()=>{ws?.close();proc?.kill('SIGTERM');server.close();setTimeout(()=>{try{fs.rmSync(profiles,{recursive:true,force:true})}catch{}},250).unref()});
