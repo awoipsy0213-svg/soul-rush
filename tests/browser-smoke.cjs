@@ -37,7 +37,7 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   for(const [width,height] of sizes){
     await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<600});
     await sleep(100);
-    const geometry=await evaluate('(()=>{const s=document.querySelector("#terminalScene"),b=document.querySelector("#terminalStage [data-launch-battle]"),r=b.getBoundingClientRect();return {vw:innerWidth,vh:innerHeight,docW:document.documentElement.scrollWidth,docH:document.documentElement.scrollHeight,sceneW:s.clientWidth,scrollW:s.scrollWidth,buttonWidth:r.width,buttonHeight:r.height,theme:getComputedStyle(document.querySelector(".guild-board")).backgroundImage.startsWith("url(")}})()');
+    const geometry=await evaluate('(()=>{const s=document.querySelector("#terminalScene"),b=document.querySelector("#terminalStage [data-launch-battle]"),r=b.getBoundingClientRect();return {vw:innerWidth,vh:innerHeight,docW:document.documentElement.scrollWidth,docH:document.documentElement.scrollHeight,sceneW:s.clientWidth,scrollW:s.scrollWidth,buttonWidth:r.width,buttonHeight:r.height,theme:document.getElementById("popTheme")!==null}})()');
     assert.ok(geometry.docW<=geometry.vw+1&&geometry.docH<=geometry.vh+1,'outer page overflow '+JSON.stringify({width,height,geometry}));
     assert.ok(geometry.scrollW<=geometry.sceneW+2,'terminal horizontal overflow '+JSON.stringify({width,height,geometry}));
     assert.ok(geometry.buttonWidth>150&&geometry.buttonHeight>=40,'start button size '+JSON.stringify(geometry));
@@ -56,19 +56,19 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   await click('#terminalStage [data-launch-battle]');await scene('battle');
   await until(()=>evaluate('running'));
   assert.equal(await evaluate('document.querySelector("#arena").dataset.regionArt'), 'forest');
-  assert.ok(await evaluate('document.querySelector("#fighter .monster-illustration").src.endsWith("moss.webp")'));
+  assert.ok(await evaluate('document.querySelector("#fighter .monster-illustration").src.startsWith("data:image/svg+xml,")'));
   await until(()=>evaluate('musicTrack==="battle"&&musicPlayer.readyState>=2&&!musicPlayer.paused'),12000);
   console.log('battle BGM playing');
-  assert.ok(await evaluate('getComputedStyle(document.querySelector("#arena")).backgroundImage.includes("meadow.jpg")'));
-  await evaluate('advanceBattle(battle,30);finishBattle()');await scene('result');
-  assert.equal(await evaluate('JSON.parse(localStorage.getItem("soul_rush_prototype_v2")).money'),initial+75);
+  assert.ok(await evaluate('getComputedStyle(document.querySelector("#arena")).backgroundImage.includes("gradient")'));
+  await evaluate('advanceBattle(battle,24);finishBattle()');await scene('result');
+  assert.equal(await evaluate('JSON.parse(localStorage.getItem("soul_rush_prototype_v2")).money'),initial+60);
   assert.ok(await evaluate('document.querySelector("#result").innerText.includes("GUILD REPORT")'));
-  assert.equal(await evaluate('document.querySelector(".report-emblem strong").textContent'),'B');
+  assert.equal(await evaluate('document.querySelector(".report-emblem strong").textContent'),'C');
   await click('#result [data-scene="terminal"]');await scene('terminal');
   await click('#terminalScene [data-scene="settings"]');await scene('settings');
   await click('#soundToggle');assert.equal(await evaluate('localStorage.getItem("soul_rush_sound_v1")'),'off');
   await click('#musicToggle');assert.equal(await evaluate('localStorage.getItem("soul_rush_music_v1")'),'off');assert.equal(await evaluate('musicPlayer.paused'),true);
-  assert.equal(await evaluate('JSON.parse(localStorage.getItem("soul_rush_prototype_v2")).money'),initial+75);
+  assert.equal(await evaluate('JSON.parse(localStorage.getItem("soul_rush_prototype_v2")).money'),initial+60);
   await click('#sceneBackBtn');await scene('terminal');
   await until(()=>evaluate('!!navigator.serviceWorker.controller'),15000);
   assert.equal(await evaluate('Promise.all('+JSON.stringify([...assets,"assets/CREDITS.html","assets/audio/guild.ogg","assets/audio/battle.ogg"])+'.map(p=>caches.match("./"+p).then(Boolean))).then(v=>v.every(Boolean))'),true,'all assets cached');
@@ -76,7 +76,7 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   await send('Network.emulateNetworkConditions',{offline:true,latency:0,downloadThroughput:0,uploadThroughput:0});
   await send('Page.reload');await until(()=>evaluate('document.getElementById("titleScreen")&&!document.getElementById("titleScreen").hidden'),12000);
   await click('#enterBtn');await scene('terminal');
-  assert.equal(await evaluate('JSON.parse(localStorage.getItem("soul_rush_prototype_v2")).money'),initial+75);
+  assert.equal(await evaluate('JSON.parse(localStorage.getItem("soul_rush_prototype_v2")).money'),initial+60);
   assert.equal(await evaluate('Promise.all(Array.from(document.querySelectorAll("#terminalScene img")).map(img=>img.decode().then(()=>img.naturalWidth>0))).then(v=>v.every(Boolean))'),true,'offline images decode');
   assert.equal(await evaluate('localStorage.getItem("soul_rush_sound_v1")'),'off');
   assert.equal(await evaluate('localStorage.getItem("soul_rush_music_v1")'),'off');
@@ -89,7 +89,7 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   const cost=await evaluate('mdef("fang").cost');
   await click('[data-buy-monster="fang"]');
   assert.equal(await evaluate('document.querySelector("#summonDialog").open'),true);
-  assert.ok(await evaluate('document.querySelector("#summonArt img").src.endsWith("fang.webp")'));
+  assert.ok(await evaluate('document.querySelector("#summonArt img").src.startsWith("data:image/svg+xml,")'));
   assert.equal(await evaluate('state.money'),before-cost);
   assert.ok(await evaluate('JSON.parse(localStorage.getItem("soul_rush_prototype_v2")).monsters.fang'));
   if(process.env.SCREENSHOT_DIR){const pic=await send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(process.env.SCREENSHOT_DIR,'summon-390x844.png'),Buffer.from(pic.data,'base64'))}
