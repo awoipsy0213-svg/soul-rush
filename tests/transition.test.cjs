@@ -201,3 +201,18 @@ test('guild board renders actual monster, equipped souls and selected request',a
   assert.equal(a.snapshot().state,JSON.stringify(seed));
   await a.beginBattle();assert.equal(a.snapshot().mission,'hunt');assert.equal(a.snapshot().stage,11);
 });
+
+test('illustrated world, equipment and report preserve actual mission data',async()=>{
+  const seed=freshSave();seed.unlocked=2;seed.selectedMission='collect';
+  const e=environment({seed,reduced:true}),a=e.api;await a.enter();
+  assert.ok(e.get('terminalMonster').innerHTML.includes('assets/icons/moss.svg'));
+  assert.ok(e.get('terminalMonster').innerHTML.includes('assets/icons/might.svg'));
+  assert.ok(e.get('terminalStage').innerHTML.includes('assets/art/meadow.jpg'));
+  await a.navigateScene('stage');
+  assert.ok(e.get('worldMap').innerHTML.includes('data-region-art="forest"'));
+  assert.ok(e.get('worldMap').innerHTML.includes('data-region-art="frost"'));
+  await a.beginBattle();assert.equal(e.get('arena').dataset.regionArt,'forest');
+  e.frame(30000);for(let i=0;i<8;i++)await Promise.resolve();
+  assert.ok(e.get('result').innerHTML.includes('report-emblem rank-A'));
+  const saved=JSON.parse(e.raw());assert.equal(saved.materials.soulFragment,3);assert.equal(saved.money,93);
+});
