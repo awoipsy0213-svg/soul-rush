@@ -6,11 +6,13 @@ const html=fs.readFileSync(require('node:path').join(__dirname,'../index.html'),
 const engine=html.match(/<script id="engine">([\s\S]*?)<\/script>/)[1];
 const ui=html.match(/<script id="ui">([\s\S]*?)<\/script>/)[1];
 const freshSave=()=>vm.runInNewContext(engine+'\nfresh()',{});
-function environment({reduced=false,animate=true,seed=null}={}){
+function environment({reduced=false,animate=true,seed=null,legacy=null,writeFail=false}={}){
   const elements=new Map(),events=new Map(),animations=[],frames=new Map(),writes=[];
   const ids=new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]));
   const sceneNames=['terminal','stage','build','shop','codex','settings','battle','result'];
-  let now=0,seq=0,raw=seed===null?null:JSON.stringify(seed);
+  let now=0,seq=0;
+  const encode=v=>v===null?null:typeof v==='string'?v:JSON.stringify(v);
+  const slots=new Map([['soul_rush_prototype_v2',encode(seed)],['soul_rush_prototype_v1',encode(legacy)]]);
   function get(id){
     if(!ids.has(id))throw Error('Missing HTML element: '+id);
     if(!elements.has(id)){
@@ -26,9 +28,9 @@ function environment({reduced=false,animate=true,seed=null}={}){
     return elements.get(id);
   }
   const document={hidden:false,getElementById:get,querySelectorAll:s=>s==='.scene'?sceneNames.map(n=>get(n+'Scene')):[],addEventListener:(name,fn,capture)=>events.set(name,{fn,capture}),createElement:()=>({style:{},remove(){}}),head:{appendChild(){}}};
-  const storage={getItem:key=>{assert.equal(key,'soul_rush_prototype_v1');return raw},setItem:(key,value)=>{assert.equal(key,'soul_rush_prototype_v1');raw=value;writes.push(value)}};
+  const storage={getItem:key=>slots.get(key)??null,setItem:(key,value)=>{assert.equal(key,'soul_rush_prototype_v2');if(writeFail)throw Error('write denied');slots.set(key,value);writes.push(value)}};
   const context={document,localStorage:storage,location:{protocol:'http:',hostname:'example.test'},navigator:{},performance:{now:()=>now},matchMedia:()=>({matches:reduced}),console,setTimeout:()=>++seq,clearTimeout(){},requestAnimationFrame:fn=>{const id=++seq;frames.set(id,fn);return id},cancelAnimationFrame:id=>frames.delete(id)};
-  const api=vm.runInNewContext(engine+'\n'+ui+'\n({enter,goTitle,navigateScene,beginBattle,actionNext,finishBattle,transitionScene,snapshot:()=>({scene,running,loadingBattle,transitioning,startedAt,elapsed:battle?.elapsed,stage:battle?.stage.n,clear:battle?.clear,money:state.money,state:JSON.stringify(state),overlayHidden:$("sceneTransition").hidden,gameHidden:$("game").hidden,titleHidden:$("titleScreen").hidden,timer:$("timer").textContent})})',context);
+  const api=vm.runInNewContext(engine+'\n'+ui+'\n({enter,goTitle,navigateScene,beginBattle,actionNext,finishBattle,transitionScene,selectStage,selectRegion,selectMission,backupJSON,persistReplacement,snapshot:()=>({scene,running,loadingBattle,transitioning,startedAt,elapsed:battle?.elapsed,stage:battle?.stage.n,clear:battle?.clear,mission:battle?.mission,protectSave,saveOK,money:state.money,state:JSON.stringify(state),overlayHidden:$("sceneTransition").hidden,gameHidden:$("game").hidden,titleHidden:$("titleScreen").hidden,timer:$("timer").textContent})})',context);
   function frame(delta=0){now+=delta;const queued=[...frames.values()];frames.clear();queued.forEach(fn=>fn(now))}
   frame();frame();
   async function step(duration,fail=false){
@@ -42,7 +44,7 @@ function environment({reduced=false,animate=true,seed=null}={}){
   async function white(){await step(400);await step(100);await step(500)}
   async function menu(){await step(150);await step(150)}
   async function result(){await step(250);await step(250)}
-  return {api,get,events,animations,frame,step,white,menu,result,writes,raw:()=>raw,now:()=>now};
+  return {api,get,events,animations,frame,step,white,menu,result,writes,raw:()=>storage.getItem('soul_rush_prototype_v2'),legacyRaw:()=>storage.getItem('soul_rush_prototype_v1'),now:()=>now};
 }
 test('whiteout swaps at full opacity and locks input for 1000ms',async()=>{
   const e=environment(),a=e.api,p=a.enter();
@@ -138,7 +140,7 @@ test('cancelled animation or failing scene callback releases lock',async()=>{
   p=a.navigateScene('shop');await e.menu();await p;
   assert.equal(a.snapshot().scene,'shop');
 });
-test('existing version 1 save survives navigation with unchanged data and key',async()=>{
+test('existing version 2 save survives navigation with unchanged data and key',async()=>{
   const seed=freshSave();
   seed.money=812;seed.unlocked=4;seed.selectedStage=3;seed.monsters.moss.level=9;seed.souls.haste=2;seed.monsters.moss.equip.push('haste');
   const e=environment({seed}),a=e.api;
@@ -146,6 +148,43 @@ test('existing version 1 save survives navigation with unchanged data and key',a
   assert.equal(a.snapshot().state,JSON.stringify(seed));
   p=a.navigateScene('settings');await e.menu();await p;
   p=a.goTitle();await e.white();await p;
-  assert.equal(e.raw(),JSON.stringify(seed));assert.equal(JSON.parse(e.raw()).version,1);
+  assert.equal(e.raw(),JSON.stringify(seed));assert.equal(JSON.parse(e.raw()).version,2);
   assert.ok(e.writes.length>=2);
+});
+
+test('legacy migration preserves raw v1 and prefers v2 on subsequent startup',async()=>{
+  const expected=freshSave();expected.money=812;expected.unlocked=12;expected.selectedStage=11;expected.monsters.moss.level=9;
+  const legacy=JSON.parse(JSON.stringify(expected));legacy.version=1;delete legacy.selectedMission;delete legacy.missionRecords;delete legacy.materials;
+  const e=environment({legacy,reduced:true}),a=e.api;
+  assert.equal(e.raw(),null);await a.enter();
+  assert.equal(a.snapshot().state,JSON.stringify(expected));assert.equal(e.legacyRaw(),JSON.stringify(legacy));
+  const next=JSON.parse(e.raw());next.money=999;
+  const e2=environment({seed:next,legacy,reduced:true});await e2.api.enter();
+  assert.equal(e2.api.snapshot().money,999);assert.equal(e2.legacyRaw(),JSON.stringify(legacy));
+});
+test('world selection, locked region and side mission retry do not unlock campaign',async()=>{
+  const seed=freshSave();seed.unlocked=2;
+  const e=environment({seed,reduced:true}),a=e.api;await a.enter();await a.navigateScene('stage');
+  assert.ok(e.get('worldMap').innerHTML.includes('始まりの森林'));
+  a.selectRegion(1);assert.equal(JSON.parse(a.snapshot().state).selectedStage,1);
+  a.selectMission('collect');assert.equal(JSON.parse(a.snapshot().state).selectedMission,'collect');
+  await a.beginBattle();assert.equal(a.snapshot().mission,'collect');
+  e.frame(30000);for(let i=0;i<8;i++)await Promise.resolve();
+  const saved=JSON.parse(e.raw());
+  assert.equal(saved.unlocked,2);assert.equal(saved.materials.soulFragment,3);assert.equal(saved.missionRecords['1:collect'].attempts,1);
+  assert.equal(saved.records[1],undefined);assert.ok(e.get('result').innerHTML.includes('魂の欠片'));
+  assert.equal(a.actionNext('next'),undefined);await a.actionNext('retry');
+  assert.equal(a.snapshot().mission,'collect');assert.equal(a.snapshot().stage,1);assert.equal(a.snapshot().elapsed,0);
+});
+test('unknown v2 is protected and never falls back to v1',async()=>{
+  const raw='{"version":999,"money":400}';
+  const e=environment({seed:raw,legacy:freshSave(),reduced:true}),a=e.api;await a.enter();
+  assert.equal(a.snapshot().protectSave,true);assert.equal(e.raw(),raw);assert.equal(a.backupJSON(),raw);assert.equal(e.writes.length,0);
+});
+test('write failure leaves the legacy and current state untouched on replacement',async()=>{
+  const seed=freshSave();seed.money=812;const legacy={...seed,version:1};
+  const e=environment({legacy,reduced:true,writeFail:true}),a=e.api;await a.enter();
+  assert.equal(a.snapshot().saveOK,false);assert.equal(e.raw(),null);assert.equal(e.legacyRaw(),JSON.stringify(legacy));
+  const before=a.snapshot().state;assert.throws(()=>a.persistReplacement(freshSave()));
+  assert.equal(a.snapshot().state,before);assert.equal(e.legacyRaw(),JSON.stringify(legacy));
 });

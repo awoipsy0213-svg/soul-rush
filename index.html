@@ -108,6 +108,14 @@ html,body{height:100%;min-height:0;overflow:hidden;overscroll-behavior:none}body
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}}
 </style>
 <style>
+/* v0.4.0 world and mission cards */
+#worldMap,#missionChoices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}
+#worldMap button,#missionChoices button{text-align:left;min-height:50px;min-width:0;padding:8px 9px;white-space:normal}
+#worldMap button small,#missionChoices button small{display:block;margin-top:4px;font-size:10px;color:var(--muted);overflow-wrap:anywhere}
+#worldMap button.chosen,#missionChoices button.chosen{background:#285249;border-color:var(--accent)}
+#worldMap button:disabled,#missionChoices button:disabled{opacity:.55}
+#stagePreview .stage-highlight{flex-wrap:wrap}
+#stagePreview .stage-actions{flex-wrap:wrap}
 /* v0.3.1 scene transitions */
 #sceneTransition{position:fixed;inset:0;z-index:2147483646;background:#0d1119;opacity:0;pointer-events:auto;touch-action:none}
 #sceneTransition[hidden]{display:none!important}
@@ -134,7 +142,7 @@ html,body{height:100%;min-height:0;overflow:hidden;overscroll-behavior:none}body
     <button class="primary" id="enterBtn">冒険を始める</button>
     <p class="hint" id="titleHint">モンスターに魂を宿し、30秒の限界を超えろ。</p>
   </div>
-  <div class="version">VERSION 0.3.1 · OFFLINE SAVE</div>
+  <div class="version">VERSION 0.4.0 · OFFLINE SAVE</div>
 </section>
 <main id="game" class="shell app-shell" hidden data-scene="terminal">
   <header class="app-topbar">
@@ -161,7 +169,7 @@ html,body{height:100%;min-height:0;overflow:hidden;overscroll-behavior:none}body
   <section class="hero-monster" id="terminalMonster"></section>
   <section class="mission" id="terminalStage"></section>
   <div class="terminal-menu">
-    <button data-scene="stage"><span data-icon="stage"></span><b>ステージ</b><small>攻略・戦績</small></button>
+    <button data-scene="stage"><span data-icon="stage"></span><b>ワールド</b><small>地域・ミッション</small></button>
     <button data-scene="build"><span data-icon="build"></span><b>ビルド</b><small>魂の編成</small></button>
     <button data-scene="shop"><span data-icon="shop"></span><b>ショップ</b><small>召喚・強化</small></button>
     <button data-scene="codex"><span data-icon="codex"></span><b>図鑑</b><small>収集記録</small></button>
@@ -172,14 +180,20 @@ html,body{height:100%;min-height:0;overflow:hidden;overscroll-behavior:none}body
 
     <section id="stageScene" class="scene scene-scroll" hidden>
       <section class="app-card">
-        <div class="scene-head"><div><div class="eyebrow">STAGE SELECT</div><h2>ステージを選択</h2><p>出撃前に敵構成と報酬を確認します。</p></div></div>
-        <div id="stagePreview"></div>
+        <div class="sectionhead"><h2>ワールドマップ</h2><span class="tag">WORLD</span></div>
+        <div id="worldMap"></div>
       </section>
       <section class="app-card">
         <div class="sectionhead"><h2>ステージ一覧</h2><span id="mapRange" class="quiet"></span></div>
         <div class="command-row"><button id="mapPrev" class="ghost">前の領域</button><button id="mapNext" class="ghost">次の領域</button></div>
         <div class="stage-map" id="stageMap"></div>
-      </section><section class="app-card" id="terminalMilestone"></section><section class="app-card"><div class="sectionhead"><h2>最近の戦績</h2><span class="tag">直近10戦</span></div><div id="terminalHistory"></div></section>
+      </section>
+      <section class="app-card">
+        <div class="sectionhead"><h2>ミッション選択</h2><span class="tag">NORMAL</span></div>
+        <div id="missionChoices"></div>
+        <div id="stagePreview"></div>
+      </section>
+      <section class="app-card" id="terminalMilestone"></section><section class="app-card"><div class="sectionhead"><h2>メインの戦績</h2><span class="tag">直近10戦</span></div><div id="terminalHistory"></div></section>
     </section>
 
     <section id="battleScene" class="scene battle-scene" hidden>
@@ -216,7 +230,7 @@ html,body{height:100%;min-height:0;overflow:hidden;overscroll-behavior:none}body
     <section id="settingsScene" class="scene scene-scroll" hidden>
       <div class="settings-grid">
         <section class="app-card"><div class="sectionhead"><h2>データ管理</h2><span class="tag">SAVE</span></div><p id="saveStatus" class="quiet" style="margin-bottom:12px">端末に自動保存</p><div class="stack"><button class="ghost" id="exportBtn">バックアップ</button><button class="ghost" id="importBtn">復元</button><button class="ghost" id="resetBtn">セーブ初期化</button></div></section>
-        <section class="app-card"><div class="sectionhead"><h2>アプリ情報</h2><span class="tag">INFO</span></div><div class="info-list"><div><span>バージョン</span><b>0.3.1</b></div><div><span>保存形式</span><b>Offline / Local</b></div><div><span>現在の出撃</span><b id="settingsActiveMonster">モス</b></div><div><span>到達ステージ</span><b id="settingsStage">1</b></div></div><button class="ghost" id="titleBtn" style="width:100%;margin-top:12px">タイトルへ戻る</button></section>
+        <section class="app-card"><div class="sectionhead"><h2>アプリ情報</h2><span class="tag">INFO</span></div><div class="info-list"><div><span>バージョン</span><b>0.4.0</b></div><div><span>保存形式</span><b>Version 2 / Local</b></div><div><span>現在の出撃</span><b id="settingsActiveMonster">モス</b></div><div><span>到達ステージ</span><b id="settingsStage">1</b></div></div><button class="ghost" id="titleBtn" style="width:100%;margin-top:12px">タイトルへ戻る</button></section>
       </div>
     </section>
   </div>
@@ -228,7 +242,7 @@ html,body{height:100%;min-height:0;overflow:hidden;overscroll-behavior:none}body
 
 <script id="engine">
 /* SOUL RUSH prototype. Pure deterministic game rules; browser UI below. */
-const VERSION=1, LIMIT=30, MAX_STAGE=100, SAVE_KEY='soul_rush_prototype_v1';
+const VERSION=2, LIMIT=30, MAX_STAGE=100, SAVE_KEY='soul_rush_prototype_v2', LEGACY_SAVE_KEY='soul_rush_prototype_v1';
 const MONSTERS=[
 {id:'moss',name:'モス',role:'均衡型',atk:11,speed:1.35,slots:3,cost:0,trait:'安定した連続攻撃。月蝕以外の魂に適性',allowed:['might','haste','spark','burst','feast','pierce'],color:'#81c8a0'},
 {id:'fang',name:'ヴォルフ',role:'高速型',atk:8,speed:2.4,slots:3,cost:150,trait:'攻撃回数型の魂と好相性。時間型の魂は習得不可',allowed:['might','haste','spark','feast','pierce'],color:'#8fb9e6'},
@@ -245,11 +259,82 @@ const SOULS=[
 const DROPS=[{at:4,id:'haste'},{at:10,id:'spark'},{at:22,id:'burst'},{at:40,id:'feast'},{at:65,id:'pierce'},{at:95,id:'pulse'},{at:135,id:'might'},{at:180,id:'spark'},{at:240,id:'burst'}];
 const mdef=id=>MONSTERS.find(m=>m.id===id),sdef=id=>SOULS.find(s=>s.id===id),clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
 const num=n=>Math.max(0,Math.floor(n)).toLocaleString('ja-JP');
-function fresh(){return {version:VERSION,money:0,unlocked:1,selectedStage:1,active:'moss',totalKills:0,clears:0,monsters:{moss:{level:1,xp:0,equip:['might']}},souls:{might:1},best:{},records:{},history:[]}}
+function fresh(){return {version:VERSION,money:0,unlocked:1,selectedStage:1,active:'moss',totalKills:0,clears:0,monsters:{moss:{level:1,xp:0,equip:['might']}},souls:{might:1},best:{},records:{},history:[],selectedMission:'main',missionRecords:{},materials:{soulFragment:0}}}
 function xpNeed(level){return 6+Math.floor((level-1)*2.5)}
 function stageData(n){n=clamp(Math.floor(n),1,MAX_STAGE);const zone=Math.floor((n-1)/5)+1,pattern=[12,17,9,25,3],count=pattern[(n-1)%5]+Math.floor((n-1)/10)*2,scale=1.22**(n-1),base=Math.max(1,Math.round(38*scale)),boss=n%5===0,elite=n%5===3,swarm=n%5===4;let hp=Array.from({length:count},(_,i)=>Math.round(base*(boss?(i===count-1?5.5:2.3):elite?1.65:swarm?.65:1+(i%3)*.1)));return {n,zone,count,hp,boss,kind:boss?'守護者の門':elite?'重装の群れ':swarm?'大群の回廊':'魂喰らいの群れ',reward:Math.round(90*1.20**(n-1)),bonus:Math.round(55*1.23**(n-1))}}
+
+/* WORLD-001: stable stage IDs preserve the existing 100-stage campaign. */
+const REGIONS=Object.freeze([
+  {id:'forest',name:'始まりの森林',start:1,end:10,desc:'冒険の始まり'},
+  {id:'ruins',name:'忘却の遺跡',start:11,end:20,desc:'古代文明の痕跡'},
+  {id:'desert',name:'灼熱の砂漠',start:21,end:30,desc:'過酷な探索'},
+  {id:'frost',name:'凍結の大地',start:31,end:40,desc:'氷に閉ざされた領域'},
+  {id:'demon',name:'魔界',start:41,end:50,desc:'異形の気配'},
+  {id:'sky',name:'天空領域',start:51,end:60,desc:'空に浮かぶ遺構'},
+  {id:'abyss',name:'魂の深淵',start:61,end:80,desc:'魂の源へ'},
+  {id:'other',name:'異次元領域',start:81,end:100,desc:'未知の世界'}
+]);
+const MISSION_TYPES=Object.freeze([
+  {id:'main',name:'メイン'},{id:'hunt',name:'討伐'},
+  {id:'collect',name:'収集'},{id:'challenge',name:'チャレンジ'}
+]);
+const MISSION_RANKS=Object.freeze(['D','C','B','A','S']);
+function regionForStage(n){return REGIONS.find(r=>n>=r.start&&n<=r.end)||REGIONS[0]}
+function canMission(state,n,type){
+  return Number.isInteger(n)&&n>=1&&n<=MAX_STAGE&&n<=state.unlocked&&
+    MISSION_TYPES.some(m=>m.id===type)&&(type==='main'||state.unlocked>=2);
+}
+function missionKey(n,type){return n+':'+type}
+function missionPlan(stage,type='main'){
+  const name=MISSION_TYPES.find(m=>m.id===type)?.name||'メイン';
+  const bonus=Math.max(1,Math.floor(stage.reward*.2));
+  if(type==='hunt'){const target=Math.ceil(stage.count/2);return {type,name,target,goal:target+'体以上撃破',bonus}}
+  if(type==='collect'){const target=Math.ceil(stage.count/6);return {type,name,target,goal:'魂の欠片を'+target+'個集める（3体につき1個）',bonus}}
+  if(type==='challenge')return {type,name,target:stage.count,goal:'25秒以内に全敵撃破',bonus};
+  return {type:'main',name:'メイン',target:stage.count,goal:'30秒以内に全敵撃破',bonus:stage.bonus};
+}
+function missionOutcome(b){
+  const p=missionPlan(b.stage,b.mission||'main');
+  const fragments=p.type==='collect'?Math.floor(b.kills/3):0;
+  const progress=p.type==='collect'?fragments:b.kills;
+  let success=p.type==='main'?b.clear:progress>=p.target;
+  if(p.type==='challenge')success=b.clear&&b.elapsed<=25;
+  const special=success&&((p.type==='hunt'||p.type==='collect')?b.clear:b.clear&&b.elapsed<=20);
+  const ratio=progress/p.target;
+  const rank=special?'S':success?'A':ratio>=.75?'B':ratio>=.5?'C':'D';
+  return {...p,progress,success,rank,fragments};
+}
+function recordMission(state,b,reward,m){
+  const key=missionKey(b.stage.n,m.type),prev=state.missionRecords[key];
+  const rankIndex=MISSION_RANKS.indexOf(m.rank),oldRankIndex=MISSION_RANKS.indexOf(prev?.bestRank);
+  state.missionRecords[key]={
+    attempts:(prev?.attempts||0)+1,successes:(prev?.successes||0)+(m.success?1:0),
+    bestRank:MISSION_RANKS[Math.max(rankIndex,oldRankIndex)],
+    lastRank:m.rank,lastKills:b.kills,lastReward:reward.total,lastElapsed:Math.round(b.elapsed*100)/100
+  };
+}
+function validateMissionData(raw,clean,safe){
+  if(raw.version!==VERSION)return;
+  if(canMission(clean,clean.selectedStage,raw.selectedMission))clean.selectedMission=raw.selectedMission;
+  clean.materials.soulFragment=safe(raw.materials?.soulFragment);
+  for(let n=1;n<=clean.unlocked;n++)for(const type of ['hunt','collect','challenge']){
+    if(!canMission(clean,n,type))continue;
+    const key=missionKey(n,type),r=raw.missionRecords?.[key];
+    if(!r||typeof r!=='object'||!MISSION_RANKS.includes(r.bestRank)||!MISSION_RANKS.includes(r.lastRank))continue;
+    const attempts=safe(r.attempts);
+    if(!attempts)continue;
+    clean.missionRecords[key]={attempts,successes:safe(r.successes,0,attempts),
+      bestRank:MISSION_RANKS[Math.max(MISSION_RANKS.indexOf(r.bestRank),MISSION_RANKS.indexOf(r.lastRank))],
+      lastRank:r.lastRank,lastKills:safe(r.lastKills,0,stageData(n).count),
+      lastReward:safe(r.lastReward),lastElapsed:Number.isFinite(r.lastElapsed)?clamp(r.lastElapsed,0,LIMIT):0};
+  }
+}
+
 function getStats(state,id=state.active){const d=mdef(id),m=state.monsters[id];let atk=d.atk*(1+(m.level-1)*.12),speed=d.speed*(1+(m.level-1)*.025),levels={};for(const k of m.equip){if(state.souls[k])levels[k]=state.souls[k]}if(levels.might)atk*=1+(15+(levels.might-1)*8)/100;if(levels.haste)speed*=1+(18+(levels.haste-1)*7)/100;return {atk,speed,levels,slots:d.slots}}
-function createBattle(state,n=state.selectedStage){const stage=stageData(n),stats=getStats(state);return {stage,monster:state.active,stats,hp:stage.hp.slice(),elapsed:0,kills:0,hits:0,nextAttack:1/stats.speed,nextBurst:stats.levels.burst?5:Infinity,nextPulse:stats.levels.pulse?10:Infinity,done:false,clear:false,events:[],lastVisual:null}}
+function createBattle(state,n=state.selectedStage,mission='main'){
+  if(mission!=='main'&&!canMission(state,n,mission))throw Error('未解放のミッションです');
+  const stage=stageData(n),stats=getStats(state);return {stage,mission,monster:state.active,stats,hp:stage.hp.slice(),elapsed:0,kills:0,hits:0,nextAttack:1/stats.speed,nextBurst:stats.levels.burst?5:Infinity,nextPulse:stats.levels.pulse?10:Infinity,done:false,clear:false,events:[],lastVisual:null}
+}
 function logEvent(b,t,text,special=false,visual=null){b.events.push({t,text,special});if(b.events.length>12)b.events.shift();if(visual)b.lastVisual={...visual,t,special}}
 function front(b){return b.hp.findIndex(x=>x>0)}
 function currentAtk(b){const l=b.stats.levels.feast;return b.stats.atk*(1+(l?(5+(l-1)*2)/100*Math.min(20,b.kills):0))}
@@ -260,20 +345,42 @@ if(b.nextBurst<=t+1e-9){b.nextBurst+=5;if(b.kills<b.stage.count){const d=current
 if(b.nextPulse<=t+1e-9){b.nextPulse+=10;if(b.kills<b.stage.count){const d=currentAtk(b)*(300+(l.pulse-1)*90)/100;hitFront(b,d);logEvent(b,t,`月蝕の魂 発動 · ${Math.round(d)}`,true,{damage:Math.round(d)})}}
 if(b.kills>prev)logEvent(b,t,`${b.kills} / ${b.stage.count} 体撃破`);if(b.kills===b.stage.count){b.done=true;b.clear=true;return b}}
 b.elapsed=to;if(to>=LIMIT){b.done=true;b.clear=false}return b}
-function rewards(b){const partial=Math.floor(b.stage.reward*b.kills/b.stage.count),bonus=b.clear?b.stage.bonus:0;return {partial,bonus,total:partial+bonus}}
+function rewards(b){
+  const partial=Math.floor(b.stage.reward*b.kills/b.stage.count),m=missionOutcome(b);
+  const bonus=m.success?m.bonus:0;
+  return {partial,bonus,total:partial+bonus}
+}
 function recordBattle(state,b,reward){const n=b.stage.n,previous=state.records[n]||null;const entry={stage:n,kills:b.kills,count:b.stage.count,elapsed:Math.round(b.elapsed*100)/100,clear:b.clear,reward:reward.total,monster:b.monster};state.records[n]={attempts:(previous?.attempts||0)+1,last:entry,bestTime:b.clear?Math.min(previous?.bestTime??LIMIT,entry.elapsed):previous?.bestTime??null};state.history.unshift(entry);state.history=state.history.slice(0,10);return previous?.last||null}
-function applyResult(state,b){if(!b.done||b.claimed)return null;b.claimed=true;const reward=rewards(b),m=state.monsters[b.monster],before=m.level,oldKills=state.totalKills;state.money+=reward.total;state.totalKills+=b.kills;m.xp+=b.kills;while(m.xp>=xpNeed(m.level)){m.xp-=xpNeed(m.level);m.level++}const drops=[];for(const drop of DROPS){if(oldKills<drop.at&&state.totalKills>=drop.at){const old=state.souls[drop.id]||0;state.souls[drop.id]=old+1;drops.push({id:drop.id,level:old+1,new:old===0})}}state.best[b.stage.n]=Math.max(state.best[b.stage.n]||0,b.kills);if(b.clear){state.clears++;state.unlocked=Math.max(state.unlocked,Math.min(MAX_STAGE,b.stage.n+1))}const previous=recordBattle(state,b,reward);return {reward,previous,levelBefore:before,levelAfter:m.level,xp:b.kills,drops,clear:b.clear,kills:b.kills,count:b.stage.count,elapsed:b.elapsed,stage:b.stage.n}}
+function applyResult(state,b){
+  if(!b.done||b.claimed)return null;
+  b.claimed=true;
+  const mission=missionOutcome(b),reward=rewards(b),m=state.monsters[b.monster],before=m.level,oldKills=state.totalKills;
+  state.money+=reward.total;state.totalKills+=b.kills;m.xp+=b.kills;
+  while(m.xp>=xpNeed(m.level)){m.xp-=xpNeed(m.level);m.level++}
+  const drops=[];
+  for(const drop of DROPS){if(oldKills<drop.at&&state.totalKills>=drop.at){const old=state.souls[drop.id]||0;state.souls[drop.id]=old+1;drops.push({id:drop.id,level:old+1,new:old===0})}}
+  let previous=null;
+  if(mission.type==='main'){
+    state.best[b.stage.n]=Math.max(state.best[b.stage.n]||0,b.kills);
+    if(b.clear){state.clears++;state.unlocked=Math.max(state.unlocked,Math.min(MAX_STAGE,b.stage.n+1))}
+    previous=recordBattle(state,b,reward);
+  }else{
+    state.materials.soulFragment=Math.min(Number.MAX_SAFE_INTEGER,state.materials.soulFragment+mission.fragments);
+    recordMission(state,b,reward,mission);
+  }
+  return {reward,previous,levelBefore:before,levelAfter:m.level,xp:b.kills,drops,clear:b.clear,kills:b.kills,count:b.stage.count,elapsed:b.elapsed,stage:b.stage.n,mission}
+}
 function soulCost(id,level){return Math.round(sdef(id).base*1.72**level)}
 function purchaseMonster(state,id){const d=mdef(id);if(!d||state.monsters[id]||state.money<d.cost)return false;state.money-=d.cost;state.monsters[id]={level:1,xp:0,equip:[]};return true}
 function purchaseSoul(state,id){const d=sdef(id);if(!d)return false;const level=state.souls[id]||0,cost=soulCost(id,level);if(!Number.isFinite(cost)||state.money<cost)return false;state.money-=cost;state.souls[id]=level+1;return true}
 function toggleSoul(state,id){const m=state.monsters[state.active],i=m.equip.indexOf(id);if(i>=0){m.equip.splice(i,1);return true}if(!state.souls[id]||!mdef(state.active).allowed.includes(id)||m.equip.length>=mdef(state.active).slots)return false;m.equip.push(id);return true}
-function validate(raw){if(!raw||raw.version!==VERSION||!raw.monsters||!raw.monsters.moss||!raw.souls)return fresh();const clean=fresh(),safe=(x,fallback=0,max=Number.MAX_SAFE_INTEGER)=>Number.isFinite(x)?clamp(Math.floor(x),0,max):fallback;clean.money=safe(raw.money);clean.unlocked=Math.max(1,safe(raw.unlocked,1,MAX_STAGE));clean.selectedStage=clamp(safe(raw.selectedStage,1),1,clean.unlocked);clean.totalKills=safe(raw.totalKills);clean.clears=safe(raw.clears);clean.souls={};for(const s of SOULS){const lv=safe(raw.souls[s.id],0,1000);if(lv)clean.souls[s.id]=lv}if(!clean.souls.might)clean.souls.might=1;clean.monsters={};for(const d of MONSTERS){const m=raw.monsters[d.id];if(!m)continue;const level=Math.max(1,safe(m.level,1,100000));clean.monsters[d.id]={level,xp:safe(m.xp,0,xpNeed(level)-1),equip:[...new Set(Array.isArray(m.equip)?m.equip.filter(id=>clean.souls[id]&&d.allowed.includes(id)):[])].slice(0,d.slots)}}clean.active=clean.monsters[raw.active]?raw.active:'moss';for(let n=1;n<=clean.unlocked;n++){if(raw.best&&raw.best[n]!==undefined)clean.best[n]=safe(raw.best[n],0,stageData(n).count)}const validEntry=(e,n)=>{if(!e||typeof e!=='object'||!Number.isInteger(e.stage)||e.stage!==n||n<1||n>clean.unlocked||!mdef(e.monster)||!Number.isFinite(e.elapsed))return null;const count=stageData(n).count,kills=safe(e.kills,0,count);return {stage:n,kills,count,elapsed:clamp(e.elapsed,0,LIMIT),clear:kills===count,reward:safe(e.reward),monster:e.monster}};for(let n=1;n<=clean.unlocked;n++){const r=raw.records?.[n],last=validEntry(r?.last,n);if(last)clean.records[n]={attempts:Math.max(1,safe(r.attempts,1)),last,bestTime:Number.isFinite(r.bestTime)?clamp(r.bestTime,0,LIMIT):null}}clean.history=(Array.isArray(raw.history)?raw.history:[]).slice(0,10).map(e=>validEntry(e,e?.stage)).filter(Boolean);return clean}
-function parseBackup(text){const raw=JSON.parse(text);if(!raw||raw.version!==VERSION||typeof raw.monsters!=='object'||!raw.monsters?.moss||typeof raw.souls!=='object'||!raw.souls||!Number.isFinite(raw.money)||!Number.isFinite(raw.unlocked)||!Number.isFinite(raw.totalKills))throw Error('SOUL RUSHの有効なセーブデータではありません。');return validate(raw)}
+function validate(raw){if(!raw||![1,VERSION].includes(raw.version)||!raw.monsters||!raw.monsters.moss||!raw.souls)return fresh();const clean=fresh(),safe=(x,fallback=0,max=Number.MAX_SAFE_INTEGER)=>Number.isFinite(x)?clamp(Math.floor(x),0,max):fallback;clean.money=safe(raw.money);clean.unlocked=Math.max(1,safe(raw.unlocked,1,MAX_STAGE));clean.selectedStage=clamp(safe(raw.selectedStage,1),1,clean.unlocked);clean.totalKills=safe(raw.totalKills);clean.clears=safe(raw.clears);clean.souls={};for(const s of SOULS){const lv=safe(raw.souls[s.id],0,1000);if(lv)clean.souls[s.id]=lv}if(!clean.souls.might)clean.souls.might=1;clean.monsters={};for(const d of MONSTERS){const m=raw.monsters[d.id];if(!m)continue;const level=Math.max(1,safe(m.level,1,100000));clean.monsters[d.id]={level,xp:safe(m.xp,0,xpNeed(level)-1),equip:[...new Set(Array.isArray(m.equip)?m.equip.filter(id=>clean.souls[id]&&d.allowed.includes(id)):[])].slice(0,d.slots)}}clean.active=clean.monsters[raw.active]?raw.active:'moss';for(let n=1;n<=clean.unlocked;n++){if(raw.best&&raw.best[n]!==undefined)clean.best[n]=safe(raw.best[n],0,stageData(n).count)}const validEntry=(e,n)=>{if(!e||typeof e!=='object'||!Number.isInteger(e.stage)||e.stage!==n||n<1||n>clean.unlocked||!mdef(e.monster)||!Number.isFinite(e.elapsed))return null;const count=stageData(n).count,kills=safe(e.kills,0,count);return {stage:n,kills,count,elapsed:clamp(e.elapsed,0,LIMIT),clear:kills===count,reward:safe(e.reward),monster:e.monster}};for(let n=1;n<=clean.unlocked;n++){const r=raw.records?.[n],last=validEntry(r?.last,n);if(last)clean.records[n]={attempts:Math.max(1,safe(r.attempts,1)),last,bestTime:Number.isFinite(r.bestTime)?clamp(r.bestTime,0,LIMIT):null}}clean.history=(Array.isArray(raw.history)?raw.history:[]).slice(0,10).map(e=>validEntry(e,e?.stage)).filter(Boolean);validateMissionData(raw,clean,safe);return clean}
+function parseBackup(text){const raw=JSON.parse(text);if(!raw||![1,VERSION].includes(raw.version)||typeof raw.monsters!=='object'||!raw.monsters?.moss||typeof raw.souls!=='object'||!raw.souls||!Number.isFinite(raw.money)||!Number.isFinite(raw.unlocked)||!Number.isFinite(raw.totalKills))throw Error('SOUL RUSHの有効なセーブデータではありません。');return validate(raw)}
 </script>
 <script id="ui">
 
 const $=id=>document.getElementById(id);
-let mapPage=0,protectSave=false,saveOK=true,hadSave=false,state=fresh(),battle=null,running=false,raf=0,startedAt=0,lastVisualTime=-1,lastLogKey='',lastEnemyKey='',resultData=null,scene='terminal',toastTimeout=0,loadingBattle=false;
+let mapPage=0,protectSave=false,protectedRaw=null,saveOK=true,hadSave=false,state=fresh(),battle=null,running=false,raf=0,startedAt=0,lastVisualTime=-1,lastLogKey='',lastEnemyKey='',resultData=null,scene='terminal',toastTimeout=0,loadingBattle=false;
 // Timings in milliseconds; swap only when fully covered.
 const TRANSITIONS=Object.freeze({
   white:{color:'#effff9',in:400,hold:100,out:500},
@@ -338,17 +445,32 @@ function navigateScene(next){
 }
 const SCENE_META={
   terminal:{kicker:'MAIN TERMINAL',title:'メインターミナル',sub:()=>`到達ステージ ${state.unlocked} · 累計撃破 ${num(state.totalKills)} 体`,back:''},
-  stage:{kicker:'STAGE SELECT',title:'ステージ',sub:()=>`出撃先を選択 · 現在 STAGE ${String(state.selectedStage).padStart(3,'0')}`,back:'terminal'},
+  stage:{kicker:'WORLD MAP',title:'ワールド',sub:()=>regionForStage(state.selectedStage).name,back:'terminal'},
   build:{kicker:'BUILD',title:'ビルド',sub:()=>`${mdef(state.active).name} の魂構成を調整`,back:'terminal'},
   shop:{kicker:'SHOP',title:'ショップ',sub:()=>`所持エーテル ${num(state.money)}`,back:'terminal'},
   codex:{kicker:'CODEX',title:'図鑑',sub:()=>`モンスター ${Object.keys(state.monsters).length}/${MONSTERS.length} · 魂 ${Object.keys(state.souls).length}/${SOULS.length}`,back:'terminal'},
   settings:{kicker:'SETTINGS',title:'設定',sub:()=>`保存状態とバックアップ管理`,back:'terminal'},
   battle:{kicker:'AUTO BATTLE',title:()=>`STAGE ${String(state.selectedStage).padStart(3,'0')}`,sub:()=>`30秒の自動戦闘`,back:''},
-  result:{kicker:'RESULT',title:'リザルト',sub:()=>resultData?`${resultData.clear?'CLEAR':'TIME UP'} · ${resultData.kills}/${resultData.count} 体撃破`:'戦闘結果',back:''}
+  result:{kicker:'RESULT',title:'リザルト',sub:()=>resultData?`${resultData.mission.success?'CLEAR':'TIME UP'} · ${resultData.kills}/${resultData.count} 体撃破`:'戦闘結果',back:''}
 };
-try{const stored=localStorage.getItem(SAVE_KEY);if(stored){state=parseBackup(stored);hadSave=true}}catch(e){saveOK=false;protectSave=true}
+try{
+  const current=localStorage.getItem(SAVE_KEY);
+  const stored=current===null?localStorage.getItem(LEGACY_SAVE_KEY):current;
+  if(stored!==null){protectedRaw=stored;state=parseBackup(stored);hadSave=true;protectedRaw=null}
+}catch(e){saveOK=false;protectSave=true}
 function updateSaveStatus(){if($('saveStatus')){$('saveStatus').textContent=saveOK?'端末に自動保存済み':(protectSave?'既存セーブ読込不可：復元または初期化を選択':'保存不可：ブラウザの保存設定を確認');$('saveStatus').classList.toggle('save-error',!saveOK)}}
-function save(){try{if(protectSave)throw Error('protected save');localStorage.setItem(SAVE_KEY,JSON.stringify(state));saveOK=true;hadSave=true}catch(e){saveOK=false}if($('saveStatus')){$('saveStatus').textContent=saveOK?'端末に自動保存済み':(protectSave?'既存セーブ読込不可：復元または初期化を選択':'保存不可：ブラウザの保存設定を確認');$('saveStatus').classList.toggle('save-error',!saveOK)}}
+function save(){
+  try{if(protectSave)throw Error('protected save');localStorage.setItem(SAVE_KEY,JSON.stringify(state));saveOK=true;hadSave=true}catch(e){saveOK=false}
+  updateSaveStatus();return saveOK
+}
+function backupJSON(){
+  if(protectSave){if(typeof protectedRaw!=='string')throw Error('保存領域を読み取れません。元データは変更していません。');return protectedRaw}
+  return JSON.stringify(state,null,2)
+}
+function persistReplacement(next){
+  localStorage.setItem(SAVE_KEY,JSON.stringify(next));
+  state=next;protectSave=false;protectedRaw=null;saveOK=true;hadSave=true;clearBattle();updateSaveStatus()
+}
 function showToast(text){$('toast').textContent=text;$('toast').hidden=false;clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>$('toast').hidden=true,2200)}
 function svg(body,view='0 0 100 100',attrs=''){return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${view}" ${attrs} aria-hidden="true">${body}</svg>`}
 function soulIcon(id){const s=sdef(id)||{color:'#a5f0cc',icon:'star'},c=s.color;const icons={fist:'<path d="M36 57V39q0-7 6-7t6 7v-6q0-7 6-7t6 7v6q0-5 5-5t5 6v16q0 13-15 19H43L31 60q-4-6 1-9 5-2 8 5Z"/>',wind:'<path d="M24 41h35q13 0 13-10 0-9-11-9M20 52h54q11 0 11 9t-10 9M29 64h24q9 0 9 9" fill="none" stroke-width="6" stroke-linecap="round"/>',bolt:'<path d="M57 17 29 55h21l-7 29 33-45H55z"/>',flame:'<path d="M52 18q4 19-13 30-1-10-10-12 5 13-1 23-6 21 17 28 27 6 35-17 6-17-9-31 1 20-10 18 7-21-9-39Z"/><path d="M51 58q-12 12-4 22 13 4 15-7 0-7-11-15Z" fill="#fff4d2" stroke="none"/>',fang:'<path d="M28 28 43 36 50 25 57 36 72 28 78 55 68 78 55 59 50 76 45 59 32 78 22 55Z"/><path d="M35 45 45 50 M65 45 55 50" stroke="#202233" stroke-width="4"/>',arrow:'<path d="M22 68 63 27l-2 17 17-2-41 41-8-8-12 5 5-12Z"/><path d="m42 30 13-13M65 80l13-13" fill="none" stroke-width="5" stroke-linecap="round"/>',moon:'<path d="M64 23a29 29 0 1 0 14 43A25 25 0 0 1 64 23Z"/><path d="m70 21 3 9 9 3-9 3-3 9-3-9-9-3 9-3Z"/>',star:'<path d="m50 20 8 20 22 10-22 9-8 22-9-22-22-9 22-10Z"/>'};return svg(`<circle cx="50" cy="50" r="42" fill="${c}" opacity=".06"/><circle cx="50" cy="50" r="35" fill="${c}" opacity=".13"/><path d="M17 67Q7 46 24 29q-1 12 7 16M72 24q22 13 14 33l-5-9M26 73q13 17 33 11" fill="none" stroke="${c}" stroke-width="6" opacity=".4" stroke-linecap="round"/><path d="M50 11q24 0 33 26T68 80q-13 13-30 6-31-9-30-35 2-25 24-34" fill="none" stroke="${c}" stroke-width="1" opacity=".65" stroke-dasharray="7 5"/><g fill="${c}" stroke="${c}" stroke-width="1.6" stroke-linejoin="round">${icons[s.icon]||icons.star}</g><circle cx="18" cy="31" r="2.5" fill="${c}"/><circle cx="84" cy="76" r="2" fill="${c}"/><circle cx="67" cy="13" r="2" fill="${c}"/>`) }
@@ -381,30 +503,69 @@ function renderCodex(){ $('codexMonsterList').innerHTML=MONSTERS.map(d=>{const o
 function renderEnemies(stage,hp){const alive=hp.map((h,i)=>h>0?i:-1).filter(i=>i>=0),visible=alive.slice(0,5);const key=stage.n+':'+visible.join(',');if(key!==lastEnemyKey){$('enemyline').innerHTML=visible.map((i,j)=>`<div class="enemy ${j===0?'first':''}" data-enemy="${i}"><div class="meter redmeter"><i style="width:100%"></i></div>${enemyIcon(i,stage)}</div>`).join('');lastEnemyKey=key}visible.forEach(i=>{const e=$('enemyline').querySelector(`[data-enemy="${i}"] .meter i`);if(e)e.style.width=(100*hp[i]/stage.hp[i])+'%'});$('enemycount').textContent=alive.length?`残り ${alive.length} 体`:'全敵撃破'}
 function renderStageHistory(target, n){const r=state.records[n];$(target).innerHTML=`<div><small>挑戦回数</small><b>${r?.attempts||0}</b></div><div><small>前回の撃破</small><b>${r?`${r.last.kills}/${r.last.count}`:'—'}</b></div><div><small>最速クリア</small><b>${r?.bestTime!=null?r.bestTime.toFixed(2)+'s':'—'}</b></div>`}
 
-function renderMap(){const maxPage=Math.ceil(MAX_STAGE/10)-1;mapPage=clamp(mapPage,0,maxPage);const start=mapPage*10+1,end=Math.min(MAX_STAGE,start+9);$('mapRange').textContent=`STAGE ${start} – ${end} / 到達 ${state.unlocked}`;$('stageMap').innerHTML=Array.from({length:end-start+1},(_,i)=>{const n=start+i,st=stageData(n),done=(state.best[n]||0)>=st.count;return `<button data-stage="${n}" class="${done?'done ':''}${n===state.selectedStage?'chosen':''}" ${n>state.unlocked?'disabled':''}>${String(n).padStart(2,'0')}<small>${n>state.unlocked?'未解放':done?'CLEAR':`${st.count}体`}</small></button>`}).join('');$('mapPrev').disabled=mapPage===0;$('mapNext').disabled=mapPage===maxPage}
-function renderStageScene(){const st=stageData(state.selectedStage), rec=state.records[state.selectedStage];renderMap();$('terminalMilestone').innerHTML=milestoneHTML();$('terminalHistory').innerHTML=historyHTML();$('stagePreview').innerHTML=`<div class="stage-highlight"><div><div class="eyebrow">ZONE ${String(st.zone).padStart(2,'0')}</div><h2 style="font-family:Georgia,serif;font-size:28px;letter-spacing:.08em">STAGE ${String(st.n).padStart(3,'0')}</h2><p class="quiet" style="margin-top:4px">${st.kind}</p></div><div class="stage-actions"><button class="ghost" data-stage-jump="-1" ${st.n<=1?'disabled':''}>‹ 前</button><button class="ghost" data-stage-jump="1" ${st.n>=state.unlocked?'disabled':''}>次 ›</button><button class="primary" data-launch-battle="1">出撃する</button></div></div><div class="metrics-grid" style="margin-top:14px"><div class="metric-box"><small>敵の数</small><strong>${st.count} 体</strong></div><div class="metric-box"><small>基準報酬</small><strong>${num(st.reward)}</strong></div><div class="metric-box"><small>クリア報酬</small><strong>${num(st.bonus)}</strong></div><div class="metric-box"><small>最高撃破</small><strong>${state.best[st.n]||0} / ${st.count}</strong></div></div><div class="record" style="margin-top:14px"><div><small>挑戦回数</small><b>${rec?.attempts||0}</b></div><div><small>前回の撃破</small><b>${rec?`${rec.last.kills}/${rec.last.count}`:'—'}</b></div><div><small>最速クリア</small><b>${rec?.bestTime!=null?rec.bestTime.toFixed(2)+'s':'—'}</b></div></div>`}
-function renderBattle(){const b=battle;if(!b)return;const st=b.stage,k=b.kills,time=Math.max(0,LIMIT-b.elapsed);$('stageZone').textContent=`領域 ${String(st.zone).padStart(2,'0')} · AUTO`;$('stageName').textContent=`STAGE ${String(st.n).padStart(3,'0')}`;$('stageDesc').textContent=st.kind;$('timer').textContent=time.toFixed(2);$('timer').classList.toggle('danger',time<=5);$('timebar').style.width=(100*time/LIMIT)+'%';$('kills').textContent=`${k} / ${st.count}`;$('killpct').textContent=`${Math.floor(k/st.count*100)}%`;$('killbar').style.width=(100*k/st.count)+'%';$('totalReward').textContent=num(rewards(b).total);$('arenaLabel').textContent='AUTO BATTLE';if($('fighter').dataset.monster!==b.monster){$('fighter').innerHTML=monsterIcon(b.monster);$('fighter').dataset.monster=b.monster}renderEnemies(st,b.hp);const key=b.events.map(e=>e.t+e.text).join('|');if(key!==lastLogKey||!$('combatLog').textContent){$('combatLog').innerHTML=b.events.length?b.events.slice().reverse().slice(0,2).map(e=>`<div class="${e.special?'soul-log':''}"><time>${e.t.toFixed(1)}s</time><span>${e.text}</span></div>`).join(''):'<div>自動戦闘開始</div>';lastLogKey=key}}
+function renderMap(){
+  const region=regionForStage(state.selectedStage);
+  mapPage=REGIONS.indexOf(region);
+  $('worldMap').innerHTML=REGIONS.map((r,i)=>{
+    const locked=state.unlocked<r.start;
+    return `<button data-region="${i}" class="${r===region?'chosen':''}" ${locked?'disabled':''}><b>${r.name}</b><small>${locked?'STAGE '+String(r.start).padStart(3,'0')+' 解放が必要':r.desc+' · '+r.start+'–'+r.end}</small></button>`
+  }).join('');
+  $('mapRange').textContent=`${region.name} · ${region.start}–${region.end}`;
+  $('stageMap').innerHTML=Array.from({length:region.end-region.start+1},(_,i)=>{
+    const n=region.start+i,st=stageData(n),done=(state.best[n]||0)>=st.count;
+    return `<button data-stage="${n}" class="${done?'done ':''}${n===state.selectedStage?'chosen':''}" ${n>state.unlocked?'disabled':''}>${String(n).padStart(2,'0')}<small>${n>state.unlocked?'未解放':done?'CLEAR':st.count+'体'}</small></button>`
+  }).join('');
+  $('mapPrev').disabled=mapPage===0;
+  $('mapNext').disabled=mapPage===REGIONS.length-1||state.unlocked<REGIONS[mapPage+1].start;
+}
+function renderStageScene(){
+  const st=stageData(state.selectedStage),type=state.selectedMission,p=missionPlan(st,type),rec=state.records[st.n],side=state.missionRecords[missionKey(st.n,type)];
+  renderMap();
+  $('missionChoices').innerHTML=MISSION_TYPES.map(m=>{
+    const allowed=canMission(state,st.n,m.id);
+    return `<button data-mission="${m.id}" class="${type===m.id?'chosen':''}" ${allowed?'':'disabled'}><b>${m.name}</b><small>${allowed?missionPlan(st,m.id).goal:'最初のメインクリアで解放'}</small></button>`
+  }).join('');
+  $('terminalMilestone').innerHTML=milestoneHTML()+`<p class="quiet" style="margin-top:10px">所持素材：魂の欠片 ${num(state.materials.soulFragment)}個</p>`;
+  $('terminalHistory').innerHTML=historyHTML();
+  $('stagePreview').innerHTML=`<div class="stage-highlight"><div><div class="eyebrow">${regionForStage(st.n).name} · ${p.name}</div><h2 style="font-family:Georgia,serif;font-size:26px;letter-spacing:.06em">STAGE ${String(st.n).padStart(3,'0')}</h2><p class="quiet" style="margin-top:4px">${p.goal}</p></div><div class="stage-actions"><button class="ghost" data-stage-jump="-1" ${st.n<=1?'disabled':''}>‹ 前</button><button class="ghost" data-stage-jump="1" ${st.n>=state.unlocked?'disabled':''}>次 ›</button><button class="primary" data-launch-battle="1">出撃する</button></div></div><div class="metrics-grid" style="margin-top:14px"><div class="metric-box"><small>敵の数</small><strong>${st.count} 体</strong></div><div class="metric-box"><small>基準報酬</small><strong>${num(st.reward)}</strong></div><div class="metric-box"><small>達成報酬</small><strong>${num(p.bonus)}</strong></div><div class="metric-box"><small>${type==='main'?'最高撃破':'最高評価'}</small><strong>${type==='main'?(state.best[st.n]||0)+' / '+st.count:side?.bestRank||'—'}</strong></div></div><div class="record" style="margin-top:14px"><div><small>挑戦回数</small><b>${type==='main'?rec?.attempts||0:side?.attempts||0}</b></div><div><small>前回の撃破</small><b>${type==='main'?(rec?rec.last.kills+'/'+rec.last.count:'—'):(side?side.lastKills+'/'+st.count:'—')}</b></div><div><small>${type==='main'?'最速クリア':'前回評価'}</small><b>${type==='main'?(rec?.bestTime!=null?rec.bestTime.toFixed(2)+'s':'—'):side?.lastRank||'—'}</b></div></div>`;
+}
+function renderBattle(){const b=battle;if(!b)return;const st=b.stage,k=b.kills,time=Math.max(0,LIMIT-b.elapsed);$('stageZone').textContent=`${regionForStage(st.n).name} · ${missionPlan(st,b.mission).name}`;$('stageName').textContent=`STAGE ${String(st.n).padStart(3,'0')}`;$('stageDesc').textContent=missionPlan(st,b.mission).goal;$('timer').textContent=time.toFixed(2);$('timer').classList.toggle('danger',time<=5);$('timebar').style.width=(100*time/LIMIT)+'%';$('kills').textContent=`${k} / ${st.count}`;$('killpct').textContent=`${Math.floor(k/st.count*100)}%`;$('killbar').style.width=(100*k/st.count)+'%';$('totalReward').textContent=num(rewards(b).total);$('arenaLabel').textContent='AUTO BATTLE';if($('fighter').dataset.monster!==b.monster){$('fighter').innerHTML=monsterIcon(b.monster);$('fighter').dataset.monster=b.monster}renderEnemies(st,b.hp);const key=b.events.map(e=>e.t+e.text).join('|');if(key!==lastLogKey||!$('combatLog').textContent){$('combatLog').innerHTML=b.events.length?b.events.slice().reverse().slice(0,2).map(e=>`<div class="${e.special?'soul-log':''}"><time>${e.t.toFixed(1)}s</time><span>${e.text}</span></div>`).join(''):'<div>自動戦闘開始</div>';lastLogKey=key}}
 function renderBattleBuild(){const b=battle,d=mdef(b.monster);$('battleMonster').innerHTML=`<div class="row"><div class="avatar">${monsterIcon(d.id)}</div><div class="grow"><b>${d.name} Lv.${state.monsters[d.id].level}</b><p class="quiet">ATK ${b.stats.atk.toFixed(1)}　SPD ${b.stats.speed.toFixed(2)}/s</p></div><span class="tag">AUTO</span></div><div class="slots">${Object.keys(b.stats.levels).map(id=>`<div class="slot filled" title="${sdef(id).name}">${soulIcon(id)}</div>`).join('')}</div>`}
 
 function animateVisual(b){const v=b.lastVisual;if(!v||v.t===lastVisualTime)return;lastVisualTime=v.t;if(document.hidden)return;const a=$('arena'),f=$('fighter');f.classList.remove('attacking');void f.offsetWidth;f.classList.add('attacking');const e=$('enemyline').querySelector('.first');if(e){e.classList.remove('hit');void e.offsetWidth;e.classList.add('hit')}const damage=document.createElement('div');damage.className='damage'+(v.special?' special':'');damage.textContent=num(v.damage);a.appendChild(damage);setTimeout(()=>damage.remove(),580);if(v.special){const fx=document.createElement('div');fx.className='skill-effect';a.appendChild(fx);setTimeout(()=>fx.remove(),350)}}
 function numSigned(n){return Math.trunc(n).toLocaleString('ja-JP')}
-function renderResult(r){$('result').className='app-card result '+(r.clear?'clear':'fail');$('result').innerHTML=`<div class="sectionhead"><div><div class="eyebrow">STAGE ${String(r.stage).padStart(3,'0')} RESULT</div><div class="result-title">${r.clear?'CLEAR':'TIME UP'}</div><p class="quiet">${r.kills} / ${r.count} 体撃破 · ${r.elapsed.toFixed(2)} 秒</p></div><div class="right"><span class="quiet">エーテル</span><div class="gold" style="font-weight:800;font-size:26px">+${num(r.reward.total)}</div></div></div><div class="rewardgrid"><div><small>割合報酬</small><b>+${num(r.reward.partial)}</b></div><div><small>クリア報酬</small><b>+${num(r.reward.bonus)}</b></div><div><small>経験値</small><b class="green">+${r.xp}</b></div></div>${r.previous?`<div class="record"><div><small>前回撃破</small><b>${r.previous.kills}/${r.count}</b></div><div><small>撃破数の変化</small><b class="${r.kills>r.previous.kills?'green':'muted'}">${r.kills-r.previous.kills>0?'+':''}${r.kills-r.previous.kills}体</b></div><div><small>報酬の変化</small><b>${r.reward.total-r.previous.reward>0?'+':''}${numSigned(r.reward.total-r.previous.reward)}</b></div></div>`:''}${r.levelAfter>r.levelBefore?`<div class="level-up">LEVEL UP · Lv.${r.levelBefore} → Lv.${r.levelAfter}</div>`:''}${r.drops.map(d=>`<div class="soul-drop">${soulIcon(d.id)}<span>${d.new?'新しい魂を獲得！':'魂のレベルアップ！'} ${sdef(d.id).name} Lv.${d.level}</span></div>`).join('')}<div class="row wrap" style="margin-top:12px"><button data-scene="build" class="ghost grow">魂を編成</button><button data-scene="shop" class="ghost grow">購入・強化</button><button data-scene="terminal" class="ghost grow">ターミナル</button><button data-result="retry" class="${r.clear&&r.stage<MAX_STAGE?'ghost':'primary'} grow">再挑戦</button>${r.clear&&r.stage<MAX_STAGE?'<button data-result="next" class="primary grow">次のステージへ</button>':''}</div>`}
+function renderResult(r){$('result').className='app-card result '+(r.mission.success?'clear':'fail');$('result').innerHTML=`<div class="sectionhead"><div><div class="eyebrow">STAGE ${String(r.stage).padStart(3,'0')} RESULT</div><div class="result-title">${r.mission.success?'CLEAR':'TIME UP'}</div><p class="quiet">${r.kills} / ${r.count} 体撃破 · ${r.elapsed.toFixed(2)} 秒</p></div><div class="right"><span class="quiet">エーテル</span><div class="gold" style="font-weight:800;font-size:26px">+${num(r.reward.total)}</div></div></div><p class="quiet" style="margin:8px 0">${r.mission.name} · 評価 ${r.mission.rank} · ${r.mission.goal}</p>${r.mission.fragments?'<div class="soul-drop">素材獲得：魂の欠片 +'+num(r.mission.fragments)+'</div>':''}<div class="rewardgrid"><div><small>割合報酬</small><b>+${num(r.reward.partial)}</b></div><div><small>達成報酬</small><b>+${num(r.reward.bonus)}</b></div><div><small>経験値</small><b class="green">+${r.xp}</b></div></div>${r.previous?`<div class="record"><div><small>前回撃破</small><b>${r.previous.kills}/${r.count}</b></div><div><small>撃破数の変化</small><b class="${r.kills>r.previous.kills?'green':'muted'}">${r.kills-r.previous.kills>0?'+':''}${r.kills-r.previous.kills}体</b></div><div><small>報酬の変化</small><b>${r.reward.total-r.previous.reward>0?'+':''}${numSigned(r.reward.total-r.previous.reward)}</b></div></div>`:''}${r.levelAfter>r.levelBefore?`<div class="level-up">LEVEL UP · Lv.${r.levelBefore} → Lv.${r.levelAfter}</div>`:''}${r.drops.map(d=>`<div class="soul-drop">${soulIcon(d.id)}<span>${d.new?'新しい魂を獲得！':'魂のレベルアップ！'} ${sdef(d.id).name} Lv.${d.level}</span></div>`).join('')}<div class="row wrap" style="margin-top:12px"><button data-scene="build" class="ghost grow">魂を編成</button><button data-scene="shop" class="ghost grow">購入・強化</button><button data-scene="terminal" class="ghost grow">ターミナル</button><button data-result="retry" class="${r.mission.type==='main'&&r.clear&&r.stage<MAX_STAGE?'ghost':'primary'} grow">再挑戦</button>${r.mission.type==='main'&&r.clear&&r.stage<MAX_STAGE?'<button data-result="next" class="primary grow">次のステージへ</button>':''}</div>`}
 function clearBattle(){battle=null;resultData=null;lastVisualTime=-1;lastEnemyKey='';lastLogKey=''}
-function selectStage(n){if(running||loadingBattle||scene!=='stage')return;state.selectedStage=clamp(n,1,state.unlocked);mapPage=Math.floor((state.selectedStage-1)/10);clearBattle();save();renderStageScene();if(scene==='battle')renderBattle();updateHeader()}
-function refreshTerminal(){const d=mdef(state.active),m=state.monsters[d.id],v=getStats(state),st=stageData(state.selectedStage);$('terminalMonster').innerHTML=`<div class="hero-info"><span class="eyebrow">ACTIVE MONSTER</span><h2>${d.name}</h2><span class="tag">Lv.${m.level} · ${d.role}</span><div class="hero-statline"><div><span>ATK</span><b>${v.atk.toFixed(1)}</b></div><div><span>SPD / 秒</span><b>${v.speed.toFixed(2)}</b></div></div><small class="quiet">EXP ${m.xp} / ${xpNeed(m.level)}</small><div class="meter"><i style="width:${100*m.xp/xpNeed(m.level)}%"></i></div></div><div class="hero-portrait">${monsterIcon(d.id)}</div><div class="hero-souls">${Array.from({length:d.slots},(_,i)=>`<div class="slot ${m.equip[i]?'filled':''}" title="${m.equip[i]?sdef(m.equip[i]).name:'空き枠'}">${m.equip[i]?soulIcon(m.equip[i]):'+'}</div>`).join('')}<span class="quiet">${m.equip.length}/${d.slots} SOULS</span></div>`;$('terminalStage').innerHTML=`<div class="grow"><span class="eyebrow">NEXT OPERATION</span><h2>STAGE ${String(st.n).padStart(3,'0')}</h2><p class="quiet">${st.kind} · ${st.count}体</p></div><button class="primary" data-launch-battle="1">出撃する　›</button>`;$('terminalProgress').textContent=`到達 ${state.unlocked}　撃破 ${num(state.totalKills)}体　クリア ${num(state.clears)}回`}
-function setScene(next){if(!SCENE_META[next]||((running||loadingBattle)&&next!=='battle'))return;if(next==='result'&&!resultData)return;scene=next;for(const sec of document.querySelectorAll('.scene')){sec.hidden=sec.id!==next+'Scene';if(!sec.hidden)sec.scrollTop=0} $('loading').hidden=true;$('titleScreen').hidden=true;$('game').hidden=false;updateHeader();if(next==='terminal')refreshTerminal();if(next==='stage'){mapPage=Math.floor((state.selectedStage-1)/10);renderStageScene()}if(next==='build')renderBuild();if(next==='shop')renderShop();if(next==='codex')renderCodex();if(next==='settings')updateSaveStatus();if(next==='battle'){renderBattleBuild();renderBattle()}if(next==='result')renderResult(resultData)}
+function selectStage(n){
+  if(transitioning||running||loadingBattle||scene!=='stage'||!canMission(state,n,'main'))return;
+  if(n!==state.selectedStage){state.selectedStage=n;state.selectedMission='main';clearBattle();save()}
+  renderStageScene();updateHeader()
+}
+function selectRegion(i){
+  const region=REGIONS[i];
+  if(transitioning||running||loadingBattle||scene!=='stage'||!region||state.unlocked<region.start)return;
+  if(regionForStage(state.selectedStage)!==region)selectStage(region.start);
+}
+function selectMission(type){
+  if(transitioning||running||loadingBattle||scene!=='stage'||!canMission(state,state.selectedStage,type))return;
+  if(state.selectedMission!==type){state.selectedMission=type;clearBattle();save()}
+  renderStageScene();updateHeader()
+}
+function refreshTerminal(){const d=mdef(state.active),m=state.monsters[d.id],v=getStats(state),st=stageData(state.selectedStage);$('terminalMonster').innerHTML=`<div class="hero-info"><span class="eyebrow">ACTIVE MONSTER</span><h2>${d.name}</h2><span class="tag">Lv.${m.level} · ${d.role}</span><div class="hero-statline"><div><span>ATK</span><b>${v.atk.toFixed(1)}</b></div><div><span>SPD / 秒</span><b>${v.speed.toFixed(2)}</b></div></div><small class="quiet">EXP ${m.xp} / ${xpNeed(m.level)}</small><div class="meter"><i style="width:${100*m.xp/xpNeed(m.level)}%"></i></div></div><div class="hero-portrait">${monsterIcon(d.id)}</div><div class="hero-souls">${Array.from({length:d.slots},(_,i)=>`<div class="slot ${m.equip[i]?'filled':''}" title="${m.equip[i]?sdef(m.equip[i]).name:'空き枠'}">${m.equip[i]?soulIcon(m.equip[i]):'+'}</div>`).join('')}<span class="quiet">${m.equip.length}/${d.slots} SOULS</span></div>`;$('terminalStage').innerHTML=`<div class="grow"><span class="eyebrow">NEXT OPERATION</span><h2>STAGE ${String(st.n).padStart(3,'0')}</h2><p class="quiet">${regionForStage(st.n).name} · ${missionPlan(st,state.selectedMission).name}</p></div><button class="primary" data-launch-battle="1">出撃する　›</button>`;$('terminalProgress').textContent=`到達 ${state.unlocked}　撃破 ${num(state.totalKills)}体　クリア ${num(state.clears)}回`}
+function setScene(next){if(!SCENE_META[next]||((running||loadingBattle)&&next!=='battle'))return;if(next==='result'&&!resultData)return;scene=next;for(const sec of document.querySelectorAll('.scene')){sec.hidden=sec.id!==next+'Scene';if(!sec.hidden)sec.scrollTop=0} $('loading').hidden=true;$('titleScreen').hidden=true;$('game').hidden=false;updateHeader();if(next==='terminal')refreshTerminal();if(next==='stage'){mapPage=REGIONS.indexOf(regionForStage(state.selectedStage));renderStageScene()}if(next==='build')renderBuild();if(next==='shop')renderShop();if(next==='codex')renderCodex();if(next==='settings')updateSaveStatus();if(next==='battle'){renderBattleBuild();renderBattle()}if(next==='result')renderResult(resultData)}
 function finishBattle(){if(!running||!battle?.done)return;running=false;cancelAnimationFrame(raf);const r=applyResult(state,battle);if(!r)return;resultData=r;save();return playTransition('result',()=>setScene('result'))}
 
 function frame(now){if(!running)return;advanceBattle(battle,(now-startedAt)/1000);renderBattle();animateVisual(battle);if(battle.done)finishBattle();else raf=requestAnimationFrame(frame)}
 function showCover(which){$('game').hidden=true;$('loading').hidden=which!=='loading';$('titleScreen').hidden=which!=='titleScreen'}
-function beginBattle(n=state.selectedStage){
-  if(transitioning||running||loadingBattle||!['stage','terminal','result'].includes(scene)||$('game').hidden||!Number.isInteger(n)||n<1||n>state.unlocked)return;
+function beginBattle(n=state.selectedStage,type=state.selectedMission){
+  if(transitioning||running||loadingBattle||!['stage','terminal','result'].includes(scene)||$('game').hidden||!canMission(state,n,type))return;
   loadingBattle=true;
   state.selectedStage=n;
+  state.selectedMission=type;
   clearBattle();
   save();
   return transitionScene('white',()=>{
-    battle=createBattle(state,n);
+    battle=createBattle(state,n,type);
     $('combatLog').textContent='';
     setScene('battle');
   },()=>{
@@ -422,7 +583,12 @@ function beginBattle(n=state.selectedStage){
     return false;
   });
 }
-function actionNext(action){if(transitioning||scene!=='result'||!resultData||running||loadingBattle)return;const r=resultData,n=action==='next'&&r.clear&&r.stage<MAX_STAGE?r.stage+1:r.stage;return beginBattle(n)}
+function actionNext(action){
+  if(transitioning||scene!=='result'||!resultData||running||loadingBattle)return;
+  const r=resultData;
+  if(action==='retry')return beginBattle(r.stage,r.mission.type);
+  if(action==='next'&&r.mission.type==='main'&&r.clear&&r.stage<MAX_STAGE)return beginBattle(r.stage+1,'main')
+}
 
 function changed(){const el=$(scene+'Scene'),scroll=el?.scrollTop||0;save();updateHeader();if(scene==='build')renderBuild();if(scene==='shop')renderShop();if(el)el.scrollTop=scroll}
 function enter(){
@@ -441,12 +607,12 @@ function goTitle(){
 const navIcons={stage:'<path d="M4 4l6 2 10 10-4 4L6 10zM14 14l4 4M15 5l5-1-1 5M10 14l-6 6"/>',build:'<path d="M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/>',shop:'<path d="M3 9l2-5h14l2 5M3 9h18v2a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0zM5 14v6h14v-6M10 20v-5h4v5"/>',codex:'<path d="M12 5c-3-2-6-2-9-1v15c3-1 6-1 9 1 3-2 6-2 9-1V4c-3-1-6-1-9 1zM12 5v15"/>',settings:'<path d="M4 7h16M4 17h16M8 4v6M16 14v6"/>'};document.querySelectorAll('[data-icon]').forEach(el=>el.innerHTML=svg(navIcons[el.dataset.icon],'0 0 24 24','fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"'));
 $('loadOrb').innerHTML=soulIcon('haste');$('titleOrb').innerHTML=soulIcon('haste');$('brandOrb').innerHTML=soulIcon('haste');$('currencyOrb').innerHTML=currencyIcon();$('titleArt').innerHTML=['golem','moss','wyrm'].map(monsterIcon).join('');updateHeader();requestAnimationFrame(()=>requestAnimationFrame(()=>showCover('titleScreen')));
 $('enterBtn').addEventListener('click',enter);$('titleBtn').addEventListener('click',goTitle);
-$('game').addEventListener('click',e=>{const btn=e.target.closest('button');if(!btn||btn.disabled||btn.closest('[hidden]')||transitioning||running||loadingBattle||$('game').hidden)return;const d=btn.dataset;if(d.scene){navigateScene(d.scene);return}if(d.launchBattle){beginBattle();return}if(d.stageJump&&scene==='stage'){selectStage(state.selectedStage+Number(d.stageJump));return}if(d.stage&&scene==='stage'){const n=Number(d.stage);if(Number.isInteger(n)&&n>=1&&n<=state.unlocked)selectStage(n);return}if(d.selectMonster&&scene==='build'&&state.monsters[d.selectMonster]){state.active=d.selectMonster;changed();showToast(mdef(state.active).name+'を選択')}else if((d.equip||d.unequip)&&scene==='build'){const id=d.equip||d.unequip;if(toggleSoul(state,id)){changed();showToast(sdef(id).name+(state.monsters[state.active].equip.includes(id)?'を装着':'を解除'))}}else if(d.buyMonster&&scene==='shop'&&purchaseMonster(state,d.buyMonster)){changed();showToast(mdef(d.buyMonster).name+'を召喚しました')}else if(d.buySoul&&scene==='shop'&&purchaseSoul(state,d.buySoul)){changed();showToast(sdef(d.buySoul).name+' Lv.'+state.souls[d.buySoul])}else if(d.result)actionNext(d.result)});
+$('game').addEventListener('click',e=>{const btn=e.target.closest('button');if(!btn||btn.disabled||btn.closest('[hidden]')||transitioning||running||loadingBattle||$('game').hidden)return;const d=btn.dataset;if(d.scene){navigateScene(d.scene);return}if(d.launchBattle){beginBattle();return}if(d.region!==undefined&&scene==='stage'){selectRegion(Number(d.region));return}if(d.mission&&scene==='stage'){selectMission(d.mission);return}if(d.stageJump&&scene==='stage'){selectStage(state.selectedStage+Number(d.stageJump));return}if(d.stage&&scene==='stage'){const n=Number(d.stage);if(Number.isInteger(n)&&n>=1&&n<=state.unlocked)selectStage(n);return}if(d.selectMonster&&scene==='build'&&state.monsters[d.selectMonster]){state.active=d.selectMonster;changed();showToast(mdef(state.active).name+'を選択')}else if((d.equip||d.unequip)&&scene==='build'){const id=d.equip||d.unequip;if(toggleSoul(state,id)){changed();showToast(sdef(id).name+(state.monsters[state.active].equip.includes(id)?'を装着':'を解除'))}}else if(d.buyMonster&&scene==='shop'&&purchaseMonster(state,d.buyMonster)){changed();showToast(mdef(d.buyMonster).name+'を召喚しました')}else if(d.buySoul&&scene==='shop'&&purchaseSoul(state,d.buySoul)){changed();showToast(sdef(d.buySoul).name+' Lv.'+state.souls[d.buySoul])}else if(d.result)actionNext(d.result)});
 
-$('resetBtn').addEventListener('click',()=>{if(!running)$('resetDialog').showModal()});$('cancelReset').addEventListener('click',()=>$('resetDialog').close());$('confirmReset').addEventListener('click',()=>{if(running)return;state=fresh();protectSave=false;clearBattle();$('resetDialog').close();save();setScene('terminal');showToast('セーブデータを初期化しました')});document.addEventListener('visibilitychange',()=>{if(!document.hidden&&running){advanceBattle(battle,(performance.now()-startedAt)/1000);if(battle.done)finishBattle()}});
-$('mapPrev').onclick=()=>{mapPage--;renderMap()};$('mapNext').onclick=()=>{mapPage++;renderMap()};
-$('exportBtn').onclick=()=>{if(running)return;$('exportText').value=JSON.stringify(state,null,2);$('exportDialog').showModal()};$('closeExport').onclick=()=>$('exportDialog').close();$('copySave').onclick=async()=>{try{await navigator.clipboard.writeText($('exportText').value);showToast('セーブをコピーしました')}catch{$('exportText').select();showToast('選択されたJSONをコピーしてください')}};$('downloadSave').onclick=()=>{const u=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=u;a.download='soul-rush-save.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)};
-$('importBtn').onclick=()=>{if(running)return;$('importText').value='';$('importFile').value='';$('importError').textContent='';$('importDialog').showModal()};$('cancelImport').onclick=()=>$('importDialog').close();$('importFile').onchange=async()=>{try{const f=$('importFile').files[0];if(f){if(f.size>1000000)throw Error('ファイルが大きすぎます。');$('importText').value=await f.text()}}catch(e){$('importError').textContent=e.message}};$('confirmImport').onclick=()=>{if(running)return;try{const raw=$('importText').value;if(raw.length>1000000)throw Error('データが大きすぎます。');const next=parseBackup(raw);if(!confirm('現在のセーブデータを上書きしますか？'))return;state=next;protectSave=false;clearBattle();save();updateHeader();refreshTerminal();$('importDialog').close();setScene('terminal');showToast('セーブを復元しました')}catch(e){$('importError').textContent=e.message||'復元できませんでした'}};
+$('resetBtn').addEventListener('click',()=>{if(!running)$('resetDialog').showModal()});$('cancelReset').addEventListener('click',()=>$('resetDialog').close());$('confirmReset').addEventListener('click',()=>{if(running)return;try{persistReplacement(fresh());$('resetDialog').close();setScene('terminal');showToast('セーブデータを初期化しました')}catch(e){showToast('初期化を保存できません。既存データは保持しました')}});document.addEventListener('visibilitychange',()=>{if(!document.hidden&&running){advanceBattle(battle,(performance.now()-startedAt)/1000);if(battle.done)finishBattle()}});
+$('mapPrev').onclick=()=>selectRegion(mapPage-1);$('mapNext').onclick=()=>selectRegion(mapPage+1);
+$('exportBtn').onclick=()=>{if(running)return;try{$('exportText').value=backupJSON();$('exportDialog').showModal()}catch(e){showToast(e.message)}};$('closeExport').onclick=()=>$('exportDialog').close();$('copySave').onclick=async()=>{try{await navigator.clipboard.writeText($('exportText').value);showToast('セーブをコピーしました')}catch{$('exportText').select();showToast('選択されたJSONをコピーしてください')}};$('downloadSave').onclick=()=>{const u=URL.createObjectURL(new Blob([$('exportText').value],{type:'application/json'}));const a=document.createElement('a');a.href=u;a.download='soul-rush-save.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)};
+$('importBtn').onclick=()=>{if(running)return;$('importText').value='';$('importFile').value='';$('importError').textContent='';$('importDialog').showModal()};$('cancelImport').onclick=()=>$('importDialog').close();$('importFile').onchange=async()=>{try{const f=$('importFile').files[0];if(f){if(f.size>1000000)throw Error('ファイルが大きすぎます。');$('importText').value=await f.text()}}catch(e){$('importError').textContent=e.message}};$('confirmImport').onclick=()=>{if(running)return;try{const raw=$('importText').value;if(raw.length>1000000)throw Error('データが大きすぎます。');const next=parseBackup(raw);if(!confirm('現在のセーブデータを上書きしますか？'))return;persistReplacement(next);updateHeader();refreshTerminal();$('importDialog').close();setScene('terminal');showToast('セーブを復元しました')}catch(e){$('importError').textContent=e.message||'復元できませんでした'}};
 if(location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1'){const manifest=document.createElement('link');manifest.rel='manifest';manifest.href='./manifest.webmanifest';document.head.appendChild(manifest);const icon=document.createElement('link');icon.rel='apple-touch-icon';icon.href='./icons/icon-192.png';document.head.appendChild(icon);if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{})}
 
 </script>
