@@ -628,8 +628,9 @@ button.chosen,.selected,#stageMap button.chosen,#worldMap button.chosen{border-c
 <dialog id="exportDialog"><h2>セーブのバックアップ</h2><p class="quiet" style="margin:8px 0">JSONファイルを保存すると、別のブラウザ・公開URLでも復元できます。</p><textarea id="exportText" readonly style="width:100%;height:120px;background:#0d1722;color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:8px;font:12px monospace"></textarea><div class="row" style="margin-top:10px"><button id="copySave" class="grow">コピー</button><button id="downloadSave" class="primary grow">JSON保存</button></div><button id="closeExport" class="ghost" style="width:100%;margin-top:8px">閉じる</button></dialog>
 
 <script id="engine">
+
 /* SOUL RUSH prototype. Pure deterministic game rules; browser UI below. */
-const VERSION=2, LIMIT=24, RECORD_TIME_LIMIT=30, MAX_STAGE=100, SAVE_KEY='soul_rush_prototype_v2', LEGACY_SAVE_KEY='soul_rush_prototype_v1';
+const VERSION=3, LIMIT=24, RECORD_TIME_LIMIT=30, MAX_STAGE=100, SAVE_KEY='soul_rush_prototype_v3', LEGACY_SAVE_KEY='soul_rush_prototype_v2', OLDEST_SAVE_KEY='soul_rush_prototype_v1';
 const MONSTERS=[
 {id:'moss',name:'モス',role:'均衡型',atk:11,speed:1.35,slots:3,cost:0,trait:'安定した連続攻撃。多くの魂に適性',allowed:['might','haste','spark','burst','feast','pierce','focus','frost','fortune','echo','giant'],color:'#81c8a0'},
 {id:'fang',name:'ヴォルフ',role:'高速型',atk:8,speed:2.4,slots:3,cost:150,trait:'攻撃回数型の魂と好相性。時間型の魂は習得不可',allowed:['might','haste','spark','feast','pierce','focus','fortune','echo','giant'],color:'#8fb9e6'},
@@ -656,10 +657,9 @@ function enemySize(i,stage){if(stage.boss&&i===stage.count-1)return ENEMY_SIZES[
 const DROPS=[{at:4,id:'haste'},{at:10,id:'spark'},{at:22,id:'burst'},{at:40,id:'feast'},{at:65,id:'pierce'},{at:95,id:'pulse'},{at:135,id:'might'},{at:180,id:'spark'},{at:240,id:'burst'}];
 const mdef=id=>MONSTERS.find(m=>m.id===id),sdef=id=>SOULS.find(s=>s.id===id),clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
 const num=n=>Math.max(0,Math.floor(n)).toLocaleString('ja-JP');
-function fresh(){return {version:VERSION,money:0,unlocked:1,selectedStage:1,active:'moss',totalKills:0,clears:0,monsters:{moss:{level:1,xp:0,equip:['might']}},souls:{might:1},copies:{},best:{},records:{},history:[],selectedMission:'main',missionRecords:{},materials:{soulFragment:0}}}
+function fresh(){return {version:VERSION,money:0,gems:0,unlocked:1,selectedStage:1,active:'moss',totalKills:0,clears:0,monsters:{moss:{level:1,xp:0,equip:['might'],rank:0,duplicates:0}},souls:{might:1},copies:{},best:{},records:{},history:[],selectedMission:'main',missionRecords:{},materials:{soulFragment:0},firstClears:{},presets:Array.from({length:5},()=>({monster:'moss',equip:['might']})),preset:0}}
 function xpNeed(level){return 6+Math.floor((level-1)*2.5)}
-function stageData(n){n=clamp(Math.floor(n),1,MAX_STAGE);const zone=Math.floor((n-1)/5)+1,pattern=[12,17,9,25,3],count=pattern[(n-1)%5]+Math.floor((n-1)/10)*2,scale=1.22**(n-1),base=Math.max(1,Math.round(38*scale)),boss=n%5===0,elite=n%5===3,swarm=n%5===4;let hp=Array.from({length:count},(_,i)=>Math.round(base*(boss?(i===count-1?5.5:2.3):elite?1.65:swarm?.65:1+(i%3)*.1)));return {n,zone,count,hp,boss,kind:boss?'守護者の門':elite?'重装の群れ':swarm?'大群の回廊':'魂喰らいの群れ',reward:Math.round(90*1.20**(n-1)),bonus:Math.round(55*1.23**(n-1))}}
-
+function stageData(n){n=clamp(Math.floor(n),1,MAX_STAGE);const zone=Math.floor((n-1)/10)+1,boss=n%10===0,swarm=n%5===4,elite=n%5===3;const pattern=[12,17,9,25,15,13,18,11,26,15],extra=Math.floor((n-1)/10)*2,count=boss?(n%20===10?1:Math.min(30,12+extra)):pattern[(n-1)%10]+extra;const base=Math.max(1,Math.round(38*1.22**Math.min(n-1,8)*1.12**Math.max(0,n-9)));const hp=Array.from({length:count},(_,i)=>Math.round(base*(boss?(i===count-1?(count===1?15:5):.65):elite?1.65:swarm?.65:1+(i%3)*.1)));return {n,zone,count,hp,boss,kind:boss?'BOSS':elite?'重装':swarm?'大群':'通常',reward:Math.round(90*1.2**Math.min(n-1,8)*1.12**Math.max(0,n-9)),bonus:Math.round(55*1.23**Math.min(n-1,8)*1.12**Math.max(0,n-9))}}
 /* WORLD-001: stable stage IDs preserve the existing 100-stage campaign. */
 const REGIONS=Object.freeze([
   {id:'forest',name:'始まりの森林',start:1,end:10,desc:'冒険の始まり'},
@@ -677,10 +677,7 @@ const MISSION_TYPES=Object.freeze([
 ]);
 const MISSION_RANKS=Object.freeze(['D','C','B','A','S']);
 function regionForStage(n){return REGIONS.find(r=>n>=r.start&&n<=r.end)||REGIONS[0]}
-function canMission(state,n,type){
-  return Number.isInteger(n)&&n>=1&&n<=MAX_STAGE&&n<=state.unlocked&&
-    MISSION_TYPES.some(m=>m.id===type)&&(type==='main'||state.unlocked>=2);
-}
+function canMission(state,n,type='main'){return Number.isInteger(n)&&n>=1&&n<=MAX_STAGE&&n<=state.unlocked&&type==='main'}
 function missionKey(n,type){return n+':'+type}
 function missionPlan(stage,type='main'){
   const name=MISSION_TYPES.find(m=>m.id===type)?.name||'メイン';
@@ -711,64 +708,76 @@ function recordMission(state,b,reward,m){
   };
 }
 function validateMissionData(raw,clean,safe){
-  if(raw.version!==VERSION)return;
+  if(raw.version<2)return;
   if(canMission(clean,clean.selectedStage,raw.selectedMission))clean.selectedMission=raw.selectedMission;
   clean.materials.soulFragment=safe(raw.materials?.soulFragment);
   for(let n=1;n<=clean.unlocked;n++)for(const type of ['hunt','collect','challenge']){
-    if(!canMission(clean,n,type))continue;
+    if(n>clean.unlocked)continue;
     const key=missionKey(n,type),r=raw.missionRecords?.[key];
     if(!r||typeof r!=='object'||!MISSION_RANKS.includes(r.bestRank)||!MISSION_RANKS.includes(r.lastRank))continue;
     const attempts=safe(r.attempts);
     if(!attempts)continue;
     clean.missionRecords[key]={attempts,successes:safe(r.successes,0,attempts),
       bestRank:MISSION_RANKS[Math.max(MISSION_RANKS.indexOf(r.bestRank),MISSION_RANKS.indexOf(r.lastRank))],
-      lastRank:r.lastRank,lastKills:safe(r.lastKills,0,stageData(n).count),
+      lastRank:r.lastRank,lastKills:safe(r.lastKills),
       lastReward:safe(r.lastReward),lastElapsed:Number.isFinite(r.lastElapsed)?clamp(r.lastElapsed,0,RECORD_TIME_LIMIT):0};
   }
 }
 
-function getStats(state,id=state.active){const d=mdef(id),m=state.monsters[id];let atk=d.atk*(1+(m.level-1)*.12),speed=d.speed*(1+(m.level-1)*.025),levels={};for(const k of m.equip){if(state.souls[k])levels[k]=state.souls[k]}if(levels.might)atk*=1+(15+(levels.might-1)*8)/100;if(levels.haste)speed*=1+(18+(levels.haste-1)*7)/100;return {atk,speed,levels,slots:d.slots}}
+function getStats(state,id=state.active){const d=mdef(id),m=state.monsters[id];let atk=d.atk*(1+(m.level-1)*.12)*(1+(m.rank||0)*.15),speed=d.speed*(1+(m.level-1)*.025)*(1+(m.rank||0)*.05),levels={};for(const k of m.equip){if(state.souls[k])levels[k]=state.souls[k]}if(levels.might)atk*=1+(15+(levels.might-1)*8)/100;if(levels.haste)speed*=1+(18+(levels.haste-1)*7)/100;return {atk,speed,levels,slots:d.slots}}
 function createBattle(state,n=state.selectedStage,mission='main'){
-  if(mission!=='main'&&!canMission(state,n,mission))throw Error('未解放のミッションです');
-  const stage=stageData(n),stats=getStats(state);return {stage,mission,monster:state.active,stats,hp:stage.hp.slice(),elapsed:0,kills:0,hits:0,nextAttack:1/stats.speed,next:Object.fromEntries(Object.entries(TRIGGERS).filter(([id,t])=>stats.levels[id]&&t.period).map(([id,t])=>[id,t.period])),done:false,clear:false,events:[],lastVisual:null,initialKills:state.totalKills,loot:[],rngState:((state.totalKills*2654435761+n*1013904223+(state.records[n]?.attempts||0))>>>0)}
+  if(!canMission(state,n,mission))throw Error('未解放のミッションです');
+  const stage=stageData(n),stats=getStats(state);return {stage,mission,monster:state.active,stats,hp:stage.hp.slice(),elapsed:0,kills:0,hits:0,nextAttack:1/stats.speed,next:Object.fromEntries(Object.entries(TRIGGERS).filter(([id,t])=>stats.levels[id]&&t.period).map(([id,t])=>[id,t.period])),done:false,clear:false,events:[],lastVisual:null,initialKills:state.totalKills,loot:[],etherDrops:[],aborted:false,rngState:((state.totalKills*2654435761+n*1013904223+(state.records[n]?.attempts||0))>>>0)}
 }
 function logEvent(b,t,text,special=false,visual=null){b.events.push({t,text,special});if(b.events.length>12)b.events.shift();if(visual)b.lastVisual={...visual,t,special}}
 function front(b){return b.hp.findIndex(x=>x>0)}
 function currentAtk(b){const l=b.stats.levels.feast;return b.stats.atk*(1+(l?(5+(l-1)*2)/100*Math.min(20,b.kills):0))}
 function randomDrop(b,i){const fixed=DROPS.find(d=>d.at===b.initialKills+b.kills);const roll=()=>{b.rngState=(Math.imul(b.rngState,1664525)+1013904223)>>>0;return b.rngState/4294967296};if(fixed){b.loot.push({i,id:fixed.id,t:b.elapsed});return}if(roll()<.42||(b.stage.boss&&b.kills===b.stage.count)){const pool=SOULS.filter(x=>SOUL_META[x.id][1]<=b.stage.n),weights={N:68,R:24,SR:7,UR:1};let pick=roll()*pool.reduce((v,x)=>v+weights[SOUL_META[x.id][0]],0);let chosen=pool[pool.length-1];for(const x of pool){pick-=weights[SOUL_META[x.id][0]];if(pick<0){chosen=x;break}}b.loot.push({i,id:chosen.id,t:b.elapsed})}}
-function grantSoul(state,id){state.copies??={};if(!state.souls[id]){state.souls[id]=1;return true}state.copies[id]=(state.copies[id]||0)+1;return false}
-function soulRequired(lv){return lv?2+Math.floor((lv-1)*.75):0}
-function damageAt(b,i,d){if(i<0||i>=b.hp.length||b.hp[i]<=0)return 0;const before=b.hp[i],l=b.stats.levels.giant,m=l&&['xl','xxl'].includes(enemySize(i,b.stage).id)?1+(35+(l-1)*10)/100:1;b.hp[i]=Math.max(0,before-d*m);if(b.hp[i]===0){b.kills++;randomDrop(b,i)}return Math.max(0,(d*m-before)/m)}
+function grantSoul(state,id){state.copies??={};if(!state.souls[id]){state.souls[id]=1;return true}state.copies[id]=safeAdd(state.copies[id]||0,1);return false}
+function soulRequired(lv){return lv?1:0}
+function damageAt(b,i,d){if(i<0||i>=b.hp.length||b.hp[i]<=0)return 0;const before=b.hp[i],l=b.stats.levels.giant,m=l&&['xl','xxl'].includes(enemySize(i,b.stage).id)?1+(35+(l-1)*10)/100:1;b.hp[i]=Math.max(0,before-d*m);if(b.hp[i]===0){b.kills++;randomDrop(b,i);const total=rewards(b).partial;const last=b.etherDrops.at(-1)?.total||0;b.etherDrops.push({i,t:b.elapsed,amount:Math.max(0,total-last),total})}return Math.max(0,(d*m-before)/m)}
 function hitFront(b,d,carry=0){let i=front(b);if(i<0)return;let rest=damageAt(b,i,d);while(carry>0&&rest>0&&(i=front(b))>=0){rest=damageAt(b,i,rest*carry)}}
 function activateSoul(b,id,t){const tr=TRIGGERS[id],lv=b.stats.levels[id];if(!lv||front(b)<0)return;const d=currentAtk(b)*(tr.power+(lv-1)*tr.growth)/100;const targets=b.hp.map((hp,i)=>hp>0?i:-1).filter(i=>i>=0).slice(0,tr.targets);targets.forEach(i=>damageAt(b,i,d));logEvent(b,t,sdef(id).name+' 発動',true,{damage:Math.round(d)})}
 function advanceBattle(b,to){if(b.done)return b;to=clamp(to,b.elapsed,LIMIT);const l=b.stats.levels;while(true){const t=Math.min(b.nextAttack,...Object.values(b.next));if(t>to+1e-9||t>LIMIT+1e-9)break;b.elapsed=t;const prev=b.kills;if(b.nextAttack<=t+1e-9){const d=currentAtk(b);b.hits++;b.nextAttack+=1/b.stats.speed;hitFront(b,d,l.pierce?Math.min(100,65+(l.pierce-1)*10)/100:0);b.lastVisual={t,damage:Math.round(d),special:false};for(const [id,tr] of Object.entries(TRIGGERS))if(tr.every&&l[id]&&b.hits%tr.every===0)activateSoul(b,id,t)}for(const [id,next] of Object.entries(b.next)){if(next<=t+1e-9){b.next[id]+=TRIGGERS[id].period;activateSoul(b,id,t)}}if(b.kills>prev)logEvent(b,t,`${b.kills} / ${b.stage.count} 体撃破`);if(b.kills===b.stage.count){b.done=true;b.clear=true;return b}}b.elapsed=to;if(to>=LIMIT){b.done=true;b.clear=false}return b}
 function rewards(b){const l=b.stats.levels.fortune,rate=1+(l?(12+(l-1)*5)/100:0),partial=Math.floor(b.stage.reward*b.kills/b.stage.count*rate),m=missionOutcome(b),bonus=m.success?Math.floor(m.bonus*rate):0;return {partial,bonus,total:partial+bonus}}
-function recordBattle(state,b,reward){const n=b.stage.n,previous=state.records[n]||null;const entry={stage:n,kills:b.kills,count:b.stage.count,elapsed:Math.round(b.elapsed*100)/100,clear:b.clear,reward:reward.total,monster:b.monster};state.records[n]={attempts:(previous?.attempts||0)+1,last:entry,bestTime:b.clear?Math.min(previous?.bestTime??LIMIT,entry.elapsed):previous?.bestTime??null};state.history.unshift(entry);state.history=state.history.slice(0,10);return previous?.last||null}
-function applyResult(state,b){
-  if(!b.done||b.claimed)return null;
-  b.claimed=true;
-  const mission=missionOutcome(b),reward=rewards(b),m=state.monsters[b.monster],before=m.level,oldKills=state.totalKills;
-  state.money+=reward.total;state.totalKills+=b.kills;m.xp+=b.kills;
-  while(m.xp>=xpNeed(m.level)){m.xp-=xpNeed(m.level);m.level++}
-  const drops=[];
-  for(const drop of b.loot){const isNew=grantSoul(state,drop.id);const entry=drops.find(d=>d.id===drop.id);if(entry)entry.count++;else drops.push({id:drop.id,level:state.souls[drop.id],new:isNew,count:1})}
-  let previous=null;
-  if(mission.type==='main'){
-    state.best[b.stage.n]=Math.max(state.best[b.stage.n]||0,b.kills);
-    if(b.clear){state.clears++;state.unlocked=Math.max(state.unlocked,Math.min(MAX_STAGE,b.stage.n+1))}
-    previous=recordBattle(state,b,reward);
-  }else{
-    state.materials.soulFragment=Math.min(Number.MAX_SAFE_INTEGER,state.materials.soulFragment+mission.fragments);
-    recordMission(state,b,reward,mission);
-  }
-  return {reward,previous,levelBefore:before,levelAfter:m.level,xp:b.kills,drops,clear:b.clear,kills:b.kills,count:b.stage.count,elapsed:b.elapsed,stage:b.stage.n,mission}
+function recordBattle(state,b,reward){const n=b.stage.n,previous=state.records[n]||null;const entry={stage:n,kills:b.kills,count:b.stage.count,elapsed:Math.round(b.elapsed*100)/100,clear:b.clear,reward:reward.total,monster:b.monster};state.records[n]={attempts:(previous?.attempts||0)+1,last:entry,bestTime:b.clear?Math.min(previous?.bestTime??RECORD_TIME_LIMIT,entry.elapsed):previous?.bestTime??null};state.history.unshift(entry);state.history=state.history.slice(0,10);return previous?.last||null}
+function applyResult(state,b){if(!b.done||b.claimed)return null;b.claimed=true;const reward=rewards(b),m=state.monsters[b.monster],before=m.level;state.money=safeAdd(state.money,reward.total);state.totalKills=safeAdd(state.totalKills,b.kills);m.xp+=b.kills;while(m.xp>=xpNeed(m.level)&&m.level<Number.MAX_SAFE_INTEGER){m.xp-=xpNeed(m.level);m.level++}const loot=b.loot.map(d=>({kind:'soul',id:d.id,new:grantSoul(state,d.id)}));state.best[b.stage.n]=Math.max(state.best[b.stage.n]||0,b.kills);let first={gems:0,chest:[]};if(b.clear){state.clears++;state.unlocked=Math.max(state.unlocked,Math.min(MAX_STAGE,b.stage.n+1));first=firstClearReward(state,b.stage.n)}const previous=recordBattle(state,b,reward);return {reward,previous,levelBefore:before,levelAfter:m.level,xp:b.kills,loot,gems:first.gems,chest:first.chest,clear:b.clear,aborted:b.aborted,kills:b.kills,count:b.stage.count,elapsed:b.elapsed,stage:b.stage.n}}
+
+const GACHA_COST=25;
+const UNLOCK_COST={moss:0,fang:35,golem:60,wyrm:90};
+const safeAdd=(a,b)=>Math.min(Number.MAX_SAFE_INTEGER,a+b);
+function grantCharacter(state,id){if(!mdef(id))return false;const m=state.monsters[id];if(m){m.duplicates=safeAdd(m.duplicates||0,1);return false}state.monsters[id]={level:1,xp:0,equip:[],rank:0,duplicates:0};return true}
+function characterRankCost(m){return Math.min(Number.MAX_SAFE_INTEGER,150+100*(m.rank||0))}
+function upgradeCharacter(state,id){const m=state.monsters[id];if(!m||m.duplicates<1||state.money<characterRankCost(m)||m.rank>=Number.MAX_SAFE_INTEGER)return false;state.money-=characterRankCost(m);m.duplicates--;m.rank++;return true}
+function purchaseMonster(state,id){const cost=UNLOCK_COST[id];if(!mdef(id)||state.monsters[id]||!Number.isFinite(cost)||state.gems<cost)return false;state.gems-=cost;grantCharacter(state,id);return true}
+function summonCharacter(state,roll=Math.random()){if(state.gems<GACHA_COST)return null;const pool=MONSTERS.filter(d=>d.id!=='moss');const d=pool[Math.min(pool.length-1,Math.max(0,Math.floor(roll*pool.length)))];state.gems-=GACHA_COST;return {id:d.id,new:grantCharacter(state,d.id)}}
+function gemReward(n){return n%10===0?20:5}
+function bossChest(state,n){const pool=SOULS.filter(d=>SOUL_META[d.id][1]<=n);const chars=MONSTERS.filter(d=>d.id!=='moss');const items=[];let seed=(Math.imul(n,2654435761)+Math.imul(state.totalKills,1597334677))>>>0;const roll=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};const d=chars[Math.floor(roll()*chars.length)];items.push({kind:'character',id:d.id,new:grantCharacter(state,d.id)});for(let i=0;i<5;i++){const x=pool[Math.floor(roll()*pool.length)];items.push({kind:'soul',id:x.id,new:grantSoul(state,x.id)})}return items}
+function firstClearReward(state,n){if(state.firstClears[n])return {gems:0,chest:[]};state.firstClears[n]=true;const gems=gemReward(n);state.gems=safeAdd(state.gems,gems);return {gems,chest:n%10===0?bossChest(state,n):[]}}
+function stopBattle(b){if(!b||b.done)return false;b.aborted=true;b.done=true;b.clear=false;return true}
+function capturePreset(state){state.presets[state.preset]={monster:state.active,equip:state.monsters[state.active].equip.slice()}}
+function selectPreset(state,i){if(!Number.isInteger(i)||i<0||i>=5)return false;capturePreset(state);const p=state.presets[i];state.preset=i;state.active=p.monster;state.monsters[p.monster].equip=p.equip.slice();return true}
+function selectCharacter(state,id){if(!state.monsters[id])return false;capturePreset(state);const previous=state.monsters[state.active].equip;state.active=id;const d=mdef(id);state.monsters[id].equip=previous.filter(k=>d.allowed.includes(k)&&state.souls[k]).slice(0,d.slots);capturePreset(state);return true}
+function equipSlot(state,i,id){const m=state.monsters[state.active],d=mdef(state.active);if(!Number.isInteger(i)||i<0||i>=d.slots||i>m.equip.length)return false;if(id===null){if(i>=m.equip.length)return false;m.equip.splice(i,1)}else{if(!state.souls[id]||!d.allowed.includes(id))return false;const other=m.equip.indexOf(id);if(other>=0&&other!==i){if(i<m.equip.length)[m.equip[other],m.equip[i]]=[m.equip[i],m.equip[other]];else return false}else m.equip[i]=id}capturePreset(state);return true}
+function soulCost(id,level){return Math.min(Number.MAX_SAFE_INTEGER,Math.round(sdef(id).base*Math.max(1,level)))}
+function purchaseSoul(state,id){const lv=state.souls[id]||0;if(!sdef(id)||!lv||!state.copies[id]||state.money<soulCost(id,lv)||lv>=Number.MAX_SAFE_INTEGER)return false;state.money-=soulCost(id,lv);if(!--state.copies[id])delete state.copies[id];state.souls[id]++;return true}
+function toggleSoul(state,id){const m=state.monsters[state.active],i=m.equip.indexOf(id);return equipSlot(state,i>=0?i:m.equip.length,i>=0?null:id)}
+
+function validate(raw){
+ if(!raw||![1,2,3].includes(raw.version)||!raw.monsters?.moss||!raw.souls)return fresh();
+ const clean=fresh(),safe=(x,f=0,max=Number.MAX_SAFE_INTEGER)=>Number.isFinite(x)?clamp(Math.floor(x),0,max):f;
+ clean.money=safe(raw.money);clean.gems=safe(raw.gems);clean.unlocked=Math.max(1,safe(raw.unlocked,1,MAX_STAGE));clean.selectedStage=clamp(safe(raw.selectedStage,1),1,clean.unlocked);clean.totalKills=safe(raw.totalKills);clean.clears=safe(raw.clears);
+ clean.souls={};for(const d of SOULS){const lv=safe(raw.souls[d.id]);if(lv)clean.souls[d.id]=lv}if(!clean.souls.might)clean.souls.might=1;
+ for(const id of Object.keys(clean.souls)){const n=safe(raw.copies?.[id]);if(n)clean.copies[id]=n}
+ const validEquip=(id,arr)=>[...new Set(Array.isArray(arr)?arr.filter(k=>clean.souls[k]&&mdef(id).allowed.includes(k)):[])].slice(0,mdef(id).slots);
+ clean.monsters={};for(const d of MONSTERS){const m=raw.monsters[d.id];if(!m)continue;const level=Math.max(1,safe(m.level,1));clean.monsters[d.id]={level,xp:safe(m.xp,0,xpNeed(level)-1),equip:validEquip(d.id,m.equip),rank:safe(m.rank),duplicates:safe(m.duplicates)}}
+ clean.active=clean.monsters[raw.active]?raw.active:'moss';
+ const validEntry=(v,n)=>{if(!v||!Number.isInteger(n)||n<1||n>clean.unlocked||v.stage!==n||!mdef(v.monster)||!Number.isFinite(v.elapsed))return null;const count=Math.max(1,safe(v.count,stageData(n).count)),kills=safe(v.kills,0,count);return {stage:n,kills,count,elapsed:clamp(v.elapsed,0,RECORD_TIME_LIMIT),clear:!!v.clear&&kills===count,reward:safe(v.reward),monster:v.monster}};
+ for(let n=1;n<=clean.unlocked;n++){if(raw.best?.[n]!==undefined)clean.best[n]=safe(raw.best[n]);const r=raw.records?.[n],last=validEntry(r?.last,n);if(last)clean.records[n]={attempts:Math.max(1,safe(r.attempts,1)),last,bestTime:Number.isFinite(r.bestTime)?clamp(r.bestTime,0,RECORD_TIME_LIMIT):null};if(raw.version===3){if(raw.firstClears?.[n]===true||n<clean.unlocked||last?.clear||clean.records[n]?.bestTime!=null)clean.firstClears[n]=true}else if(n<clean.unlocked||last?.clear||clean.records[n]?.bestTime!=null)firstClearReward(clean,n)}
+ clean.history=(Array.isArray(raw.history)?raw.history:[]).slice(0,10).map(v=>validEntry(v,v?.stage)).filter(Boolean);validateMissionData(raw,clean,safe);clean.selectedMission='main';
+ const current={monster:clean.active,equip:clean.monsters[clean.active].equip.slice()};clean.presets=Array.from({length:5},(_,i)=>{const p=raw.presets?.[i];return p&&clean.monsters[p.monster]?{monster:p.monster,equip:validEquip(p.monster,p.equip)}:{monster:current.monster,equip:current.equip.slice()}});clean.preset=safe(raw.preset,0,4);if(raw.version===3&&raw.presets?.[clean.preset]){const p=clean.presets[clean.preset];clean.active=p.monster;clean.monsters[p.monster].equip=p.equip.slice()}else capturePreset(clean);return clean
 }
-function soulCost(id,level){return Math.round(sdef(id).base*1.65**Math.max(0,level-1))}
-function purchaseMonster(state,id){const d=mdef(id);if(!d||state.monsters[id]||state.money<d.cost)return false;state.money-=d.cost;state.monsters[id]={level:1,xp:0,equip:[]};return true}
-function purchaseSoul(state,id){const d=sdef(id);if(!d)return false;const level=state.souls[id]||0,cost=soulCost(id,level);const need=soulRequired(level);if((!level&&state.unlocked<SOUL_META[id][1])||level>=1000||!Number.isFinite(cost)||state.money<cost||(state.copies?.[id]||0)<need)return false;state.money-=cost;if(need){state.copies[id]-=need;if(!state.copies[id])delete state.copies[id]}state.souls[id]=level+1;return true}
-function toggleSoul(state,id){const m=state.monsters[state.active],i=m.equip.indexOf(id);if(i>=0){m.equip.splice(i,1);return true}if(!state.souls[id]||!mdef(state.active).allowed.includes(id)||m.equip.length>=mdef(state.active).slots)return false;m.equip.push(id);return true}
-function validate(raw){if(!raw||![1,VERSION].includes(raw.version)||!raw.monsters||!raw.monsters.moss||!raw.souls)return fresh();const clean=fresh(),safe=(x,fallback=0,max=Number.MAX_SAFE_INTEGER)=>Number.isFinite(x)?clamp(Math.floor(x),0,max):fallback;clean.money=safe(raw.money);clean.unlocked=Math.max(1,safe(raw.unlocked,1,MAX_STAGE));clean.selectedStage=clamp(safe(raw.selectedStage,1),1,clean.unlocked);clean.totalKills=safe(raw.totalKills);clean.clears=safe(raw.clears);clean.souls={};for(const s of SOULS){const lv=safe(raw.souls[s.id],0,1000);if(lv)clean.souls[s.id]=lv}if(!clean.souls.might)clean.souls.might=1;for(const id of Object.keys(clean.souls)){const n=safe(raw.copies?.[id]);if(n)clean.copies[id]=n}clean.monsters={};for(const d of MONSTERS){const m=raw.monsters[d.id];if(!m)continue;const level=Math.max(1,safe(m.level,1,100000));clean.monsters[d.id]={level,xp:safe(m.xp,0,xpNeed(level)-1),equip:[...new Set(Array.isArray(m.equip)?m.equip.filter(id=>clean.souls[id]&&d.allowed.includes(id)):[])].slice(0,d.slots)}}clean.active=clean.monsters[raw.active]?raw.active:'moss';for(let n=1;n<=clean.unlocked;n++){if(raw.best&&raw.best[n]!==undefined)clean.best[n]=safe(raw.best[n],0,stageData(n).count)}const validEntry=(e,n)=>{if(!e||typeof e!=='object'||!Number.isInteger(e.stage)||e.stage!==n||n<1||n>clean.unlocked||!mdef(e.monster)||!Number.isFinite(e.elapsed))return null;const count=stageData(n).count,kills=safe(e.kills,0,count);return {stage:n,kills,count,elapsed:clamp(e.elapsed,0,RECORD_TIME_LIMIT),clear:kills===count,reward:safe(e.reward),monster:e.monster}};for(let n=1;n<=clean.unlocked;n++){const r=raw.records?.[n],last=validEntry(r?.last,n);if(last)clean.records[n]={attempts:Math.max(1,safe(r.attempts,1)),last,bestTime:Number.isFinite(r.bestTime)?clamp(r.bestTime,0,RECORD_TIME_LIMIT):null}}clean.history=(Array.isArray(raw.history)?raw.history:[]).slice(0,10).map(e=>validEntry(e,e?.stage)).filter(Boolean);validateMissionData(raw,clean,safe);return clean}
-function parseBackup(text){const raw=JSON.parse(text);if(!raw||![1,VERSION].includes(raw.version)||typeof raw.monsters!=='object'||!raw.monsters?.moss||typeof raw.souls!=='object'||!raw.souls||!Number.isFinite(raw.money)||!Number.isFinite(raw.unlocked)||!Number.isFinite(raw.totalKills))throw Error('SOUL RUSHの有効なセーブデータではありません。');return validate(raw)}
+function parseBackup(text){const raw=JSON.parse(text);if(!raw||![1,2,3].includes(raw.version)||!raw.monsters?.moss||!raw.souls||typeof raw.souls!=='object'||!Number.isFinite(raw.money)||!Number.isFinite(raw.unlocked)||!Number.isFinite(raw.totalKills))throw Error('SOUL RUSHの有効なセーブではありません');return validate(raw)}
 </script>
 <script id="ui">
 
