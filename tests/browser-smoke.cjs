@@ -40,12 +40,12 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   }
   await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true,screenWidth:390,screenHeight:844});
   await click('#heroSelect');await scene('characters');
-  assert.equal(await evaluate('document.querySelectorAll(".character-card").length'),4);
+  assert.equal(await evaluate('document.querySelectorAll(".character-card").length'),7);
   assert.equal(await evaluate('getComputedStyle(document.getElementById("characters")).overflowX'),'auto');
   assert.ok(await evaluate('document.getElementById("characters").scrollWidth>document.getElementById("characters").clientWidth'));
   await screenshot('characters');await click('#backBtn');await scene('terminal');
   await click('#slots [data-index="0"]');await scene('souls');
-  assert.equal(await evaluate('document.querySelectorAll(".soul-tile").length'),13);
+  assert.equal(await evaluate('document.querySelectorAll(".soul-tile").length'),22);
   assert.equal(await evaluate('getComputedStyle(document.getElementById("soulScroll")).overflowY'),'auto');
   await screenshot('souls');await click('#backBtn');await scene('terminal');
   // Synthetic test-only data in this isolated browser profile.
@@ -70,7 +70,7 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   await evaluate('state.unlocked=10;state.selectedStage=10;state.monsters.moss.level=500;save();renderHome()');
   await click('#startBtn');await scene('battle');
   await evaluate('cancelAnimationFrame(raf);advanceBattle(battle,24);updateBattle();settleBattle()');await scene('result');
-  assert.equal(await evaluate('resultData.gems'),20);assert.equal(await evaluate('resultData.chest.length'),6);
+  assert.equal(await evaluate('resultData.gems'),4);assert.equal(await evaluate('resultData.chest.length'),6);
   assert.equal(await evaluate('document.getElementById("bossChest").hidden'),false);
   assert.equal(await evaluate('document.querySelectorAll("#scatter .loot-token").length'),await evaluate('resultData.loot.length+5'));
   for(const [width,height] of [[390,844],[375,600],[320,568]]){
@@ -86,12 +86,12 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   await click('#resultActions [data-action="home"]');await scene('terminal');
   const saved=await evaluate('localStorage.getItem(SAVE_KEY)');
   assert.ok(await until(()=>evaluate('navigator.serviceWorker.controller!==null'),15000));
-  assert.ok(await evaluate('caches.keys().then(keys=>keys.some(k=>k.endsWith(":0.9.0")))'));
+  assert.ok(await evaluate('caches.keys().then(keys=>keys.some(k=>k.endsWith(":0.10.0")))'));
   await send('Network.emulateNetworkConditions',{offline:true,latency:0,downloadThroughput:0,uploadThroughput:0});
   await send('Page.reload');await until(()=>evaluate('document.getElementById("titleScreen")&&!document.getElementById("titleScreen").hidden'),15000);
   await click('#enterBtn');await scene('terminal');
   assert.equal(await evaluate('JSON.parse(localStorage.getItem(SAVE_KEY)).gems'),JSON.parse(saved).gems);
   await send('Network.emulateNetworkConditions',{offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1});
   assert.equal(errors.length,0,errors.join('\n'));
-  console.log('v0.9 browser smoke passed: four home viewports, horizontal character list, soul grid, full enemy track, pause/abort, boss chest, scatter bounds and offline save.');
+  console.log('v0.10 browser smoke passed: four home viewports, horizontal character list, soul grid, full enemy track, pause/abort, boss chest, scatter bounds and offline save.');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(()=>{ws?.close();proc?.kill('SIGTERM');server.close();setTimeout(()=>{try{fs.rmSync(profiles,{recursive:true,force:true})}catch{}},250).unref()});
