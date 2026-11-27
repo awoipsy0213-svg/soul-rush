@@ -1,41 +1,33 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const {test}=require('node:test');
 const html=fs.readFileSync(require('node:path').join(__dirname,'../index.html'),'utf8');
-const source=html.match(/<script id="engine">([\s\S]*?)<\/script>/)[1];
-function run(code){return vm.runInNewContext(source+'\n'+code,{console})}
-test('WORLD-01: eight regions partition all 100 stable stage IDs',()=>{
-  const r=run('({length:REGIONS.length,ids:REGIONS.flatMap(r=>Array.from({length:r.end-r.start+1},(_,i)=>r.start+i)),first:regionForStage(1).id,last:regionForStage(100).id})');
-  assert.equal(r.length,8);assert.equal(JSON.stringify(r.ids),JSON.stringify(Array.from({length:100},(_,i)=>i+1)));assert.equal(r.first,'forest');assert.equal(r.last,'other');
+const engine=html.match(/<script id="engine">([\s\S]*?)<\/script>/)[1];
+const run=code=>vm.runInNewContext(engine+'\n'+code,{console});
+test("normal mode only; replay unlocked stages, reject locked and legacy missions",()=>{
+ const x=run(`(()=>{const s=fresh();s.unlocked=4;return {normal:canMission(s,1,'main'),locked:canMission(s,5,'main'),hunt:canMission(s,1,'hunt'),collect:canMission(s,1,'collect'),challenge:canMission(s,1,'challenge')}})()`);
+ assert.equal(x.normal,true);assert.equal(x.locked,false);assert.equal(x.hunt,false);assert.equal(x.collect,false);assert.equal(x.challenge,false);assert.throws(()=>run(`createBattle(fresh(),2)`))
 });
-test('WORLD-02: side missions unlock only after first clear and reject locked stages',()=>{
-  const r=run('(()=>{const s=fresh(),before=canMission(s,1,"hunt");s.unlocked=2;return {before,after:canMission(s,1,"hunt"),locked:canMission(s,3,"hunt"),invalid:canMission(s,1,"__proto__")}})()');
-  assert.equal(r.before,false);assert.equal(r.after,true);assert.equal(r.locked,false);assert.equal(r.invalid,false);
-  assert.throws(()=>run('createBattle(fresh(),1,"collect")'));
+test("boss every tenth stage; single giant and small swarm alternate",()=>{
+ const x=run(`({bosses:Array.from({length:100},(_,i)=>stageData(i+1)).filter(x=>x.boss).map(x=>x.n),ten:stageData(10).count,twenty:stageData(20).count,tenSize:enemySize(0,stageData(10)).id,twentySizes:stageData(20).hp.map((_,i)=>enemySize(i,stageData(20)).id)})`);
+ assert.equal(JSON.stringify(x.bosses),'[10,20,30,40,50,60,70,80,90,100]');assert.equal(x.ten,1);assert.ok(x.twenty>1);assert.equal(x.tenSize,'xxl');assert.ok(x.twentySizes.every(id=>id==='xs'||id==='s'))
 });
-test('WORLD-03: hunt gives partial and mission reward without advancing main record',()=>{
-  const r=run('(()=>{const s=fresh();s.unlocked=2;const b=createBattle(s,1,"hunt");advanceBattle(b,24);const r=applyResult(s,b),again=applyResult(s,b);return {s,r,again}})()');
-  assert.equal(r.r.mission.success,true);assert.equal(r.r.mission.rank,'A');assert.equal(r.r.reward.total,78);assert.equal(r.s.money,78);assert.equal(r.s.unlocked,2);assert.equal(r.s.clears,0);assert.equal(r.s.records[1],undefined);assert.equal(r.s.missionRecords['1:hunt'].successes,1);assert.equal(r.again,null);
+test("legacy v2 migration preserves money, XP, soul levels, records and selected stage",()=>{
+ const x=run(`(()=>{const s=fresh();s.version=2;delete s.presets;delete s.gems;delete s.firstClears;delete s.preset;s.money=717;s.unlocked=4;s.selectedStage=4;s.selectedMission='collect';s.active='fang';s.monsters.fang={level:10,xp:1,equip:['haste','spark','feast']};s.souls={might:1,haste:3,spark:2,feast:1};s.copies={haste:2};s.materials.soulFragment=6;s.history=[{stage:1,kills:12,count:12,elapsed:28.5,clear:true,reward:145,monster:'fang'}];const v=parseBackup(JSON.stringify(s)),next=parseBackup(JSON.stringify(v));return {money:v.money,level:v.monsters.fang.level,xp:v.monsters.fang.xp,equip:v.monsters.fang.equip,active:v.active,stage:v.selectedStage,mission:v.selectedMission,gems:v.gems,nextGems:next.gems,history:v.history[0],copies:v.copies.haste,soul:v.souls.haste,fragments:v.materials.soulFragment,presets:v.presets.length}})()`);
+ assert.equal(x.money,717);assert.equal(x.level,10);assert.equal(x.xp,1);assert.equal(JSON.stringify(x.equip),'["haste","spark","feast"]');assert.equal(x.active,'fang');assert.equal(x.stage,4);assert.equal(x.mission,'main');assert.equal(x.gems,15);assert.equal(x.nextGems,15);assert.equal(x.history.elapsed,28.5);assert.equal(x.copies,2);assert.equal(x.soul,3);assert.equal(x.fragments,6);assert.equal(x.presets,5)
 });
-test('WORLD-04: collect yields shards and independent record exactly once',()=>{
-  const r=run('(()=>{const s=fresh();s.unlocked=2;const b=createBattle(s,1,"collect");advanceBattle(b,24);const r=applyResult(s,b);applyResult(s,b);return {r,s}})()');
-  assert.equal(r.r.mission.fragments,2);assert.equal(r.r.mission.success,true);assert.equal(r.s.materials.soulFragment,2);assert.equal(r.s.missionRecords['1:collect'].attempts,1);assert.equal(r.s.records[1],undefined);
+test("migration awards historical boss chest and gems only once",()=>{
+ const x=run(`(()=>{const s=fresh();s.version=2;s.unlocked=11;s.selectedStage=11;delete s.gems;delete s.firstClears;delete s.presets;const v=validate(s),again=validate(v);return {gems:v.gems,again:again.gems,characters:Object.keys(v.monsters).length,same:JSON.stringify(v.monsters)===JSON.stringify(again.monsters),clears:Object.keys(v.firstClears).length,stage:v.selectedStage}})()`);
+ assert.equal(x.gems,65);assert.equal(x.again,65);assert.equal(x.characters,2);assert.equal(x.same,true);assert.equal(x.clears,10);assert.equal(x.stage,11)
 });
-test('WORLD-05: rank thresholds and time challenge boundaries',()=>{
-  const r=run('(()=>{const stage=stageData(1),m=(kills,elapsed,mission)=>missionOutcome({stage,kills,elapsed,clear:kills===stage.count,mission}).rank;return [m(0,24,"main"),m(6,24,"main"),m(9,24,"main"),m(12,24,"main"),m(12,20,"main"),m(12,20,"challenge"),m(12,20.01,"challenge"),m(12,16,"challenge")]})()');
-  assert.equal(JSON.stringify(r),JSON.stringify(['D','C','B','A','S','A','B','S']));
+test("v1 import and invalid backup protection",()=>{
+ const x=run(`(()=>{const s=fresh();s.version=1;s.money=812;s.unlocked=2;delete s.gems;delete s.presets;delete s.firstClears;delete s.missionRecords;delete s.materials;return parseBackup(JSON.stringify(s))})()`);
+ assert.equal(x.money,812);assert.equal(x.version,3);assert.equal(x.gems,5);assert.throws(()=>run("parseBackup('{}')"));assert.throws(()=>run("parseBackup('bad JSON')"));assert.throws(()=>run(`parseBackup(JSON.stringify({...fresh(),version:999}))`))
 });
-test('WORLD-06: side clear cannot open next main stage or change main history',()=>{
-  const r=run('(()=>{const s=fresh();s.unlocked=2;s.monsters.moss.level=30;const b=createBattle(s,2,"challenge");advanceBattle(b,24);applyResult(s,b);return {unlocked:s.unlocked,clear:b.clear,history:s.history.length,best:s.best[2],record:s.missionRecords["2:challenge"]}})()');
-  assert.equal(r.clear,true);assert.equal(r.unlocked,2);assert.equal(r.history,0);assert.equal(r.best,undefined);assert.equal(r.record.attempts,1);
+test("historic counts and mission records survive changed enemy definitions",()=>{
+ const x=run(`(()=>{const s=fresh();s.version=2;s.unlocked=11;s.records[5]={attempts:1,last:{stage:5,kills:3,count:3,clear:true,elapsed:29,reward:500,monster:'moss'},bestTime:29};s.missionRecords['4:collect']={attempts:3,successes:2,bestRank:'A',lastRank:'A',lastKills:25,lastReward:100,lastElapsed:29.7};const v=validate(s);return {record:v.records[5],side:v.missionRecords['4:collect']}})()`);
+ assert.equal(x.record.last.count,3);assert.equal(x.record.last.clear,true);assert.equal(x.record.bestTime,29);assert.equal(x.side.attempts,3);assert.equal(x.side.lastElapsed,29.7)
 });
-test('SAVE-01: v1 migration preserves old progress, inventory and main records',()=>{
-  const r=run('(()=>{const s=fresh();s.monsters.moss.level=30;const b=createBattle(s);advanceBattle(b,24);applyResult(s,b);const expected=JSON.stringify(s);s.version=1;delete s.selectedMission;delete s.materials;delete s.missionRecords;return {expected,actual:JSON.stringify(parseBackup(JSON.stringify(s)))}})()');
-  assert.deepEqual(JSON.parse(r.actual),JSON.parse(r.expected));
-});
-test('SAVE-02: v2 mission data round trips; invalid keys and invalid selection are ignored',()=>{
-  const r=run('(()=>{const s=fresh();s.unlocked=2;const b=createBattle(s,1,"collect");advanceBattle(b,24);applyResult(s,b);s.selectedMission="collect";const before=JSON.stringify(s),actual=JSON.stringify(parseBackup(before));s.selectedMission="bogus";s.missionRecords["999:hunt"]=s.missionRecords["1:collect"];s.materials.soulFragment=-5;const invalid=parseBackup(JSON.stringify(s));return {before,actual,invalid}})()');
-  assert.deepEqual(JSON.parse(r.actual),JSON.parse(r.before));assert.equal(r.invalid.selectedMission,'main');assert.equal(r.invalid.materials.soulFragment,0);assert.equal(r.invalid.missionRecords['999:hunt'],undefined);
-});
-test('WORLD-07: all collection goals can be reached by full clears',()=>{
-  assert.equal(run('Array.from({length:MAX_STAGE},(_,i)=>stageData(i+1)).every(stage=>Math.floor(stage.count/3)>=missionPlan(stage,"collect").target)'),true);
+test("invalid preset and active identity sanitized safely",()=>{
+ const x=run(`(()=>{const s=fresh();s.active='__proto__';s.presets[0]={monster:'__proto__',equip:['bad']};s.preset=99;const v=validate(s);return {active:v.active,preset:v.preset,monsters:Object.keys(v.monsters),equip:v.monsters[v.active].equip}})()`);
+ assert.equal(x.active,'moss');assert.equal(x.preset,4);assert.equal(JSON.stringify(x.monsters),'["moss"]');assert.equal(JSON.stringify(x.equip),'["might"]')
 });
