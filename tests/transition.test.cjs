@@ -82,36 +82,36 @@ test('menu and return-to-title durations; same scene is a no-op',async()=>{
   assert.equal(a.snapshot().titleHidden,false);assert.equal(a.snapshot().gameHidden,true);
   assert.equal(e.now(),2300);
 });
-test('battle clock starts after whiteout; 30-second reward is granted once before result fade',async()=>{
+test('battle clock starts after whiteout; 24-second reward is granted once before result fade',async()=>{
   const e=environment(),a=e.api;
   let p=a.enter();await e.white();await p;
   p=a.beginBattle();assert.equal(a.beginBattle(),undefined);
   await e.step(400);
-  assert.equal(a.snapshot().scene,'battle');assert.equal(a.snapshot().timer,'30.00');
+  assert.equal(a.snapshot().scene,'battle');assert.equal(a.snapshot().timer,'24.00');
   assert.equal(a.snapshot().running,false);assert.equal(a.snapshot().loadingBattle,true);
   await e.step(100);await e.step(500);await p;
   assert.equal(a.snapshot().startedAt,2000);assert.equal(a.snapshot().running,true);
   assert.equal(a.snapshot().overlayHidden,true);
-  e.frame(29999);assert.equal(a.snapshot().running,true);
-  e.frame(1);assert.equal(a.snapshot().running,false);assert.equal(a.snapshot().elapsed,30);
-  assert.equal(a.snapshot().money,75);assert.equal(JSON.parse(e.raw()).money,75);
+  e.frame(23999);assert.equal(a.snapshot().running,true);
+  e.frame(1);assert.equal(a.snapshot().running,false);assert.equal(a.snapshot().elapsed,24);
+  assert.equal(a.snapshot().money,60);assert.equal(JSON.parse(e.raw()).money,60);
   assert.equal(a.finishBattle(),undefined);assert.equal(a.snapshot().scene,'battle');
   await e.step(250);assert.equal(a.snapshot().scene,'result');
   await e.step(250);assert.equal(a.snapshot().overlayHidden,true);
-  assert.equal(a.snapshot().money,75);assert.equal(JSON.parse(e.raw()).records[1].attempts,1);
+  assert.equal(a.snapshot().money,60);assert.equal(JSON.parse(e.raw()).records[1].attempts,1);
 });
 test('next stage and retry retain the timer and correct stage',async()=>{
   const seed=freshSave();seed.monsters.moss.level=30;
   const e=environment({seed}),a=e.api;
   let p=a.enter();await e.white();await p;
   p=a.beginBattle();await e.white();await p;
-  e.frame(30000);await e.result();
+  e.frame(24000);await e.result();
   assert.equal(a.snapshot().clear,true);assert.equal(JSON.parse(e.raw()).unlocked,2);
   p=a.actionNext('next');await e.step(400);
   assert.equal(a.snapshot().stage,2);assert.equal(a.snapshot().running,false);
   await e.step(100);await e.step(500);await p;
   assert.equal(a.snapshot().running,true);
-  e.frame(30000);await e.result();
+  e.frame(24000);await e.result();
   p=a.actionNext('retry');await e.white();await p;
   assert.equal(a.snapshot().stage,2);assert.equal(a.snapshot().elapsed,0);
 });
@@ -120,8 +120,8 @@ test('reduced motion skips animations and retains combat timing',async()=>{
   await a.enter();await a.navigateScene('stage');await a.beginBattle();
   assert.equal(e.animations.length,0);assert.equal(a.snapshot().startedAt,0);
   assert.equal(a.snapshot().running,true);assert.equal(a.snapshot().overlayHidden,true);
-  e.frame(30000);for(let i=0;i<8;i++)await Promise.resolve();
-  assert.equal(a.snapshot().scene,'result');assert.equal(a.snapshot().money,75);
+  e.frame(24000);for(let i=0;i<8;i++)await Promise.resolve();
+  assert.equal(a.snapshot().scene,'result');assert.equal(a.snapshot().money,60);
 });
 test('missing animation API falls back to immediate navigation',async()=>{
   const e=environment({animate:false}),a=e.api;
@@ -169,9 +169,9 @@ test('world selection, locked region and side mission retry do not unlock campai
   a.selectRegion(1);assert.equal(JSON.parse(a.snapshot().state).selectedStage,1);
   a.selectMission('collect');assert.equal(JSON.parse(a.snapshot().state).selectedMission,'collect');
   await a.beginBattle();assert.equal(a.snapshot().mission,'collect');
-  e.frame(30000);for(let i=0;i<8;i++)await Promise.resolve();
+  e.frame(24000);for(let i=0;i<8;i++)await Promise.resolve();
   const saved=JSON.parse(e.raw());
-  assert.equal(saved.unlocked,2);assert.equal(saved.materials.soulFragment,3);assert.equal(saved.missionRecords['1:collect'].attempts,1);
+  assert.equal(saved.unlocked,2);assert.equal(saved.materials.soulFragment,2);assert.equal(saved.missionRecords['1:collect'].attempts,1);
   assert.equal(saved.records[1],undefined);assert.ok(e.get('result').innerHTML.includes('魂の欠片'));
   assert.equal(a.actionNext('next'),undefined);await a.actionNext('retry');
   assert.equal(a.snapshot().mission,'collect');assert.equal(a.snapshot().stage,1);assert.equal(a.snapshot().elapsed,0);
@@ -206,24 +206,24 @@ test('illustrated world, equipment and report preserve actual mission data',asyn
   const seed=freshSave();seed.unlocked=2;seed.selectedMission='collect';
   const e=environment({seed,reduced:true}),a=e.api;await a.enter();
   assert.ok(e.get('terminalMonster').innerHTML.includes('assets/icons/moss.svg'));
-  assert.ok(e.get('terminalMonster').innerHTML.includes('assets/icons/might.svg'));
+  assert.ok(e.get('terminalMonster').innerHTML.includes('data-soul="might"'));
   assert.ok(e.get('terminalStage').innerHTML.includes('assets/art/meadow.jpg'));
   await a.navigateScene('stage');
   assert.ok(e.get('worldMap').innerHTML.includes('data-region-art="forest"'));
   assert.ok(e.get('worldMap').innerHTML.includes('data-region-art="frost"'));
   await a.beginBattle();assert.equal(e.get('arena').dataset.regionArt,'forest');
-  e.frame(30000);for(let i=0;i<8;i++)await Promise.resolve();
+  e.frame(24000);for(let i=0;i<8;i++)await Promise.resolve();
   assert.ok(e.get('result').innerHTML.includes('report-emblem rank-A'));
-  const saved=JSON.parse(e.raw());assert.equal(saved.materials.soulFragment,3);assert.equal(saved.money,93);
+  const saved=JSON.parse(e.raw());assert.equal(saved.materials.soulFragment,2);assert.equal(saved.money,78);
 });
 
 test('large portrait card uses real local illustration without changing saved progress',async()=>{
   const seed=freshSave();seed.monsters.moss.level=9;seed.money=812;
   const e=environment({seed,reduced:true}),a=e.api;await a.enter();
   const card=e.get('terminalMonster').innerHTML;
-  assert.ok(card.includes('assets/portraits/moss.webp'));
+  assert.ok(card.includes('data:image/svg+xml,'));
   assert.ok(card.includes('contract-title'));assert.ok(card.includes('Lv.9'));
   assert.ok(card.includes('装着魂'));assert.ok(card.includes('data-scene="build"'));
   assert.equal(a.snapshot().state,JSON.stringify(seed));
-  await a.beginBattle();assert.ok(e.get('fighter').innerHTML.includes('assets/portraits/moss.webp'));
+  await a.beginBattle();assert.ok(e.get('fighter').innerHTML.includes('data:image/svg+xml,'));
 });
