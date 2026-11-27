@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#10151e">
+<meta name="theme-color" content="#2b1c13">
 <title>SOUL RUSH - 魂の系譜</title>
 <style>
 :root{color-scheme:dark;--bg:#0d1119;--panel:#161e2b;--panel2:#1b2635;--line:#2a3b4c;--muted:#93a5b9;--txt:#e8f0f5;--accent:#85e6c4;--gold:#f4c982;--purple:#c3a3ff;--red:#ed8798;--blue:#83b9f4}*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",sans-serif;font-size:15px;line-height:1.5}body{background:radial-gradient(ellipse at 50% 0,#23333d 0,transparent 53%),#0d1119}button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}button:disabled{cursor:not-allowed;opacity:.42}button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}button,input{max-width:100%}button{border:1px solid var(--line);background:#1c2938;border-radius:10px;padding:11px 16px;font-weight:650}button:not(:disabled):active{transform:translateY(1px)}.primary{background:linear-gradient(120deg,#a2efd7,#5bc9ae);color:#102a28;border:0;box-shadow:0 6px 22px #4ccead21}.ghost{background:transparent}.quiet{color:var(--muted);font-size:12px}.tiny{font-size:11px;color:var(--muted)}.gold{color:var(--gold)}.green{color:var(--accent)}.tag{display:inline-flex;border:1px solid var(--line);background:#0d1722;color:var(--muted);padding:3px 8px;border-radius:5px;font-size:11px;letter-spacing:.05em}.number{font-variant-numeric:tabular-nums}.hidden,[hidden]{display:none!important}h1,h2,h3,p{margin:0}h1{font-size:29px;line-height:1.15}h2{font-size:17px;letter-spacing:.02em}h3{font-size:15px}p{font-size:13px}.eyebrow{font-size:10px;letter-spacing:.2em;font-weight:800;color:var(--accent)}.panel{background:linear-gradient(145deg,#182431,#141c28);border:1px solid var(--line);border-radius:15px;padding:15px;min-width:0}.sectionhead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}.line{height:1px;background:var(--line);margin:12px 0}.row{display:flex;align-items:center;gap:10px;min-width:0}.grow{flex:1;min-width:0}.wrap{flex-wrap:wrap}.right{text-align:right}.meter{height:7px;background:#0b121c;border-radius:20px;overflow:hidden}.meter>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#438d88,#9cf0ce);border-radius:20px;transition:width .12s linear}.meter.goldmeter>i{background:linear-gradient(90deg,#a66c3d,#f4cb81)}.meter.redmeter>i{background:linear-gradient(90deg,#c36688,#f4a0ac)}
@@ -120,6 +120,156 @@ html,body{height:100%;min-height:0;overflow:hidden;overscroll-behavior:none}body
 #sceneTransition{position:fixed;inset:0;z-index:2147483646;background:#0d1119;opacity:0;pointer-events:auto;touch-action:none}
 #sceneTransition[hidden]{display:none!important}
 </style>
+
+<style id="guildTheme">
+/* UI-002 guild board. Original SVG textures; no remote resources. */
+:root{
+ --bg:#21160f;--panel:#352419;--panel2:#4a3020;--line:#88633d;--muted:#d8c4a5;--txt:#fff1d8;
+ --accent:#d8b1ff;--gold:#ffdc92;--purple:#dfb7ff;--red:#ffb0ab;--blue:#a1bcd3;
+ --app-line:#937047;--app-glow:0 4px 12px #0d0807aa;
+ --guild-hall:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20480%20900%22%20preserveAspectRatio%3D%22xMidYMid%20slice%22%3E%0A%3Cdefs%3E%0A%3ClinearGradient%20id%3D%22room%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%23211b20%22%2F%3E%3Cstop%20offset%3D%22.52%22%20stop-color%3D%22%23463120%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23110c0a%22%2F%3E%3C%2FlinearGradient%3E%0A%3ClinearGradient%20id%3D%22wood%22%3E%3Cstop%20stop-color%3D%22%23180d09%22%2F%3E%3Cstop%20offset%3D%22.22%22%20stop-color%3D%22%234f2f1b%22%2F%3E%3Cstop%20offset%3D%22.46%22%20stop-color%3D%22%237e5031%22%2F%3E%3Cstop%20offset%3D%22.54%22%20stop-color%3D%22%233f281a%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23170e0c%22%2F%3E%3C%2FlinearGradient%3E%0A%3ClinearGradient%20id%3D%22glass%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%23728c9d%22%2F%3E%3Cstop%20offset%3D%22.55%22%20stop-color%3D%22%233b5866%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%231c292f%22%2F%3E%3C%2FlinearGradient%3E%0A%3ClinearGradient%20id%3D%22banner%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%23724037%22%2F%3E%3Cstop%20offset%3D%22.5%22%20stop-color%3D%22%2346231e%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23261714%22%2F%3E%3C%2FlinearGradient%3E%0A%3CradialGradient%20id%3D%22lamp%22%3E%3Cstop%20stop-color%3D%22%23ffd890%22%20stop-opacity%3D%22.6%22%2F%3E%3Cstop%20offset%3D%22.34%22%20stop-color%3D%22%23eea44d%22%20stop-opacity%3D%22.2%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23ec9a37%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%0A%3CradialGradient%20id%3D%22v%22%3E%3Cstop%20offset%3D%22.2%22%20stop-color%3D%22%23160c07%22%20stop-opacity%3D%220%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23100906%22%20stop-opacity%3D%22.8%22%2F%3E%3C%2FradialGradient%3E%0A%3Cpattern%20id%3D%22grain%22%20width%3D%2226%22%20height%3D%22125%22%20patternUnits%3D%22userSpaceOnUse%22%3E%3Cpath%20d%3D%22M3-5Q10%2040%203%2075T3%20128M9-5Q6%2045%2014%2080T11%20130M23-10Q17%2025%2022%2065T22%20135%22%20stroke%3D%22%23c78a55%22%20stroke-opacity%3D%22.10%22%20fill%3D%22none%22%2F%3E%3Cpath%20d%3D%22M1%200V125M25%200V125%22%20stroke%3D%22%23120906%22%20stroke-opacity%3D%22.35%22%2F%3E%3C%2Fpattern%3E%0A%3Cpattern%20id%3D%22masonry%22%20width%3D%22120%22%20height%3D%2246%22%20patternUnits%3D%22userSpaceOnUse%22%3E%3Cpath%20d%3D%22M0%201H120M0%2024H120M30%201V24M92%2024V46%22%20stroke%3D%22%23b99569%22%20stroke-opacity%3D%22.10%22%20fill%3D%22none%22%2F%3E%3C%2Fpattern%3E%0A%3C%2Fdefs%3E%0A%3Cpath%20fill%3D%22url(%23room)%22%20d%3D%22M0%200H480V900H0Z%22%2F%3E%3Cpath%20fill%3D%22url(%23masonry)%22%20d%3D%22M0%200H480V900H0Z%22%2F%3E%0A%3Cg%20opacity%3D%22.82%22%3E%3Cpath%20d%3D%22M57%20312V122Q109%2014%20161%20122V312Z%22%20fill%3D%22url(%23glass)%22%20stroke%3D%22%23211813%22%20stroke-width%3D%2217%22%2F%3E%3Cpath%20d%3D%22M109%2068V314M57%20154H161M57%20234H161%22%20stroke%3D%22%23342b28%22%20stroke-width%3D%227%22%2F%3E%3Cpath%20d%3D%22M109%2087%20%20136%20154%20109%20215%2082%20154Z%22%20fill%3D%22%2395b0bf%22%20opacity%3D%22.16%22%2F%3E%3Cpath%20d%3D%22M50%20320H168%22%20stroke%3D%22%231c120f%22%20stroke-width%3D%2212%22%2F%3E%3C%2Fg%3E%3Cg%20opacity%3D%22.82%22%3E%3Cpath%20d%3D%22M183%20312V122Q235%2014%20287%20122V312Z%22%20fill%3D%22url(%23glass)%22%20stroke%3D%22%23211813%22%20stroke-width%3D%2217%22%2F%3E%3Cpath%20d%3D%22M235%2068V314M183%20154H287M183%20234H287%22%20stroke%3D%22%23342b28%22%20stroke-width%3D%227%22%2F%3E%3Cpath%20d%3D%22M235%2087%20%20262%20154%20235%20215%20208%20154Z%22%20fill%3D%22%2395b0bf%22%20opacity%3D%22.16%22%2F%3E%3Cpath%20d%3D%22M176%20320H294%22%20stroke%3D%22%231c120f%22%20stroke-width%3D%2212%22%2F%3E%3C%2Fg%3E%3Cg%20opacity%3D%22.82%22%3E%3Cpath%20d%3D%22M309%20312V122Q361%2014%20413%20122V312Z%22%20fill%3D%22url(%23glass)%22%20stroke%3D%22%23211813%22%20stroke-width%3D%2217%22%2F%3E%3Cpath%20d%3D%22M361%2068V314M309%20154H413M309%20234H413%22%20stroke%3D%22%23342b28%22%20stroke-width%3D%227%22%2F%3E%3Cpath%20d%3D%22M361%2087%20%20388%20154%20361%20215%20334%20154Z%22%20fill%3D%22%2395b0bf%22%20opacity%3D%22.16%22%2F%3E%3Cpath%20d%3D%22M302%20320H420%22%20stroke%3D%22%231c120f%22%20stroke-width%3D%2212%22%2F%3E%3C%2Fg%3E%0A%3Cpath%20d%3D%22M0%2015%20240%20100%20480%2015M0%20100%20240%20170%20480%20100%22%20stroke%3D%22%23150d0a%22%20stroke-width%3D%2225%22%20fill%3D%22none%22%2F%3E%0A%3Cpath%20d%3D%22M0%2038%20240%20126%20480%2038%22%20stroke%3D%22%238b5c39%22%20stroke-opacity%3D%22.5%22%20stroke-width%3D%223%22%20fill%3D%22none%22%2F%3E%0A%3Cpath%20d%3D%22M0%20333H480M0%20359H480%22%20stroke%3D%22%231c100a%22%20stroke-width%3D%2216%22%2F%3E%0A%3Cg%3E%3Crect%20x%3D%221%22%20width%3D%2230%22%20height%3D%22900%22%20fill%3D%22url(%23wood)%22%2F%3E%3Crect%20x%3D%221%22%20width%3D%2230%22%20height%3D%22900%22%20fill%3D%22url(%23grain)%22%2F%3E%3Cpath%20d%3D%22M-6%20330H38M-6%20350H38M-6%20580H38%22%20stroke%3D%22%2321130c%22%20stroke-width%3D%2210%22%2F%3E%3Cpath%20d%3D%22M-6%20333H38M-6%20583H38%22%20stroke%3D%22%23bd8951%22%20stroke-width%3D%221.5%22%20opacity%3D%22.6%22%2F%3E%3C%2Fg%3E%3Cg%3E%3Crect%20x%3D%22137%22%20width%3D%2230%22%20height%3D%22900%22%20fill%3D%22url(%23wood)%22%2F%3E%3Crect%20x%3D%22137%22%20width%3D%2230%22%20height%3D%22900%22%20fill%3D%22url(%23grain)%22%2F%3E%3Cpath%20d%3D%22M130%20330H174M130%20350H174M130%20580H174%22%20stroke%3D%22%2321130c%22%20stroke-width%3D%2210%22%2F%3E%3Cpath%20d%3D%22M130%20333H174M130%20583H174%22%20stroke%3D%22%23bd8951%22%20stroke-width%3D%221.5%22%20opacity%3D%22.6%22%2F%3E%3C%2Fg%3E%3Cg%3E%3Crect%20x%3D%22313%22%20width%3D%2230%22%20height%3D%22900%22%20fill%3D%22url(%23wood)%22%2F%3E%3Crect%20x%3D%22313%22%20width%3D%2230%22%20height%3D%22900%22%20fill%3D%22url(%23grain)%22%2F%3E%3Cpath%20d%3D%22M306%20330H350M306%20350H350M306%20580H350%22%20stroke%3D%22%2321130c%22%20stroke-width%3D%2210%22%2F%3E%3Cpath%20d%3D%22M306%20333H350M306%20583H350%22%20stroke%3D%22%23bd8951%22%20stroke-width%3D%221.5%22%20opacity%3D%22.6%22%2F%3E%3C%2Fg%3E%3Cg%3E%3Crect%20x%3D%22449%22%20width%3D%2230%22%20height%3D%22900%22%20fill%3D%22url(%23wood)%22%2F%3E%3Crect%20x%3D%22449%22%20width%3D%2230%22%20height%3D%22900%22%20fill%3D%22url(%23grain)%22%2F%3E%3Cpath%20d%3D%22M442%20330H486M442%20350H486M442%20580H486%22%20stroke%3D%22%2321130c%22%20stroke-width%3D%2210%22%2F%3E%3Cpath%20d%3D%22M442%20333H486M442%20583H486%22%20stroke%3D%22%23bd8951%22%20stroke-width%3D%221.5%22%20opacity%3D%22.6%22%2F%3E%3C%2Fg%3E%0A%3Cg%3E%3Cpath%20d%3D%22M47%2038h48v120l-24%2018-24-18Z%22%20fill%3D%22url(%23banner)%22%20stroke%3D%22%23a57a43%22%20stroke-width%3D%222%22%2F%3E%3Cg%20transform%3D%22translate(71%20104)%20scale(.65)%22%3E%3Cpath%20d%3D%22M0-29%2024-21%2023%203Q19%2023%200%2034-19%2023-23%203L-24-21Z%22%20fill%3D%22%2343281f%22%20stroke%3D%22%23bb9250%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M-10-13%2012%2013M10-13-12%2013M-14-9l4-5%204%205M6-9l4-5%204%205%22%20fill%3D%22none%22%20stroke%3D%22%23e5c080%22%20stroke-width%3D%222.8%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fg%3E%3Cpath%20d%3D%22M41%2038h60%22%20stroke%3D%22%23ad8957%22%20stroke-width%3D%224%22%2F%3E%3C%2Fg%3E%3Cg%3E%3Cpath%20d%3D%22M385%2038h48v120l-24%2018-24-18Z%22%20fill%3D%22url(%23banner)%22%20stroke%3D%22%23a57a43%22%20stroke-width%3D%222%22%2F%3E%3Cg%20transform%3D%22translate(409%20104)%20scale(.65)%22%3E%3Cpath%20d%3D%22M0-29%2024-21%2023%203Q19%2023%200%2034-19%2023-23%203L-24-21Z%22%20fill%3D%22%2343281f%22%20stroke%3D%22%23bb9250%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M-10-13%2012%2013M10-13-12%2013M-14-9l4-5%204%205M6-9l4-5%204%205%22%20fill%3D%22none%22%20stroke%3D%22%23e5c080%22%20stroke-width%3D%222.8%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fg%3E%3Cpath%20d%3D%22M379%2038h60%22%20stroke%3D%22%23ad8957%22%20stroke-width%3D%224%22%2F%3E%3C%2Fg%3E%0A%3Cg%20transform%3D%22translate(42%20225)%22%3E%3Ccircle%20r%3D%22120%22%20fill%3D%22url(%23lamp)%22%2F%3E%3Cpath%20d%3D%22M0-54V-22M-18-20-12-31H12L18-20%2014%2019%200%2026-14%2019Z%22%20fill%3D%22%23412917%22%20stroke%3D%22%23b78b50%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M-10-17%200-23%2010-17%208%2014%200%2019-8%2014Z%22%20fill%3D%22%23ffd087%22%2F%3E%3Cpath%20d%3D%22M-10-17%2010%2017M10-17-10%2017%22%20stroke%3D%22%23a0662f%22%20stroke-width%3D%221.3%22%2F%3E%3Ccircle%20cy%3D%221%22%20r%3D%226%22%20fill%3D%22%23fff4c1%22%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%22translate(438%20225)%22%3E%3Ccircle%20r%3D%22120%22%20fill%3D%22url(%23lamp)%22%2F%3E%3Cpath%20d%3D%22M0-54V-22M-18-20-12-31H12L18-20%2014%2019%200%2026-14%2019Z%22%20fill%3D%22%23412917%22%20stroke%3D%22%23b78b50%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M-10-17%200-23%2010-17%208%2014%200%2019-8%2014Z%22%20fill%3D%22%23ffd087%22%2F%3E%3Cpath%20d%3D%22M-10-17%2010%2017M10-17-10%2017%22%20stroke%3D%22%23a0662f%22%20stroke-width%3D%221.3%22%2F%3E%3Ccircle%20cy%3D%221%22%20r%3D%226%22%20fill%3D%22%23fff4c1%22%2F%3E%3C%2Fg%3E%0A%3Cpath%20d%3D%22M0%20630%20480%20630V900H0Z%22%20fill%3D%22%23392719%22%2F%3E%3Cpath%20d%3D%22M0%20630%20480%20630V900H0Z%22%20fill%3D%22url(%23grain)%22%2F%3E%0A%3Cpath%20d%3D%22M240%20630%2020%20900M240%20630%20460%20900M110%20630%200%20750M370%20630%20480%20750M0%20730H480M0%20820H480%22%20fill%3D%22none%22%20stroke%3D%22%23160e0a%22%20stroke-width%3D%223%22%20opacity%3D%22.7%22%2F%3E%0A%3Crect%20width%3D%22480%22%20height%3D%22900%22%20fill%3D%22url(%23v)%22%2F%3E%0A%3C%2Fsvg%3E");--guild-wood:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22300%22%20height%3D%22120%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22w%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%2353331f%22%2F%3E%3Cstop%20offset%3D%22.12%22%20stop-color%3D%22%2345291b%22%2F%3E%3Cstop%20offset%3D%22.55%22%20stop-color%3D%22%23372015%22%2F%3E%3Cstop%20offset%3D%22.95%22%20stop-color%3D%22%232b1a12%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23120c09%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22300%22%20height%3D%22120%22%20fill%3D%22url(%23w)%22%2F%3E%3Cpath%20d%3D%22M-5%20-6Q75%204%20155%20-2T305%201%22%20fill%3D%22none%22%20stroke%3D%22%23b17d47%22%20stroke-opacity%3D%22.17%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M-5%201Q78%2011%20154%205T305%208%22%20fill%3D%22none%22%20stroke%3D%22%23170d08%22%20stroke-opacity%3D%22.24%22%20stroke-width%3D%221%22%2F%3E%3Cpath%20d%3D%22M-5%208Q81%2018%20153%2012T305%2015%22%20fill%3D%22none%22%20stroke%3D%22%23170d08%22%20stroke-opacity%3D%22.24%22%20stroke-width%3D%221%22%2F%3E%3Cpath%20d%3D%22M-5%2015Q84%2025%20152%2019T305%2022%22%20fill%3D%22none%22%20stroke%3D%22%23170d08%22%20stroke-opacity%3D%22.24%22%20stroke-width%3D%221%22%2F%3E%3Cpath%20d%3D%22M-5%2022Q87%2032%20151%2026T305%2029%22%20fill%3D%22none%22%20stroke%3D%22%23b17d47%22%20stroke-opacity%3D%22.17%22%20stroke-width%3D%221%22%2F%3E%3Cpath%20d%3D%22M-5%2029Q90%2039%20150%2033T305%2036%22%20fill%3D%22none%22%20stroke%3D%22%23170d08%22%20stroke-opacity%3D%22.24%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M-5%2036Q93%2046%20149%2040T305%2043%22%20fill%3D%22none%22%20stroke%3D%22%23170d08%22%20stroke-opacity%3D%22.24%22%20stroke-width%3D%221%22%2F%3E%3Cpath%20d%3D%22M-5%2043Q96%2053%20148%2047T305%2050%22%20fill%3D%22none%22%20stroke%3D%22%23170d08%22%20stroke-opacity%3D%22.24%22%20stroke-width%3D%221%22%2F%3E%3Cpath%20d%3D%22M-5%2050Q99%2060%20147%2054T305%2057%22%20fill%3D%22none%22%20stroke%3D%22%23b17d47%22%20stroke-opacity%3D%22.17%22%20stroke-width%3D%221%22%2F%3E%3Cpath%20d%3D%22M-5%2057Q102%2067%20146%2061T305%2064%22%20fill%3D%22none%22%20stroke%3D%22%23170d08%22%20stroke-opacity%3D%22.24%22%20stroke-width%3D%221%22%2F%3E%3Cpath%20d%3D%22M-5%2064Q105%2074%20145%2068T305%2071%22%20fill%3D%22none%22%20stroke%3D%22%23170d08%22%20stroke-opacity%3D%22.24%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M-5%2071Q108%2081%20144%2075T305%2078%22%20fill%3D%22none%22%20stroke%3D%22%23170d08%22%20stroke-opacity%3D%22.24%22%20stroke-width%3D%221%22%2F%3E%3Cpath%20d%3D%22M-5%2078Q111%2088%20143%2082T305%2085%22%20fill%3D%22none%22%20stroke%3D%22%23b17d47%22%20stroke-opacity%3D%22.17%22%20stroke-width%3D%221%22%2F%3E%3Cpath%20d%3D%22M-5%2085Q114%2095%20142%2089T305%2092%22%20fill%3D%22none%22%20stroke%3D%22%23170d08%22%20stroke-opacity%3D%22.24%22%20stroke-width%3D%221%22%2F%3E%3Cpath%20d%3D%22M-5%2092Q117%20102%20141%2096T305%2099%22%20fill%3D%22none%22%20stroke%3D%22%23170d08%22%20stroke-opacity%3D%22.24%22%20stroke-width%3D%221%22%2F%3E%3Cpath%20d%3D%22M-5%2099Q120%20109%20140%20103T305%20106%22%20fill%3D%22none%22%20stroke%3D%22%23170d08%22%20stroke-opacity%3D%22.24%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M-5%20106Q123%20116%20139%20110T305%20113%22%20fill%3D%22none%22%20stroke%3D%22%23b17d47%22%20stroke-opacity%3D%22.17%22%20stroke-width%3D%221%22%2F%3E%3Cpath%20d%3D%22M-5%20113Q126%20123%20138%20117T305%20120%22%20fill%3D%22none%22%20stroke%3D%22%23170d08%22%20stroke-opacity%3D%22.24%22%20stroke-width%3D%221%22%2F%3E%3Cpath%20d%3D%22M-5%20120Q129%20130%20137%20124T305%20127%22%20fill%3D%22none%22%20stroke%3D%22%23170d08%22%20stroke-opacity%3D%22.24%22%20stroke-width%3D%221%22%2F%3E%3Cpath%20d%3D%22M0%203H300M0%20116H300%22%20stroke%3D%22%23bb874b%22%20stroke-opacity%3D%22.18%22%2F%3E%3Cellipse%20cx%3D%22213%22%20cy%3D%2258%22%20rx%3D%2228%22%20ry%3D%225%22%20fill%3D%22none%22%20stroke%3D%22%23140d08%22%20opacity%3D%22.25%22%2F%3E%3Cellipse%20cx%3D%22213%22%20cy%3D%2258%22%20rx%3D%2218%22%20ry%3D%222%22%20fill%3D%22none%22%20stroke%3D%22%23140d08%22%20opacity%3D%22.24%22%2F%3E%3C%2Fsvg%3E");--guild-paper:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22320%22%20height%3D%22200%22%3E%3Cdefs%3E%3CradialGradient%20id%3D%22p%22%3E%3Cstop%20stop-color%3D%22%23f4e4bd%22%2F%3E%3Cstop%20offset%3D%22.74%22%20stop-color%3D%22%23dec18e%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23bc945e%22%2F%3E%3C%2FradialGradient%3E%3Cfilter%20id%3D%22n%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%22.58%22%20numOctaves%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3C%2Ffilter%3E%3C%2Fdefs%3E%3Crect%20width%3D%22320%22%20height%3D%22200%22%20fill%3D%22url(%23p)%22%2F%3E%3Crect%20width%3D%22320%22%20height%3D%22200%22%20filter%3D%22url(%23n)%22%20opacity%3D%22.09%22%2F%3E%3Cpath%20d%3D%22M7%2029V9H29M291%209h22v20M7%20171v20h22M291%20191h22v-20%22%20stroke%3D%22%238e653f%22%20opacity%3D%22.6%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E");--guild-map:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20500%20200%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22m%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%23ad9c72%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23d7c89f%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22500%22%20height%3D%22200%22%20fill%3D%22url(%23m)%22%2F%3E%3Cg%20stroke%3D%22%23786b4a%22%20stroke-width%3D%221.5%22%20fill%3D%22%23b8b48a%22%3E%3Cpath%20d%3D%22M-30%20175Q70%20130%20104%20125T170%2088%20244%2072%20335%2032%20520%2010V220H-30Z%22%2F%3E%3Cpath%20d%3D%22M-15%20195%2044%20150%2090%20163%20145%20120%20190%20143%20237%2092%20267%20114%20320%2061%20357%2081%20400%2047%20440%2061%20510%208V220H-15Z%22%20fill%3D%22%239e9c6d%22%2F%3E%3Cpath%20d%3D%22M80%20130l28-34%2019%2022%2014-21%2028%2030m143-30%2021-31%2019%2024%2013-13%2030%2038%22%20fill%3D%22%23d2c7a4%22%2F%3E%3C%2Fg%3E%3Cpath%20d%3D%22M25%20190Q98%20170%20151%20145T273%20119%20380%2076%20485%2031%22%20stroke%3D%22%23745338%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%20stroke-dasharray%3D%226%207%22%2F%3E%3Cg%20fill%3D%22%23a25a38%22%20stroke%3D%22%2369462c%22%3E%3Ccircle%20cx%3D%2255%22%20cy%3D%22181%22%20r%3D%225%22%2F%3E%3Ccircle%20cx%3D%22151%22%20cy%3D%22145%22%20r%3D%225%22%2F%3E%3Ccircle%20cx%3D%22272%22%20cy%3D%22119%22%20r%3D%225%22%2F%3E%3Ccircle%20cx%3D%22380%22%20cy%3D%2276%22%20r%3D%225%22%2F%3E%3Ccircle%20cx%3D%22463%22%20cy%3D%2242%22%20r%3D%225%22%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%22translate(435%20153)%22%20fill%3D%22none%22%20stroke%3D%22%2377603e%22%20opacity%3D%22.75%22%3E%3Ccircle%20r%3D%2224%22%2F%3E%3Cpath%20d%3D%22M0-29%204-4%2029%200%204%204%200%2029-4%204-29%200-4-4Z%22%2F%3E%3Ccircle%20r%3D%2217%22%20stroke-dasharray%3D%222%203%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");--guild-crest:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%22-36%20-40%2072%2080%22%3E%3Cpath%20d%3D%22M0-29%2024-21%2023%203Q19%2023%200%2034-19%2023-23%203L-24-21Z%22%20fill%3D%22%2343281f%22%20stroke%3D%22%23bb9250%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M-10-13%2012%2013M10-13-12%2013M-14-9l4-5%204%205M6-9l4-5%204%205%22%20fill%3D%22none%22%20stroke%3D%22%23e5c080%22%20stroke-width%3D%222.8%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22M-30%2018Q-28%2034-10%2038M30%2018Q28%2034%2010%2038%22%20stroke%3D%22%23bd9250%22%20stroke-width%3D%222%22%20fill%3D%22none%22%2F%3E%3Cpath%20d%3D%22M-28%2024l-5-3m9%2010-6-1m11%206-6%202m53-14%205-3m-9%2010%206-1m-11%206%206%202%22%20stroke%3D%22%23d4ad6b%22%20stroke-width%3D%222%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E");
+ --ink:#382215;--gold-edge:#bf9252;--paper-text:#4b2c1a;
+}
+body{background:#1a110c var(--guild-hall) center center/cover no-repeat;color:var(--txt)}
+.app-shell{max-width:780px;position:relative;background:linear-gradient(180deg,#1b100bc9,#1c100bd1 18%,#1b100baa 70%,#1a100bdf);gap:8px}
+.app-topbar{border-bottom:1px solid #b18b55;padding:5px 2px 9px;box-shadow:0 2px 0 #130b07;min-height:54px}
+.title-copy .eyebrow,.eyebrow{color:#e6c58d;font-family:Georgia,"Yu Mincho",serif;letter-spacing:.13em}
+.title-copy h2{font-family:"Yu Mincho","Hiragino Mincho ProN",Georgia,serif;color:#ffedcf;font-weight:800;letter-spacing:.02em}
+.brand-mini{filter:drop-shadow(0 0 6px #b278df80)}
+.status-chip{background:linear-gradient(#513522,#28170f);border:1px solid #b18750;border-radius:4px;box-shadow:inset 0 0 0 2px #1f130b,0 2px 6px #0007}
+button{background:linear-gradient(#6b472c,#402719 52%,#2e1c13);border:1px solid #ba8e54;border-radius:5px;color:#ffefcf;box-shadow:inset 0 0 0 2px #24160f88,inset 0 2px 0 #dfbd7555,0 2px 3px #0005;text-shadow:0 1px 2px #140b07}
+button.ghost{background:linear-gradient(#503624,#302015)}
+button:not(:disabled):hover{border-color:#ffdc98;filter:brightness(1.1)}
+button:not(:disabled):active{filter:brightness(.92);transform:translateY(1px)}
+button:focus-visible{outline:2px solid #ffdc98;outline-offset:2px}
+button.primary{background:linear-gradient(180deg,#ad5e43 0%,#8b3e2d 24%,#67261d 55%,#4a1b15 100%);border:2px solid #dfb471;color:#fff3cd;font-family:"Yu Mincho","Hiragino Mincho ProN",Georgia,serif;box-shadow:inset 0 0 0 2px #532a16,inset 0 0 0 4px #f1c77b55,0 4px 9px #0009;text-shadow:0 1px 3px #2c100b}
+.back-btn{background:linear-gradient(#553825,#28190e);border-radius:4px;border-color:#c29659}
+.cover{background:linear-gradient(#1e100b33,#170d09a6),var(--guild-hall) center/cover}
+.cover::before{width:min(380px,82vw);height:min(380px,82vw);border:1px solid #c7a76d4f;box-shadow:0 0 0 15px #b49b5c12,0 0 0 38px #c6a5720a,inset 0 0 55px #e8ad4e16}
+.cover h1{font-family:Georgia,"Yu Mincho",serif;color:#f6d99d;text-shadow:0 2px 0 #4f2d16,0 5px 12px #0a0503,0 0 32px #d4a05d52;letter-spacing:.04em}
+.cover .logo-orb{filter:drop-shadow(0 0 20px #c18bff88)}
+.cover .subtitle,.cover .hint,.version{color:#e7cba4;text-shadow:0 1px 5px #110905}
+.cover .primary{min-height:54px}
+.loading-ring{border-color:#bd92514d;border-top-color:#eac685}
+.app-card,.hero-monster,.mission,.battle-progress,.battle-build,.battle-bottom{
+ background:linear-gradient(135deg,#3d291b8c,#1b110be0),var(--guild-wood) center/300px 120px;
+ border:1px solid #ba8e54;border-radius:5px;box-shadow:inset 0 0 0 3px #20130e,inset 0 0 0 4px #9a744648,0 4px 12px #0e0807a6
+}
+.app-card{padding:14px}
+.sectionhead{padding-bottom:8px;border-bottom:1px solid #9a724b6e}
+.sectionhead h2,.scene-head h2{font-family:"Yu Mincho","Hiragino Mincho ProN",Georgia,serif;color:#ffdfa0;font-weight:800}
+.tag{border-color:#aa804d;background:#2d1b12;color:#f1d3a5;border-radius:3px}
+.quiet,.tiny,.log time,.log div,.soul-card .type,.mini-stats{color:var(--muted)}
+.meter{background:#20130e;border:1px solid #9e774744;border-radius:2px}
+.meter>i{background:linear-gradient(90deg,#7951a9,#d2a7f9);border-radius:0}
+.meter.goldmeter>i{background:linear-gradient(90deg,#b17b39,#ffe1a1)}
+.avatar,.soul-icon{background:radial-gradient(#705034,#2d1d16 68%);border:1px solid #b98e56;border-radius:5px;box-shadow:inset 0 0 0 2px #25180e}
+.slot{border-color:#b48a56;border-radius:3px;background:linear-gradient(#422b20,#25180f);color:#c4a67e}
+.slot.filled{background:radial-gradient(#66438c,#372344 58%,#1e1526);border-color:#c8a1f3;box-shadow:inset 0 0 0 2px #24182e,0 0 6px #ab74e04a}
+.slot.filled svg,.soul-icon svg{filter:drop-shadow(0 0 3px #b47be8a0)}
+.monster-card,.soul-card,.metric-box,.stat,.summary-chip,.record>div,.rewardgrid>div,.info-list div{background:linear-gradient(145deg,#4b3223,#2b1b14);border:1px solid #967047;border-radius:4px}
+.monster-card.selected,.soul-card.selected{border-color:#d4abed;box-shadow:inset 0 0 0 1px #c49ce44d,0 0 8px #a277c62b}
+.soul-card p{color:#eddbc4}
+.toast,dialog{background:#332218;border:1px solid #ceaa70;color:#fff0d4;border-radius:5px;box-shadow:0 5px 24px #000a}
+#exportText,#importText{background:#23170f!important;color:#fceacb!important;border-color:#957149!important}
+/* The hub is a framed notice board, not a generic app dashboard. */
+.terminal-scene{max-width:560px;justify-content:flex-start;gap:9px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:1px 3px 5px}
+.terminal-heading{flex:none;display:flex;align-items:center;justify-content:center;gap:12px;text-align:left;padding:4px 6px}
+.guild-crest{width:44px;height:52px;flex:none;background:var(--guild-crest) center/contain no-repeat;filter:drop-shadow(0 2px 3px #000)}
+.terminal-heading .eyebrow{font-size:9px;letter-spacing:.20em}
+.terminal-heading h1{font-family:"Yu Mincho","Hiragino Mincho ProN",Georgia,serif;letter-spacing:.07em;font-size:25px;color:#fbe0a7;text-shadow:0 2px 5px #120905;margin:2px 0}
+.terminal-heading .quiet{font-size:11px;color:#e3c8a5}
+.guild-board{flex:1;min-height:0;position:relative;display:flex;flex-direction:column;gap:8px;padding:10px;background:var(--guild-wood) center/300px 120px;border:5px ridge #926138;box-shadow:inset 0 0 0 1px #c39b61,0 5px 15px #080403b3;overflow:visible}
+.guild-board:before,.guild-board:after{position:absolute;top:2px;width:9px;height:9px;content:"";border-radius:50%;background:radial-gradient(circle at 30% 25%,#fff2bd,#b78b46 42%,#563018 78%);box-shadow:0 1px 2px #130905;z-index:2}
+.guild-board:before{left:2px}.guild-board:after{right:2px}
+.guild-board-heading{display:flex;align-items:center;justify-content:space-between;gap:4px;min-height:20px;color:#eed49e;font-family:Georgia,"Yu Mincho",serif;font-size:12px;letter-spacing:.07em}
+.guild-board-heading:before,.guild-board-heading:after{content:"";height:1px;flex:1;background:linear-gradient(90deg,transparent,#c6a05e,transparent)}
+.hero-monster{position:relative;flex:1;min-height:220px;max-height:none;padding:12px;background:var(--guild-paper) center/100% 100%;border:1px solid #e4c287;color:var(--ink);box-shadow:0 3px 7px #100905a6,inset 0 0 0 3px #9c704033;overflow:hidden;border-radius:1px}
+.hero-monster:before{right:4%;top:5%;width:47%;border-color:#76563850;box-shadow:0 0 0 7px #805c3515,0 0 0 18px #805c3510}
+.hero-info{width:56%}
+.hero-info .eyebrow{color:#6d3a24;font-weight:900}
+.hero-info h2{font-family:"Yu Mincho","Hiragino Mincho ProN",Georgia,serif;color:#3c2217;font-size:29px;font-weight:800}
+.hero-info .tag{color:#f9e1b3;border-color:#885b35;background:#60402b}
+.hero-info .quiet,.hero-statline span{color:#62412b}
+.hero-statline{gap:12px}
+.hero-statline b{color:#3a2419}
+.hero-info .meter{background:#86603e50;border-color:#956a39}
+.hero-portrait{height:70%;width:48%;right:2%;top:2%;filter:drop-shadow(0 9px 6px #45301b66)}
+.hero-portrait svg{max-height:260px}
+.hero-souls{background:linear-gradient(#523522,#332015);border:1px solid #ab8050;box-shadow:inset 0 0 0 2px #28170e;padding:7px 8px;border-radius:3px;gap:5px}
+.hero-souls .slot{width:clamp(29px,8.4vw,40px);height:clamp(29px,8.4vw,40px);border-radius:3px}
+.hero-souls .slot svg{width:85%;height:85%}
+.hero-souls .quiet{color:#ebd1a9;white-space:nowrap;font-size:9px}
+.hero-souls .soul-label{font-family:Georgia,"Yu Mincho",serif;color:#e6c98f;font-size:10px;white-space:nowrap;margin-right:2px}
+.guild-stamp{position:absolute;right:8px;top:8px;width:28px;height:28px;display:grid;place-items:center;color:#edc0a2;font-size:10px;background:radial-gradient(circle at 36% 25%,#a65340,#69291c 75%);border:2px solid #7b3829;border-radius:48% 54% 47% 51%;box-shadow:0 2px 3px #331a13aa;transform:rotate(-11deg);z-index:1}
+.mission{padding:10px 11px;flex-wrap:wrap;gap:8px;position:relative;background:var(--guild-paper) center/100% 100%;color:var(--paper-text);border-color:#c19a61;border-radius:1px;box-shadow:0 3px 7px #130b07aa}
+.mission .eyebrow{color:#6d3a24;font-size:9px;font-weight:900}
+.mission h2{font-family:"Yu Mincho","Hiragino Mincho ProN",Georgia,serif;font-size:20px;color:#3c2417;margin:3px 0;line-height:1.2}
+.mission .quiet{color:#65442b;font-size:11px}
+.mission .primary{width:100%;min-height:49px;border-radius:4px;box-shadow:inset 0 0 0 2px #532a16,inset 0 0 0 4px #f1c77b55,0 3px 5px #321b12aa;font-size:16px;letter-spacing:.12em}
+.mission .primary small{display:block;font:9px Georgia,serif;letter-spacing:.18em;color:#f5d7ac;margin-top:1px}
+.mission .ghost{font-size:11px;min-height:38px;flex:none;padding:5px 10px}
+.terminal-menu{gap:5px}
+.terminal-menu button{border-color:#b68c56;border-radius:4px;min-height:66px;background:linear-gradient(#543721,#2d1d13);box-shadow:inset 0 0 0 2px #1c120a,inset 0 2px 0 #c49b5b55,0 3px 5px #130b0799}
+.terminal-menu button>span{color:#f6d697;width:24px;height:24px;filter:drop-shadow(0 1px 1px #170c06)}
+.terminal-menu b{font-family:"Yu Mincho","Hiragino Mincho ProN",Georgia,serif;font-size:12px;color:#ffe6bb}
+.terminal-menu small{color:#dbc3a1}
+.terminal-foot{color:#e5ccaa;flex-wrap:wrap}
+.terminal-foot button{min-height:40px}
+.terminal-foot #terminalProgress{flex:1;line-height:1.5;font-size:10px}
+.guild-materials{font-size:10px;color:#efd7b1}
+/* World notices, training, inventory, and report. */
+#stageScene .app-card:first-child{background:linear-gradient(#e6d0a5b8,#e3c394d9),var(--guild-map) center/cover;color:var(--ink);box-shadow:inset 0 0 0 3px #bb8f595e,0 3px 8px #150b08a8}
+#stageScene .app-card:first-child .sectionhead{border-color:#9b714e6b}
+#stageScene .app-card:first-child h2{color:#462b19}
+#worldMap button,#missionChoices button{background:linear-gradient(#f0ddb6,#d5b37e);border:1px solid #89603b;color:#3e2518;text-shadow:none;box-shadow:inset 0 0 0 2px #b2875144,0 2px 2px #1d100b55;min-height:51px}
+#worldMap button small,#missionChoices button small{color:#67472e}
+#worldMap button.chosen,#missionChoices button.chosen{background:linear-gradient(#9c543a,#673222);border-color:#f4d19b;color:#fff2d6;text-shadow:0 1px 1px #34160c}
+#worldMap button.chosen small,#missionChoices button.chosen small{color:#f9dfba}
+.stage-map button.chosen{background:linear-gradient(#956143,#634024);border-color:#ffdc92;color:#fff5e0}
+.stage-map button.done{border-color:#b4ad71}
+.stage-map button small{color:#f3d6aa}
+.stage-map button:disabled{opacity:.45}
+.stage-highlight{padding:10px;background:var(--guild-paper) center/100% 100%;color:#3d2516;border:1px solid #caa66f}
+.stage-highlight .eyebrow,.stage-highlight .quiet{color:#633e25}
+#codexScene .app-card{border-left:5px solid #ac7d42}
+#codexScene .monster-card,#codexScene .soul-card{border-color:#b38b59}
+#buildScene .app-card:first-child{border-top:3px solid #b18a58}
+#shopScene .app-card:first-child{border-top:3px solid #b18a58}
+.battle-arena-wrap .arena{border:2px solid #ac8453;border-radius:5px;background:linear-gradient(180deg,#273135,#384738 63%,#453b2a 64%,#2b251b)}
+.battle-heading h1{font-family:Georgia,"Yu Mincho",serif;color:#f4daab}
+.battle-time .timer{color:#ffdfa3;text-shadow:0 1px 2px #1c0c06}
+.battle-time .timer.danger{color:#ffaaa5}
+.result-wrap .result{color:#3b2418;background:var(--guild-paper) center/100% 100%;border:3px double #9b6d3c;border-radius:2px;box-shadow:0 4px 12px #120a07aa}
+.result-wrap .result .eyebrow,.result-wrap .result>.quiet,.result-wrap .result .sectionhead .quiet{color:#633d28}
+.result-wrap .result-title{color:#79412b!important;font-family:Georgia,"Yu Mincho",serif;letter-spacing:.08em}
+.result-wrap .result.clear .result-title{color:#4e642d!important}
+.result-wrap .result .sectionhead .gold{color:#6a401b}
+.result-wrap .result .rewardgrid,.result-wrap .result .record{color:#fff0ce}
+.result-wrap .result .soul-drop{color:#553073}
+.result-wrap .result .level-up{color:#5e3a78;font-weight:bold}
+.result-wrap .result .green{color:#e1bbff}
+.result-wrap .result .record small,.result-wrap .result .rewardgrid small{color:#f1d0a7}
+@media(max-height:700px){
+ .app-shell{gap:5px}.app-topbar{min-height:46px;padding:3px 1px 5px}
+ .terminal-scene{gap:6px}.terminal-heading{display:flex;padding:2px 4px;gap:8px}
+ .terminal-heading .guild-crest{width:31px;height:35px}.terminal-heading h1{font-size:19px}
+ .terminal-heading .quiet{display:none}.terminal-heading .eyebrow{font-size:8px}
+ .guild-board{flex:none;padding:6px;gap:6px;border-width:4px}
+ .guild-board-heading{font-size:10px;min-height:15px}
+ .hero-monster{min-height:174px;padding:8px;flex:none}
+ .hero-info h2{font-size:23px}.hero-statline{margin:5px 0}
+ .hero-souls{padding:4px 5px}.hero-souls .slot{width:31px;height:31px}
+ .mission{padding:7px 8px;gap:5px}.mission h2{font-size:16px;margin:2px 0}
+ .mission .primary{min-height:42px;font-size:14px;padding:6px}.mission .ghost{min-height:33px}
+ .terminal-menu button{min-height:48px;gap:2px;padding:4px}.terminal-menu button>span{width:19px;height:19px}.terminal-menu small{display:none}
+ .terminal-foot button{min-height:36px}
+}
+@media(max-width:350px){.hero-souls .soul-label{display:none}.hero-souls{gap:3px}.hero-souls .slot{width:30px;height:30px}.terminal-menu b{font-size:11px}.terminal-foot #terminalProgress{font-size:9px}.guild-board{padding:6px}}
+@media(min-width:750px) and (min-height:701px){.guild-board{min-height:400px}.hero-monster{min-height:230px}}
+@media(max-height:480px) and (orientation:landscape){.terminal-heading{display:flex}.guild-board{flex:none}.terminal-scene{overflow-y:auto}.hero-monster{height:auto}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}}
+</style>
 </head>
 <body>
 <div id="sceneTransition" hidden aria-hidden="true"></div>
@@ -142,7 +292,7 @@ html,body{height:100%;min-height:0;overflow:hidden;overscroll-behavior:none}body
     <button class="primary" id="enterBtn">冒険を始める</button>
     <p class="hint" id="titleHint">モンスターに魂を宿し、30秒の限界を超えろ。</p>
   </div>
-  <div class="version">VERSION 0.4.0 · OFFLINE SAVE</div>
+  <div class="version">VERSION 0.4.1 · OFFLINE SAVE</div>
 </section>
 <main id="game" class="shell app-shell" hidden data-scene="terminal">
   <header class="app-topbar">
@@ -165,14 +315,17 @@ html,body{height:100%;min-height:0;overflow:hidden;overscroll-behavior:none}body
 
   <div class="app-frame">
     <section id="terminalScene" class="scene terminal-scene">
-  <div class="terminal-heading"><span class="eyebrow">THE SOUL ARCHIVE</span><h1>出撃準備</h1><p class="quiet">魂を宿し、限界を超える。</p></div>
-  <section class="hero-monster" id="terminalMonster"></section>
-  <section class="mission" id="terminalStage"></section>
+  <div class="terminal-heading"><span class="guild-crest" aria-hidden="true"></span><div><span class="eyebrow">THE ADVENTURERS' GUILD</span><h1>ギルド掲示板</h1><p class="quiet">魂を宿し、新たな依頼へ。</p></div></div>
+  <div class="guild-board">
+    <div class="guild-board-heading">出撃モンスター・受注依頼</div>
+    <section class="hero-monster" id="terminalMonster"></section>
+    <section class="mission" id="terminalStage"></section>
+  </div>
   <div class="terminal-menu">
-    <button data-scene="stage"><span data-icon="stage"></span><b>ワールド</b><small>地域・ミッション</small></button>
-    <button data-scene="build"><span data-icon="build"></span><b>ビルド</b><small>魂の編成</small></button>
-    <button data-scene="shop"><span data-icon="shop"></span><b>ショップ</b><small>召喚・強化</small></button>
-    <button data-scene="codex"><span data-icon="codex"></span><b>図鑑</b><small>収集記録</small></button>
+    <button data-scene="stage"><span data-icon="stage"></span><b>ワールド</b><small>世界地図</small></button>
+    <button data-scene="build"><span data-icon="build"></span><b>モンスター</b><small>育成・魂編成</small></button>
+    <button data-scene="shop"><span data-icon="shop"></span><b>商店</b><small>召喚・強化</small></button>
+    <button data-scene="codex"><span data-icon="codex"></span><b>図鑑</b><small>古書の記録</small></button>
   </div>
   <div class="terminal-foot"><span id="terminalProgress"></span><button class="ghost" data-scene="settings"><span data-icon="settings"></span>設定</button></div>
 </section>
@@ -189,7 +342,7 @@ html,body{height:100%;min-height:0;overflow:hidden;overscroll-behavior:none}body
         <div class="stage-map" id="stageMap"></div>
       </section>
       <section class="app-card">
-        <div class="sectionhead"><h2>ミッション選択</h2><span class="tag">NORMAL</span></div>
+        <div class="sectionhead"><h2>ギルド依頼書</h2><span class="tag">NORMAL</span></div>
         <div id="missionChoices"></div>
         <div id="stagePreview"></div>
       </section>
@@ -217,20 +370,20 @@ html,body{height:100%;min-height:0;overflow:hidden;overscroll-behavior:none}body
     </section>
 
     <section id="shopScene" class="scene scene-scroll" hidden>
-      <div class="stack"><section class="app-card"><div class="sectionhead"><div><div class="eyebrow">MONSTER SANCTUARY</div><h2>モンスターの召喚</h2></div><span class="tag">エーテルで購入</span></div><p class="quiet" style="margin-bottom:12px">種類ごとに異なる攻撃性能・魂の枠・固有特性を持ちます。</p><div class="shop-grid" id="monsterShop"></div></section><section class="app-card"><div class="sectionhead"><div><div class="eyebrow">SOUL ARCHIVE</div><h2>魂の習得・強化</h2></div></div><p class="quiet" style="margin-bottom:12px">未所持の魂を購入、または所持している魂をレベルアップします。</p><div class="shop-grid" id="soulShop"></div></section></div>
+      <div class="stack"><section class="app-card"><div class="sectionhead"><div><div class="eyebrow">MONSTER SANCTUARY</div><h2>モンスターの召喚所</h2></div><span class="tag">エーテルで購入</span></div><p class="quiet" style="margin-bottom:12px">種類ごとに異なる攻撃性能・魂の枠・固有特性を持ちます。</p><div class="shop-grid" id="monsterShop"></div></section><section class="app-card"><div class="sectionhead"><div><div class="eyebrow">SOUL ARCHIVE</div><h2>魂の研究商店</h2></div></div><p class="quiet" style="margin-bottom:12px">未所持の魂を購入、または所持している魂をレベルアップします。</p><div class="shop-grid" id="soulShop"></div></section></div>
     </section>
 
     <section id="codexScene" class="scene scene-scroll" hidden>
       <div class="codex-grid">
-        <section class="app-card"><div class="sectionhead"><h2>モンスター図鑑</h2><span class="tag">MONSTERS</span></div><div id="codexMonsterList" class="cardgrid"></div></section>
-        <section class="app-card"><div class="sectionhead"><h2>魂図鑑</h2><span class="tag">SOULS</span></div><div id="codexSoulList" class="cardgrid"></div></section>
+        <section class="app-card"><div class="sectionhead"><h2>魔獣図鑑</h2><span class="tag">MONSTERS</span></div><div id="codexMonsterList" class="cardgrid"></div></section>
+        <section class="app-card"><div class="sectionhead"><h2>魂の魔導書</h2><span class="tag">SOULS</span></div><div id="codexSoulList" class="cardgrid"></div></section>
       </div>
     </section>
 
     <section id="settingsScene" class="scene scene-scroll" hidden>
       <div class="settings-grid">
         <section class="app-card"><div class="sectionhead"><h2>データ管理</h2><span class="tag">SAVE</span></div><p id="saveStatus" class="quiet" style="margin-bottom:12px">端末に自動保存</p><div class="stack"><button class="ghost" id="exportBtn">バックアップ</button><button class="ghost" id="importBtn">復元</button><button class="ghost" id="resetBtn">セーブ初期化</button></div></section>
-        <section class="app-card"><div class="sectionhead"><h2>アプリ情報</h2><span class="tag">INFO</span></div><div class="info-list"><div><span>バージョン</span><b>0.4.0</b></div><div><span>保存形式</span><b>Version 2 / Local</b></div><div><span>現在の出撃</span><b id="settingsActiveMonster">モス</b></div><div><span>到達ステージ</span><b id="settingsStage">1</b></div></div><button class="ghost" id="titleBtn" style="width:100%;margin-top:12px">タイトルへ戻る</button></section>
+        <section class="app-card"><div class="sectionhead"><h2>アプリ情報</h2><span class="tag">INFO</span></div><div class="info-list"><div><span>バージョン</span><b>0.4.1</b></div><div><span>保存形式</span><b>Version 2 / Local</b></div><div><span>現在の出撃</span><b id="settingsActiveMonster">モス</b></div><div><span>到達ステージ</span><b id="settingsStage">1</b></div></div><button class="ghost" id="titleBtn" style="width:100%;margin-top:12px">タイトルへ戻る</button></section>
       </div>
     </section>
   </div>
@@ -444,14 +597,14 @@ function navigateScene(next){
   return playTransition('menu',()=>setScene(next));
 }
 const SCENE_META={
-  terminal:{kicker:'MAIN TERMINAL',title:'メインターミナル',sub:()=>`到達ステージ ${state.unlocked} · 累計撃破 ${num(state.totalKills)} 体`,back:''},
+  terminal:{kicker:'MAIN TERMINAL',title:'冒険者ギルド',sub:()=>`到達ステージ ${state.unlocked} · 累計撃破 ${num(state.totalKills)} 体`,back:''},
   stage:{kicker:'WORLD MAP',title:'ワールド',sub:()=>regionForStage(state.selectedStage).name,back:'terminal'},
-  build:{kicker:'BUILD',title:'ビルド',sub:()=>`${mdef(state.active).name} の魂構成を調整`,back:'terminal'},
-  shop:{kicker:'SHOP',title:'ショップ',sub:()=>`所持エーテル ${num(state.money)}`,back:'terminal'},
-  codex:{kicker:'CODEX',title:'図鑑',sub:()=>`モンスター ${Object.keys(state.monsters).length}/${MONSTERS.length} · 魂 ${Object.keys(state.souls).length}/${SOULS.length}`,back:'terminal'},
+  build:{kicker:'BUILD',title:'モンスター・魂',sub:()=>`${mdef(state.active).name} の魂構成を調整`,back:'terminal'},
+  shop:{kicker:'SHOP',title:'ギルド商店',sub:()=>`所持エーテル ${num(state.money)}`,back:'terminal'},
+  codex:{kicker:'CODEX',title:'ギルド書庫',sub:()=>`モンスター ${Object.keys(state.monsters).length}/${MONSTERS.length} · 魂 ${Object.keys(state.souls).length}/${SOULS.length}`,back:'terminal'},
   settings:{kicker:'SETTINGS',title:'設定',sub:()=>`保存状態とバックアップ管理`,back:'terminal'},
   battle:{kicker:'AUTO BATTLE',title:()=>`STAGE ${String(state.selectedStage).padStart(3,'0')}`,sub:()=>`30秒の自動戦闘`,back:''},
-  result:{kicker:'RESULT',title:'リザルト',sub:()=>resultData?`${resultData.mission.success?'CLEAR':'TIME UP'} · ${resultData.kills}/${resultData.count} 体撃破`:'戦闘結果',back:''}
+  result:{kicker:'RESULT',title:'討伐報告書',sub:()=>resultData?`${resultData.mission.success?'CLEAR':'TIME UP'} · ${resultData.kills}/${resultData.count} 体撃破`:'戦闘結果',back:''}
 };
 try{
   const current=localStorage.getItem(SAVE_KEY);
@@ -534,7 +687,7 @@ function renderBattleBuild(){const b=battle,d=mdef(b.monster);$('battleMonster')
 
 function animateVisual(b){const v=b.lastVisual;if(!v||v.t===lastVisualTime)return;lastVisualTime=v.t;if(document.hidden)return;const a=$('arena'),f=$('fighter');f.classList.remove('attacking');void f.offsetWidth;f.classList.add('attacking');const e=$('enemyline').querySelector('.first');if(e){e.classList.remove('hit');void e.offsetWidth;e.classList.add('hit')}const damage=document.createElement('div');damage.className='damage'+(v.special?' special':'');damage.textContent=num(v.damage);a.appendChild(damage);setTimeout(()=>damage.remove(),580);if(v.special){const fx=document.createElement('div');fx.className='skill-effect';a.appendChild(fx);setTimeout(()=>fx.remove(),350)}}
 function numSigned(n){return Math.trunc(n).toLocaleString('ja-JP')}
-function renderResult(r){$('result').className='app-card result '+(r.mission.success?'clear':'fail');$('result').innerHTML=`<div class="sectionhead"><div><div class="eyebrow">STAGE ${String(r.stage).padStart(3,'0')} RESULT</div><div class="result-title">${r.mission.success?'CLEAR':'TIME UP'}</div><p class="quiet">${r.kills} / ${r.count} 体撃破 · ${r.elapsed.toFixed(2)} 秒</p></div><div class="right"><span class="quiet">エーテル</span><div class="gold" style="font-weight:800;font-size:26px">+${num(r.reward.total)}</div></div></div><p class="quiet" style="margin:8px 0">${r.mission.name} · 評価 ${r.mission.rank} · ${r.mission.goal}</p>${r.mission.fragments?'<div class="soul-drop">素材獲得：魂の欠片 +'+num(r.mission.fragments)+'</div>':''}<div class="rewardgrid"><div><small>割合報酬</small><b>+${num(r.reward.partial)}</b></div><div><small>達成報酬</small><b>+${num(r.reward.bonus)}</b></div><div><small>経験値</small><b class="green">+${r.xp}</b></div></div>${r.previous?`<div class="record"><div><small>前回撃破</small><b>${r.previous.kills}/${r.count}</b></div><div><small>撃破数の変化</small><b class="${r.kills>r.previous.kills?'green':'muted'}">${r.kills-r.previous.kills>0?'+':''}${r.kills-r.previous.kills}体</b></div><div><small>報酬の変化</small><b>${r.reward.total-r.previous.reward>0?'+':''}${numSigned(r.reward.total-r.previous.reward)}</b></div></div>`:''}${r.levelAfter>r.levelBefore?`<div class="level-up">LEVEL UP · Lv.${r.levelBefore} → Lv.${r.levelAfter}</div>`:''}${r.drops.map(d=>`<div class="soul-drop">${soulIcon(d.id)}<span>${d.new?'新しい魂を獲得！':'魂のレベルアップ！'} ${sdef(d.id).name} Lv.${d.level}</span></div>`).join('')}<div class="row wrap" style="margin-top:12px"><button data-scene="build" class="ghost grow">魂を編成</button><button data-scene="shop" class="ghost grow">購入・強化</button><button data-scene="terminal" class="ghost grow">ターミナル</button><button data-result="retry" class="${r.mission.type==='main'&&r.clear&&r.stage<MAX_STAGE?'ghost':'primary'} grow">再挑戦</button>${r.mission.type==='main'&&r.clear&&r.stage<MAX_STAGE?'<button data-result="next" class="primary grow">次のステージへ</button>':''}</div>`}
+function renderResult(r){$('result').className='app-card result '+(r.mission.success?'clear':'fail');$('result').innerHTML=`<div class="sectionhead"><div><div class="eyebrow">GUILD REPORT · STAGE ${String(r.stage).padStart(3,'0')}</div><div class="result-title">${r.mission.success?'CLEAR':'TIME UP'}</div><p class="quiet">${r.kills} / ${r.count} 体撃破 · ${r.elapsed.toFixed(2)} 秒</p></div><div class="right"><span class="quiet">エーテル</span><div class="gold" style="font-weight:800;font-size:26px">+${num(r.reward.total)}</div></div></div><p class="quiet" style="margin:8px 0">${r.mission.name} · 評価 ${r.mission.rank} · ${r.mission.goal}</p>${r.mission.fragments?'<div class="soul-drop">素材獲得：魂の欠片 +'+num(r.mission.fragments)+'</div>':''}<div class="rewardgrid"><div><small>割合報酬</small><b>+${num(r.reward.partial)}</b></div><div><small>達成報酬</small><b>+${num(r.reward.bonus)}</b></div><div><small>経験値</small><b class="green">+${r.xp}</b></div></div>${r.previous?`<div class="record"><div><small>前回撃破</small><b>${r.previous.kills}/${r.count}</b></div><div><small>撃破数の変化</small><b class="${r.kills>r.previous.kills?'green':'muted'}">${r.kills-r.previous.kills>0?'+':''}${r.kills-r.previous.kills}体</b></div><div><small>報酬の変化</small><b>${r.reward.total-r.previous.reward>0?'+':''}${numSigned(r.reward.total-r.previous.reward)}</b></div></div>`:''}${r.levelAfter>r.levelBefore?`<div class="level-up">LEVEL UP · Lv.${r.levelBefore} → Lv.${r.levelAfter}</div>`:''}${r.drops.map(d=>`<div class="soul-drop">${soulIcon(d.id)}<span>${d.new?'新しい魂を獲得！':'魂のレベルアップ！'} ${sdef(d.id).name} Lv.${d.level}</span></div>`).join('')}<div class="row wrap" style="margin-top:12px"><button data-scene="build" class="ghost grow">魂を編成</button><button data-scene="shop" class="ghost grow">購入・強化</button><button data-scene="terminal" class="ghost grow">ターミナル</button><button data-result="retry" class="${r.mission.type==='main'&&r.clear&&r.stage<MAX_STAGE?'ghost':'primary'} grow">再挑戦</button>${r.mission.type==='main'&&r.clear&&r.stage<MAX_STAGE?'<button data-result="next" class="primary grow">次のステージへ</button>':''}</div>`}
 function clearBattle(){battle=null;resultData=null;lastVisualTime=-1;lastEnemyKey='';lastLogKey=''}
 function selectStage(n){
   if(transitioning||running||loadingBattle||scene!=='stage'||!canMission(state,n,'main'))return;
@@ -551,7 +704,12 @@ function selectMission(type){
   if(state.selectedMission!==type){state.selectedMission=type;clearBattle();save()}
   renderStageScene();updateHeader()
 }
-function refreshTerminal(){const d=mdef(state.active),m=state.monsters[d.id],v=getStats(state),st=stageData(state.selectedStage);$('terminalMonster').innerHTML=`<div class="hero-info"><span class="eyebrow">ACTIVE MONSTER</span><h2>${d.name}</h2><span class="tag">Lv.${m.level} · ${d.role}</span><div class="hero-statline"><div><span>ATK</span><b>${v.atk.toFixed(1)}</b></div><div><span>SPD / 秒</span><b>${v.speed.toFixed(2)}</b></div></div><small class="quiet">EXP ${m.xp} / ${xpNeed(m.level)}</small><div class="meter"><i style="width:${100*m.xp/xpNeed(m.level)}%"></i></div></div><div class="hero-portrait">${monsterIcon(d.id)}</div><div class="hero-souls">${Array.from({length:d.slots},(_,i)=>`<div class="slot ${m.equip[i]?'filled':''}" title="${m.equip[i]?sdef(m.equip[i]).name:'空き枠'}">${m.equip[i]?soulIcon(m.equip[i]):'+'}</div>`).join('')}<span class="quiet">${m.equip.length}/${d.slots} SOULS</span></div>`;$('terminalStage').innerHTML=`<div class="grow"><span class="eyebrow">NEXT OPERATION</span><h2>STAGE ${String(st.n).padStart(3,'0')}</h2><p class="quiet">${regionForStage(st.n).name} · ${missionPlan(st,state.selectedMission).name}</p></div><button class="primary" data-launch-battle="1">出撃する　›</button>`;$('terminalProgress').textContent=`到達 ${state.unlocked}　撃破 ${num(state.totalKills)}体　クリア ${num(state.clears)}回`}
+function refreshTerminal(){
+  const d=mdef(state.active),m=state.monsters[d.id],v=getStats(state),st=stageData(state.selectedStage),region=regionForStage(st.n),p=missionPlan(st,state.selectedMission);
+  $('terminalMonster').innerHTML=`<span class="guild-stamp" aria-hidden="true">契約</span><div class="hero-info"><span class="eyebrow">CONTRACTED MONSTER</span><h2>${d.name}</h2><span class="tag">Lv.${m.level} · ${d.role}</span><div class="hero-statline"><div><span>攻撃力 ATK</span><b>${v.atk.toFixed(1)}</b></div><div><span>攻撃速度 SPD</span><b>${v.speed.toFixed(2)}</b></div></div><small class="quiet">EXP ${m.xp} / ${xpNeed(m.level)}</small><div class="meter"><i style="width:${100*m.xp/xpNeed(m.level)}%"></i></div></div><div class="hero-portrait">${monsterIcon(d.id)}</div><div class="hero-souls"><span class="soul-label">装着魂</span>${Array.from({length:d.slots},(_,i)=>`<div class="slot ${m.equip[i]?'filled':''}" title="${m.equip[i]?sdef(m.equip[i]).name:'空き枠'}">${m.equip[i]?soulIcon(m.equip[i]):'+'}</div>`).join('')}<span class="quiet">${m.equip.length}/${d.slots}</span></div>`;
+  $('terminalStage').innerHTML=`<div class="grow"><span class="eyebrow">GUILD REQUEST · ${String(st.n).padStart(3,'0')}</span><h2>${region.name}</h2><p class="quiet">${p.name} · STAGE ${String(st.n).padStart(3,'0')} · ${st.count}体</p><p class="quiet">${p.goal}</p></div><button class="ghost" data-scene="stage">依頼を選ぶ ›</button><button class="primary" data-launch-battle="1">ミッション開始　›<small>MISSION START</small></button>`;
+  $('terminalProgress').textContent=`到達 ${state.unlocked}　撃破 ${num(state.totalKills)}体　クリア ${num(state.clears)}回`;
+}
 function setScene(next){if(!SCENE_META[next]||((running||loadingBattle)&&next!=='battle'))return;if(next==='result'&&!resultData)return;scene=next;for(const sec of document.querySelectorAll('.scene')){sec.hidden=sec.id!==next+'Scene';if(!sec.hidden)sec.scrollTop=0} $('loading').hidden=true;$('titleScreen').hidden=true;$('game').hidden=false;updateHeader();if(next==='terminal')refreshTerminal();if(next==='stage'){mapPage=REGIONS.indexOf(regionForStage(state.selectedStage));renderStageScene()}if(next==='build')renderBuild();if(next==='shop')renderShop();if(next==='codex')renderCodex();if(next==='settings')updateSaveStatus();if(next==='battle'){renderBattleBuild();renderBattle()}if(next==='result')renderResult(resultData)}
 function finishBattle(){if(!running||!battle?.done)return;running=false;cancelAnimationFrame(raf);const r=applyResult(state,battle);if(!r)return;resultData=r;save();return playTransition('result',()=>setScene('result'))}
 

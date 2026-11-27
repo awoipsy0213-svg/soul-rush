@@ -188,3 +188,16 @@ test('write failure leaves the legacy and current state untouched on replacement
   const before=a.snapshot().state;assert.throws(()=>a.persistReplacement(freshSave()));
   assert.equal(a.snapshot().state,before);assert.equal(e.legacyRaw(),JSON.stringify(legacy));
 });
+
+test('guild board renders actual monster, equipped souls and selected request',async()=>{
+  const seed=freshSave();seed.unlocked=12;seed.selectedStage=11;seed.selectedMission='hunt';seed.monsters.moss.level=9;
+  const e=environment({seed,reduced:true}),a=e.api;await a.enter();
+  assert.ok(e.get('terminalMonster').innerHTML.includes('Lv.9'));
+  assert.ok(e.get('terminalMonster').innerHTML.includes('装着魂'));
+  assert.ok(e.get('terminalStage').innerHTML.includes('忘却の遺跡'));
+  assert.ok(e.get('terminalStage').innerHTML.includes('討伐'));
+  assert.ok(e.get('terminalStage').innerHTML.includes('data-scene="stage"'));
+  assert.ok(e.get('terminalStage').innerHTML.includes('data-launch-battle="1"'));
+  assert.equal(a.snapshot().state,JSON.stringify(seed));
+  await a.beginBattle();assert.equal(a.snapshot().mission,'hunt');assert.equal(a.snapshot().stage,11);
+});
