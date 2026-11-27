@@ -84,6 +84,19 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   await evaluate('cancelAnimationFrame(raf);advanceBattle(battle,24);settleBattle()');await scene('result');
   assert.equal(await evaluate('resultData.gems===0&&resultData.chest.length===0'),true);
   await click('#resultActions [data-action="home"]');await scene('terminal');
+  // Exercise the actual new arena UI with deterministic, isolated test state.
+  await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true,screenWidth:390,screenHeight:844});
+  await evaluate('state.gems=40;state.monsters.moss.level=10000;save();renderHome()');
+  await click('#arenaBtn');assert.equal(await evaluate('document.getElementById("arenaDialog").open'),true);
+  await click('#arenaActions [data-action="arena-enter"]');assert.equal(await evaluate('state.gems'),20);
+  await screenshot('arena-entry');await click('#arenaActions [data-action="arena-fight"]');
+  await until(()=>evaluate('!arenaBusy'),10000);assert.equal(await evaluate('state.arena.wins'),1);
+  await screenshot('arena-win');const money=await evaluate('state.money');
+  await click('#arenaActions [data-action="arena-claim"]');assert.equal(await evaluate('state.arena===null'),true);
+  assert.equal(await evaluate('state.money'),money+60);assert.equal(await evaluate('JSON.parse(localStorage.getItem(SAVE_KEY)).money'),money+60);
+  await click('#arenaActions [data-action="arena-close"]');
+  await click('[data-action="shop-open"]');assert.ok(await evaluate('document.getElementById("shopDialog").open&&document.querySelector("[data-action=buy-monster-pack]").disabled'));
+  await screenshot('shop');await click('[data-action="shop-close"]');
   const saved=await evaluate('localStorage.getItem(SAVE_KEY)');
   assert.ok(await until(()=>evaluate('navigator.serviceWorker.controller!==null'),15000));
   assert.ok(await evaluate('caches.keys().then(keys=>keys.some(k=>k.endsWith(":0.11.0")))'));
@@ -93,5 +106,5 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   assert.equal(await evaluate('JSON.parse(localStorage.getItem(SAVE_KEY)).gems'),JSON.parse(saved).gems);
   await send('Network.emulateNetworkConditions',{offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1});
   assert.equal(errors.length,0,errors.join('\n'));
-  console.log('v0.11 browser smoke passed: four home viewports, horizontal character list, soul grid, full enemy track, pause/abort, boss chest, scatter bounds and offline save.');
+  console.log('v0.11 browser smoke passed: four home viewports, horizontal character list, soul grid, full enemy track, pause/abort, boss chest, scatter bounds, arena entry/fight/claim, shop and offline save.');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(()=>{ws?.close();proc?.kill('SIGTERM');server.close();setTimeout(()=>{try{fs.rmSync(profiles,{recursive:true,force:true})}catch{}},250).unref()});
