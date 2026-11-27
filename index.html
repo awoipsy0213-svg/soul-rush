@@ -107,8 +107,14 @@ html,body{height:100%;min-height:0;overflow:hidden;overscroll-behavior:none}body
 @media(max-height:480px) and (orientation:landscape){.terminal-scene,.battle-scene{overflow-y:auto;justify-content:flex-start}.hero-monster{flex:none;height:180px}.battle-arena-wrap{flex:none;height:150px}.cover-art{display:none}.cover .logo-orb{height:50px;width:50px}.cover h1{font-size:30px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}}
 </style>
+<style>
+/* v0.3.1 scene transitions */
+#sceneTransition{position:fixed;inset:0;z-index:2147483646;background:#0d1119;opacity:0;pointer-events:auto;touch-action:none}
+#sceneTransition[hidden]{display:none!important}
+</style>
 </head>
 <body>
+<div id="sceneTransition" hidden aria-hidden="true"></div>
 
 <section id="loading" class="cover" aria-label="ロード中">
   <div class="cover-content">
@@ -128,7 +134,7 @@ html,body{height:100%;min-height:0;overflow:hidden;overscroll-behavior:none}body
     <button class="primary" id="enterBtn">冒険を始める</button>
     <p class="hint" id="titleHint">モンスターに魂を宿し、30秒の限界を超えろ。</p>
   </div>
-  <div class="version">VERSION 0.3.0 · OFFLINE SAVE</div>
+  <div class="version">VERSION 0.3.1 · OFFLINE SAVE</div>
 </section>
 <main id="game" class="shell app-shell" hidden data-scene="terminal">
   <header class="app-topbar">
@@ -210,7 +216,7 @@ html,body{height:100%;min-height:0;overflow:hidden;overscroll-behavior:none}body
     <section id="settingsScene" class="scene scene-scroll" hidden>
       <div class="settings-grid">
         <section class="app-card"><div class="sectionhead"><h2>データ管理</h2><span class="tag">SAVE</span></div><p id="saveStatus" class="quiet" style="margin-bottom:12px">端末に自動保存</p><div class="stack"><button class="ghost" id="exportBtn">バックアップ</button><button class="ghost" id="importBtn">復元</button><button class="ghost" id="resetBtn">セーブ初期化</button></div></section>
-        <section class="app-card"><div class="sectionhead"><h2>アプリ情報</h2><span class="tag">INFO</span></div><div class="info-list"><div><span>バージョン</span><b>0.3.0</b></div><div><span>保存形式</span><b>Offline / Local</b></div><div><span>現在の出撃</span><b id="settingsActiveMonster">モス</b></div><div><span>到達ステージ</span><b id="settingsStage">1</b></div></div><button class="ghost" id="titleBtn" style="width:100%;margin-top:12px">タイトルへ戻る</button></section>
+        <section class="app-card"><div class="sectionhead"><h2>アプリ情報</h2><span class="tag">INFO</span></div><div class="info-list"><div><span>バージョン</span><b>0.3.1</b></div><div><span>保存形式</span><b>Offline / Local</b></div><div><span>現在の出撃</span><b id="settingsActiveMonster">モス</b></div><div><span>到達ステージ</span><b id="settingsStage">1</b></div></div><button class="ghost" id="titleBtn" style="width:100%;margin-top:12px">タイトルへ戻る</button></section>
       </div>
     </section>
   </div>
@@ -268,6 +274,68 @@ function parseBackup(text){const raw=JSON.parse(text);if(!raw||raw.version!==VER
 
 const $=id=>document.getElementById(id);
 let mapPage=0,protectSave=false,saveOK=true,hadSave=false,state=fresh(),battle=null,running=false,raf=0,startedAt=0,lastVisualTime=-1,lastLogKey='',lastEnemyKey='',resultData=null,scene='terminal',toastTimeout=0,loadingBattle=false;
+// Timings in milliseconds; swap only when fully covered.
+const TRANSITIONS=Object.freeze({
+  white:{color:'#effff9',in:400,hold:100,out:500},
+  menu:{color:'#0d1119',in:150,hold:0,out:150},
+  result:{color:'#0d1119',in:250,hold:0,out:250}
+});
+let transitioning=false;
+function blockTransitionInput(event){
+  if(!transitioning)return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+}
+document.addEventListener('click',blockTransitionInput,true);
+document.addEventListener('keydown',blockTransitionInput,true);
+async function animateOverlay(veil,to,duration){
+  let animation;
+  try{
+    animation=veil.animate([{opacity:Number(veil.style.opacity||0)},{opacity:to}],{duration,easing:'ease-in-out',fill:'forwards'});
+    await animation.finished;
+  }catch(e){
+    // Cancelled or unsupported animation must not lock navigation.
+  }finally{
+    veil.style.opacity=String(to);
+    if(animation)animation.cancel();
+  }
+}
+async function transitionScene(kind,change,after=()=>{}){
+  if(transitioning)return false;
+  const spec=TRANSITIONS[kind],veil=$('sceneTransition');
+  transitioning=true;
+  try{
+    const reduced=typeof matchMedia==='function'&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(reduced||!veil||typeof veil.animate!=='function'){
+      change();
+    }else{
+      veil.style.backgroundColor=spec.color;
+      veil.style.opacity='0';
+      veil.hidden=false;
+      await animateOverlay(veil,1,spec.in);
+      change();
+      if(spec.hold)await animateOverlay(veil,1,spec.hold);
+      await animateOverlay(veil,0,spec.out);
+    }
+  }finally{
+    if(veil){veil.hidden=true;veil.style.opacity='0'}
+    transitioning=false;
+  }
+  // The combat clock starts only after the overlay is removed.
+  after();
+  return true;
+}
+function playTransition(kind,change,after){
+  return transitionScene(kind,change,after).catch(e=>{
+    console.error('Scene transition failed',e);
+    showToast('画面の切り替えに失敗しました。もう一度お試しください');
+    return false;
+  });
+}
+function navigateScene(next){
+  if(transitioning||running||loadingBattle||$('game').hidden||next===scene||!['terminal','stage','build','shop','codex','settings'].includes(next))return;
+  return playTransition('menu',()=>setScene(next));
+}
 const SCENE_META={
   terminal:{kicker:'MAIN TERMINAL',title:'メインターミナル',sub:()=>`到達ステージ ${state.unlocked} · 累計撃破 ${num(state.totalKills)} 体`,back:''},
   stage:{kicker:'STAGE SELECT',title:'ステージ',sub:()=>`出撃先を選択 · 現在 STAGE ${String(state.selectedStage).padStart(3,'0')}`,back:'terminal'},
@@ -325,19 +393,55 @@ function clearBattle(){battle=null;resultData=null;lastVisualTime=-1;lastEnemyKe
 function selectStage(n){if(running||loadingBattle||scene!=='stage')return;state.selectedStage=clamp(n,1,state.unlocked);mapPage=Math.floor((state.selectedStage-1)/10);clearBattle();save();renderStageScene();if(scene==='battle')renderBattle();updateHeader()}
 function refreshTerminal(){const d=mdef(state.active),m=state.monsters[d.id],v=getStats(state),st=stageData(state.selectedStage);$('terminalMonster').innerHTML=`<div class="hero-info"><span class="eyebrow">ACTIVE MONSTER</span><h2>${d.name}</h2><span class="tag">Lv.${m.level} · ${d.role}</span><div class="hero-statline"><div><span>ATK</span><b>${v.atk.toFixed(1)}</b></div><div><span>SPD / 秒</span><b>${v.speed.toFixed(2)}</b></div></div><small class="quiet">EXP ${m.xp} / ${xpNeed(m.level)}</small><div class="meter"><i style="width:${100*m.xp/xpNeed(m.level)}%"></i></div></div><div class="hero-portrait">${monsterIcon(d.id)}</div><div class="hero-souls">${Array.from({length:d.slots},(_,i)=>`<div class="slot ${m.equip[i]?'filled':''}" title="${m.equip[i]?sdef(m.equip[i]).name:'空き枠'}">${m.equip[i]?soulIcon(m.equip[i]):'+'}</div>`).join('')}<span class="quiet">${m.equip.length}/${d.slots} SOULS</span></div>`;$('terminalStage').innerHTML=`<div class="grow"><span class="eyebrow">NEXT OPERATION</span><h2>STAGE ${String(st.n).padStart(3,'0')}</h2><p class="quiet">${st.kind} · ${st.count}体</p></div><button class="primary" data-launch-battle="1">出撃する　›</button>`;$('terminalProgress').textContent=`到達 ${state.unlocked}　撃破 ${num(state.totalKills)}体　クリア ${num(state.clears)}回`}
 function setScene(next){if(!SCENE_META[next]||((running||loadingBattle)&&next!=='battle'))return;if(next==='result'&&!resultData)return;scene=next;for(const sec of document.querySelectorAll('.scene')){sec.hidden=sec.id!==next+'Scene';if(!sec.hidden)sec.scrollTop=0} $('loading').hidden=true;$('titleScreen').hidden=true;$('game').hidden=false;updateHeader();if(next==='terminal')refreshTerminal();if(next==='stage'){mapPage=Math.floor((state.selectedStage-1)/10);renderStageScene()}if(next==='build')renderBuild();if(next==='shop')renderShop();if(next==='codex')renderCodex();if(next==='settings')updateSaveStatus();if(next==='battle'){renderBattleBuild();renderBattle()}if(next==='result')renderResult(resultData)}
-function finishBattle(){if(!running||!battle?.done)return;running=false;cancelAnimationFrame(raf);const r=applyResult(state,battle);if(!r)return;resultData=r;save();setScene('result')}
+function finishBattle(){if(!running||!battle?.done)return;running=false;cancelAnimationFrame(raf);const r=applyResult(state,battle);if(!r)return;resultData=r;save();return playTransition('result',()=>setScene('result'))}
 
 function frame(now){if(!running)return;advanceBattle(battle,(now-startedAt)/1000);renderBattle();animateVisual(battle);if(battle.done)finishBattle();else raf=requestAnimationFrame(frame)}
 function showCover(which){$('game').hidden=true;$('loading').hidden=which!=='loading';$('titleScreen').hidden=which!=='titleScreen'}
-function beginBattle(n=state.selectedStage){if(running||loadingBattle||!['stage','terminal','result'].includes(scene)||$('game').hidden||!Number.isInteger(n)||n<1||n>state.unlocked)return;loadingBattle=true;state.selectedStage=n;clearBattle();save();$('loadingCaption').textContent='BATTLE LOADING';$('loadingText').textContent='出撃準備中…';showCover('loading');requestAnimationFrame(()=>requestAnimationFrame(()=>{try{battle=createBattle(state,n);$('combatLog').textContent='';loadingBattle=false;running=true;setScene('battle');startedAt=performance.now();raf=requestAnimationFrame(frame)}catch(e){loadingBattle=false;running=false;clearBattle();setScene('terminal');showToast('出撃準備に失敗しました。再度お試しください')}}))}
-function actionNext(action){if(scene!=='result'||!resultData||running||loadingBattle)return;const r=resultData,n=action==='next'&&r.clear&&r.stage<MAX_STAGE?r.stage+1:r.stage;beginBattle(n)}
+function beginBattle(n=state.selectedStage){
+  if(transitioning||running||loadingBattle||!['stage','terminal','result'].includes(scene)||$('game').hidden||!Number.isInteger(n)||n<1||n>state.unlocked)return;
+  loadingBattle=true;
+  state.selectedStage=n;
+  clearBattle();
+  save();
+  return transitionScene('white',()=>{
+    battle=createBattle(state,n);
+    $('combatLog').textContent='';
+    setScene('battle');
+  },()=>{
+    loadingBattle=false;
+    running=true;
+    startedAt=performance.now();
+    raf=requestAnimationFrame(frame);
+  }).catch(e=>{
+    console.error('Battle preparation failed',e);
+    loadingBattle=false;
+    running=false;
+    clearBattle();
+    setScene('terminal');
+    showToast('出撃準備に失敗しました。再度お試しください');
+    return false;
+  });
+}
+function actionNext(action){if(transitioning||scene!=='result'||!resultData||running||loadingBattle)return;const r=resultData,n=action==='next'&&r.clear&&r.stage<MAX_STAGE?r.stage+1:r.stage;return beginBattle(n)}
 
 function changed(){const el=$(scene+'Scene'),scroll=el?.scrollTop||0;save();updateHeader();if(scene==='build')renderBuild();if(scene==='shop')renderShop();if(el)el.scrollTop=scroll}
-function enter(){$('titleScreen').hidden=true;$('game').hidden=false;setScene('terminal');save();updateHeader();if(protectSave)showToast('既存セーブを読み込めません。元データは保護しています')}
+function enter(){
+  if(transitioning||running||loadingBattle||$('titleScreen').hidden)return;
+  return playTransition('white',()=>{
+    setScene('terminal');
+    save();
+    updateHeader();
+    if(protectSave)showToast('既存セーブを読み込めません。元データは保護しています');
+  });
+}
+function goTitle(){
+  if(transitioning||running||loadingBattle||$('game').hidden)return;
+  return playTransition('white',()=>{save();updateHeader();showCover('titleScreen')});
+}
 const navIcons={stage:'<path d="M4 4l6 2 10 10-4 4L6 10zM14 14l4 4M15 5l5-1-1 5M10 14l-6 6"/>',build:'<path d="M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/>',shop:'<path d="M3 9l2-5h14l2 5M3 9h18v2a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0zM5 14v6h14v-6M10 20v-5h4v5"/>',codex:'<path d="M12 5c-3-2-6-2-9-1v15c3-1 6-1 9 1 3-2 6-2 9-1V4c-3-1-6-1-9 1zM12 5v15"/>',settings:'<path d="M4 7h16M4 17h16M8 4v6M16 14v6"/>'};document.querySelectorAll('[data-icon]').forEach(el=>el.innerHTML=svg(navIcons[el.dataset.icon],'0 0 24 24','fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"'));
 $('loadOrb').innerHTML=soulIcon('haste');$('titleOrb').innerHTML=soulIcon('haste');$('brandOrb').innerHTML=soulIcon('haste');$('currencyOrb').innerHTML=currencyIcon();$('titleArt').innerHTML=['golem','moss','wyrm'].map(monsterIcon).join('');updateHeader();requestAnimationFrame(()=>requestAnimationFrame(()=>showCover('titleScreen')));
-$('enterBtn').addEventListener('click',enter);$('titleBtn').addEventListener('click',()=>{if(running||loadingBattle)return;save();updateHeader();showCover('titleScreen')});
-$('game').addEventListener('click',e=>{const btn=e.target.closest('button');if(!btn||btn.disabled||btn.closest('[hidden]')||running||loadingBattle||$('game').hidden)return;const d=btn.dataset;if(d.scene){if(['terminal','stage','build','shop','codex','settings'].includes(d.scene))setScene(d.scene);return}if(d.launchBattle){beginBattle();return}if(d.stageJump&&scene==='stage'){selectStage(state.selectedStage+Number(d.stageJump));return}if(d.stage&&scene==='stage'){const n=Number(d.stage);if(Number.isInteger(n)&&n>=1&&n<=state.unlocked)selectStage(n);return}if(d.selectMonster&&scene==='build'&&state.monsters[d.selectMonster]){state.active=d.selectMonster;changed();showToast(mdef(state.active).name+'を選択')}else if((d.equip||d.unequip)&&scene==='build'){const id=d.equip||d.unequip;if(toggleSoul(state,id)){changed();showToast(sdef(id).name+(state.monsters[state.active].equip.includes(id)?'を装着':'を解除'))}}else if(d.buyMonster&&scene==='shop'&&purchaseMonster(state,d.buyMonster)){changed();showToast(mdef(d.buyMonster).name+'を召喚しました')}else if(d.buySoul&&scene==='shop'&&purchaseSoul(state,d.buySoul)){changed();showToast(sdef(d.buySoul).name+' Lv.'+state.souls[d.buySoul])}else if(d.result)actionNext(d.result)});
+$('enterBtn').addEventListener('click',enter);$('titleBtn').addEventListener('click',goTitle);
+$('game').addEventListener('click',e=>{const btn=e.target.closest('button');if(!btn||btn.disabled||btn.closest('[hidden]')||transitioning||running||loadingBattle||$('game').hidden)return;const d=btn.dataset;if(d.scene){navigateScene(d.scene);return}if(d.launchBattle){beginBattle();return}if(d.stageJump&&scene==='stage'){selectStage(state.selectedStage+Number(d.stageJump));return}if(d.stage&&scene==='stage'){const n=Number(d.stage);if(Number.isInteger(n)&&n>=1&&n<=state.unlocked)selectStage(n);return}if(d.selectMonster&&scene==='build'&&state.monsters[d.selectMonster]){state.active=d.selectMonster;changed();showToast(mdef(state.active).name+'を選択')}else if((d.equip||d.unequip)&&scene==='build'){const id=d.equip||d.unequip;if(toggleSoul(state,id)){changed();showToast(sdef(id).name+(state.monsters[state.active].equip.includes(id)?'を装着':'を解除'))}}else if(d.buyMonster&&scene==='shop'&&purchaseMonster(state,d.buyMonster)){changed();showToast(mdef(d.buyMonster).name+'を召喚しました')}else if(d.buySoul&&scene==='shop'&&purchaseSoul(state,d.buySoul)){changed();showToast(sdef(d.buySoul).name+' Lv.'+state.souls[d.buySoul])}else if(d.result)actionNext(d.result)});
 
 $('resetBtn').addEventListener('click',()=>{if(!running)$('resetDialog').showModal()});$('cancelReset').addEventListener('click',()=>$('resetDialog').close());$('confirmReset').addEventListener('click',()=>{if(running)return;state=fresh();protectSave=false;clearBattle();$('resetDialog').close();save();setScene('terminal');showToast('セーブデータを初期化しました')});document.addEventListener('visibilitychange',()=>{if(!document.hidden&&running){advanceBattle(battle,(performance.now()-startedAt)/1000);if(battle.done)finishBattle()}});
 $('mapPrev').onclick=()=>{mapPage--;renderMap()};$('mapNext').onclick=()=>{mapPage++;renderMap()};
