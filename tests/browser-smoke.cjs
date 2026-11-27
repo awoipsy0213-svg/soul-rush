@@ -63,7 +63,7 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   assert.equal(await evaluate('JSON.parse(localStorage.getItem("soul_rush_prototype_v2")).money'),initial+75);
   await click('#sceneBackBtn');await scene('terminal');
   await until(()=>evaluate('!!navigator.serviceWorker.controller'),15000);
-  assert.equal(await evaluate('Promise.all('+JSON.stringify([...files.map(x=>x[0]),"assets/CREDITS.html"])+'.map(p=>caches.match("./"+p).then(Boolean))).then(v=>v.every(Boolean))'),true,'all assets cached');
+  assert.equal(await evaluate('Promise.all('+JSON.stringify([...assets,"assets/CREDITS.html"])+'.map(p=>caches.match("./"+p).then(Boolean))).then(v=>v.every(Boolean))'),true,'all assets cached');
   await send('Network.setBypassServiceWorker',{bypass:false});
   await send('Network.emulateNetworkConditions',{offline:true,latency:0,downloadThroughput:0,uploadThroughput:0});
   await send('Page.reload');await until(()=>evaluate('document.getElementById("titleScreen")&&!document.getElementById("titleScreen").hidden'),12000);
