@@ -433,6 +433,75 @@ button.primary{background:linear-gradient(180deg,#ad5e43 0%,#8b3e2d 24%,#67261d 
 @media(max-height:480px) and (orientation:landscape){.cover-art{display:none}.hero-monster{height:auto}.hero-monster .hero-portrait{height:145px}}
 @media(prefers-reduced-motion:reduce){.hero-portrait>.monster-illustration,.summon-art:before,.summon-art .monster-illustration{animation:none!important}}
 </style>
+
+<style id="popTheme">
+:root{--bg:#f1edf8;--panel:#fffaf1;--panel2:#e8e0f4;--line:#8f80a6;--txt:#40364f;--muted:#746781;--gold:#9a693b;--green:#347e65;--accent:#8874b4;--guild-wood:linear-gradient(135deg,#e9e1f4,#d6caec);--paper-real:linear-gradient(150deg,#fffdf7,#f9f1e7);--guild-paper:var(--paper-real);--guild-gold:#8b77aa}
+html,body{background:#eee8f7;color:#40364f;font-family:system-ui,-apple-system,"Hiragino Sans","Yu Gothic",sans-serif}
+body:before,body:after,.shell:before,.shell:after,.guild-board:before,.guild-board:after,.hero-portrait:after,.app-card:before,.app-card:after,.mission:before,.mission:after{display:none!important}
+#game,.app-frame,.scene,.terminal-scene{background:transparent!important}
+.app-topbar{background:#514563!important;color:#fffaf5!important;border:0!important;border-radius:16px;box-shadow:0 3px 0 #3c334c;padding:9px 10px!important}
+.app-title h2,.app-title .eyebrow,.app-title p{color:#fffaf5!important;text-shadow:none!important;font-family:inherit!important}
+.status-chip{background:#756487!important;border:1px solid #a99ac0!important;border-radius:12px!important;box-shadow:none!important}
+.status-chip strong,.status-chip .quiet{color:#fff7d9!important}
+.guild-board,.app-card,.mission,.monster-card,.soul-card,.result-wrap .result,.rewardgrid>div,.record,.history-row,.stage-card,.battle-build,.battle-hud,.arena{border:1.5px solid #a598b8!important;border-radius:14px!important;box-shadow:0 3px 0 #d5cbe5!important;background:#fffaf1!important;color:#40364f!important}
+.guild-board{background:#e9e0f4!important;padding:8px}
+.guild-board-heading,.terminal-heading h1,.terminal-heading .eyebrow,.sectionhead h2,.mission h2,.monster-card h3,.soul-card h3,.result-title,.summon-panel h2{color:#514563!important;font-family:inherit!important;text-shadow:none!important}
+.terminal-heading .guild-crest{filter:hue-rotate(45deg);opacity:.8}
+.hero-monster{border:1.5px solid #a598b8!important;border-radius:12px!important;background:#fffaf1!important;box-shadow:none!important}
+.hero-monster .hero-portrait{background:linear-gradient(155deg,#d2e9e9,#e8def9 55%,#d5e7cd)!important;border-bottom:1.5px solid #a598b8!important;box-shadow:none!important}
+.hero-portrait:before{background:linear-gradient(90deg,#fffaf0b0,transparent 65%)!important}
+.hero-portrait>.monster-illustration[data-monster-art]{height:92%;width:65%;right:0;bottom:2%;filter:drop-shadow(0 5px 0 #65527a18)!important}
+.monster-illustration[data-monster-art]{filter:drop-shadow(0 3px 0 #65527a18)!important}
+.hero-portrait .monster-sigil{opacity:.06}
+.contract-title .eyebrow,.contract-title .contract-role,.contract-title .contract-label,.contract-title h2,.contract-title .tag{color:#514563!important;text-shadow:none!important;font-family:inherit!important}
+.contract-title .tag{background:#fffaf1!important;border:1px solid #a598b8!important;border-radius:8px}
+.hero-monster .hero-info,.hero-monster .hero-souls{background:#fffaf1!important;border-color:#d3c7e4!important;color:#40364f!important}
+.contract-stat b,.contract-stat span,.contract-exp .quiet{font-family:inherit!important;color:#514563!important}
+.quiet,.tiny,small,.hint,.type,.asset-credits,.asset-credits a,.terminal-foot{color:#746781!important;text-shadow:none!important}
+.app-topbar .quiet,.app-topbar small{color:#f4e7ff!important}
+.gold,.number{color:#a16c37!important;text-shadow:none!important}
+.status-chip .number{color:#fff7d9!important}
+.green{color:#347e65!important}
+button,.ghost,.tag,.slot,.soul-icon,.avatar,.monster-card .avatar,#worldMap button,#stageMap button{background:#f2eaf9!important;border:1.5px solid #9f90b3!important;color:#514563!important;border-radius:10px!important;box-shadow:0 2px 0 #d8cee6!important;text-shadow:none!important}
+button.primary,.primary,.mission .primary{background:#a9dfc4!important;color:#315d4a!important;border:1.5px solid #5c9b7a!important;box-shadow:0 3px 0 #6ca889!important;font-family:inherit!important;text-shadow:none!important}
+button:disabled{opacity:.48;box-shadow:none!important}
+button.chosen,.selected,#stageMap button.chosen,#worldMap button.chosen{border-color:#6da98b!important;background:#dcf0df!important}
+.terminal-menu button{background:#fffaf1!important;border:1.5px solid #a598b8!important;color:#514563!important;border-radius:12px!important;box-shadow:0 3px 0 #d5cbe5!important}
+.terminal-menu button b,.terminal-menu button small,.mission small{font-family:inherit!important;color:#514563!important;text-shadow:none!important}
+.terminal-menu button>span{background:#cfc1ea!important;border-radius:10px!important;filter:none!important;padding:3px}
+.nav-art{filter:none!important}
+.meter{background:#e1d8ed!important;border:0!important;border-radius:10px!important;box-shadow:none!important;overflow:hidden}
+.meter i{background:#83c4a5!important;border-radius:10px!important;box-shadow:none!important}
+.redmeter i{background:#e88c96!important}
+.copy-progress{font-size:11px;color:#746781;display:grid;gap:4px}
+.copy-progress .meter{height:6px}
+.asset-soul.pop-jewel{background:transparent!important;box-shadow:none!important;border:0!important;display:grid;place-items:center;overflow:hidden;width:100%;height:100%}
+.pop-jewel svg{width:100%;height:100%;display:block}
+.arena[data-region-art]{background:linear-gradient(180deg,#d8eef2 0%,#e4eef0 48%,#c5dfbf 49%,#a9cda9 100%)!important;overflow:hidden}
+.arena[data-region-art="ruins"],.arena[data-region-art="abyss"]{background:linear-gradient(#e5def2 0 52%,#c9bfdc 53% 100%)!important}
+.arena[data-region-art="desert"],.arena[data-region-art="other"]{background:linear-gradient(#ffe9ca 0 52%,#ebc898 53% 100%)!important}
+.arena[data-region-art="frost"],.arena[data-region-art="sky"]{background:linear-gradient(#dbeefb 0 52%,#c3d8ed 53% 100%)!important}
+.arena[data-region-art="demon"]{background:linear-gradient(#f7dce0 0 52%,#d6b8cf 53% 100%)!important}
+.arena[data-region-art]:after{background:linear-gradient(transparent,#51456312)!important}
+.arena-label,.enemycount{background:#fffaf1d9!important;color:#514563!important;border:1px solid #a598b8!important;border-radius:7px!important}
+.arena .fighter{filter:none!important}
+.enemyline .enemy{width:var(--enemy-size)!important;min-width:var(--enemy-size)!important;max-width:var(--enemy-size)!important;flex:0 0 var(--enemy-size)!important;height:auto!important;gap:2px!important;filter:none!important;transform:none!important}
+.enemyline .enemy svg{display:block;width:var(--enemy-size)!important;height:var(--enemy-size)!important;max-width:none!important;max-height:none!important;filter:none!important}
+.enemyline .enemy .meter{width:100%!important;height:4px!important}
+.enemyline .enemy.hit{animation:popHit .18s ease-out}
+@keyframes popHit{50%{opacity:.45;transform:translateX(3px)}}
+.loot-fly{position:absolute;z-index:9;width:32px;height:32px;pointer-events:none;animation:popLoot .8s ease-out forwards;filter:drop-shadow(0 2px 2px #51456355)}
+@keyframes popLoot{0%{opacity:0;transform:translate(-50%,0) scale(.4)}20%{opacity:1;transform:translate(-50%,-24px) scale(1.1)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-64px) scale(.7)}}
+.cover{background:radial-gradient(ellipse at 50% 25%,#fff7e8,#e6d9f4 65%,#d2dfe9)!important;color:#514563!important}
+.cover h1,.cover .subtitle,.cover .eyebrow,.cover .version{color:#514563!important;text-shadow:none!important;font-family:inherit!important}
+#summonDialog{background:#fffaf1!important;border:2px solid #a598b8!important;border-radius:16px!important}
+.summon-art{background:radial-gradient(#fff4d9,#ddd0f1)!important;border-radius:12px!important;border-color:#a598b8!important;box-shadow:none!important}
+.summon-panel p{color:#746781!important}
+.report-emblem{border-color:#a598b8!important;box-shadow:none!important;background:#d9cbed!important;color:#514563!important}
+.report-emblem strong{text-shadow:none!important}
+.report-emblem.rank-S{background:#f7d78f!important}.report-emblem.rank-A{background:#bde5c8!important}.report-emblem.rank-B{background:#c4dff1!important}
+@media(prefers-reduced-motion:reduce){.loot-fly{display:none}}
+</style>
 </head>
 <body>
 <div id="sceneTransition" hidden aria-hidden="true"></div>
@@ -455,7 +524,7 @@ button.primary{background:linear-gradient(180deg,#ad5e43 0%,#8b3e2d 24%,#67261d 
     <button class="primary" id="enterBtn">冒険を始める</button>
     <p class="hint" id="titleHint">モンスターに魂を宿し、24秒の限界を超えろ。</p>
   </div>
-  <div class="version">VERSION 0.4.3 · OFFLINE SAVE</div>
+  <div class="version">VERSION 0.8.1 · OFFLINE SAVE</div>
 </section>
 <main id="game" class="shell app-shell" hidden data-scene="terminal">
   <header class="app-topbar">
@@ -798,21 +867,28 @@ function persistReplacement(next){
 function showToast(text){$('toast').textContent=text;$('toast').hidden=false;clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>$('toast').hidden=true,2200)}
 function svg(body,view='0 0 100 100',attrs=''){return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${view}" ${attrs} aria-hidden="true">${body}</svg>`}
 function legacySoulIcon(id){const s=sdef(id)||{color:'#a5f0cc',icon:'star'},c=s.color;const icons={fist:'<path d="M36 57V39q0-7 6-7t6 7v-6q0-7 6-7t6 7v6q0-5 5-5t5 6v16q0 13-15 19H43L31 60q-4-6 1-9 5-2 8 5Z"/>',wind:'<path d="M24 41h35q13 0 13-10 0-9-11-9M20 52h54q11 0 11 9t-10 9M29 64h24q9 0 9 9" fill="none" stroke-width="6" stroke-linecap="round"/>',bolt:'<path d="M57 17 29 55h21l-7 29 33-45H55z"/>',flame:'<path d="M52 18q4 19-13 30-1-10-10-12 5 13-1 23-6 21 17 28 27 6 35-17 6-17-9-31 1 20-10 18 7-21-9-39Z"/><path d="M51 58q-12 12-4 22 13 4 15-7 0-7-11-15Z" fill="#fff4d2" stroke="none"/>',fang:'<path d="M28 28 43 36 50 25 57 36 72 28 78 55 68 78 55 59 50 76 45 59 32 78 22 55Z"/><path d="M35 45 45 50 M65 45 55 50" stroke="#202233" stroke-width="4"/>',arrow:'<path d="M22 68 63 27l-2 17 17-2-41 41-8-8-12 5 5-12Z"/><path d="m42 30 13-13M65 80l13-13" fill="none" stroke-width="5" stroke-linecap="round"/>',moon:'<path d="M64 23a29 29 0 1 0 14 43A25 25 0 0 1 64 23Z"/><path d="m70 21 3 9 9 3-9 3-3 9-3-9-9-3 9-3Z"/>',star:'<path d="m50 20 8 20 22 10-22 9-8 22-9-22-22-9 22-10Z"/>'};return svg(`<circle cx="50" cy="50" r="42" fill="${c}" opacity=".06"/><circle cx="50" cy="50" r="35" fill="${c}" opacity=".13"/><path d="M17 67Q7 46 24 29q-1 12 7 16M72 24q22 13 14 33l-5-9M26 73q13 17 33 11" fill="none" stroke="${c}" stroke-width="6" opacity=".4" stroke-linecap="round"/><path d="M50 11q24 0 33 26T68 80q-13 13-30 6-31-9-30-35 2-25 24-34" fill="none" stroke="${c}" stroke-width="1" opacity=".65" stroke-dasharray="7 5"/><g fill="${c}" stroke="${c}" stroke-width="1.6" stroke-linejoin="round">${icons[s.icon]||icons.star}</g><circle cx="18" cy="31" r="2.5" fill="${c}"/><circle cx="84" cy="76" r="2" fill="${c}"/><circle cx="67" cy="13" r="2" fill="${c}"/>`) }
-function soulIcon(id){
-  const s=sdef(id);
-  if(!s)return legacySoulIcon(id);
-  return `<span class="asset-soul" style="--soul-color:${s.color}"><img src="./assets/icons/${s.id}.svg" alt="" aria-hidden="true" draggable="false"></span>`;
+function popCreature(id){
+const shapes={
+moss:`<path d="M19 67Q5 52 18 39L31 57M28 40Q21 14 37 19L46 32Q55 10 68 17L70 38" fill="#6ecf9b"/><path d="M19 66Q19 31 52 31Q83 31 84 66Q88 88 52 88Q16 88 19 66Z" fill="#9be2ad"/><path d="M38 34Q35 14 54 12Q62 27 49 35" fill="#399b6b"/><ellipse cx="30" cy="70" rx="6" ry="4" fill="#ffc3bb" stroke="none"/><ellipse cx="73" cy="70" rx="6" ry="4" fill="#ffc3bb" stroke="none"/><path d="M35 85l-4 7h16m20-7 4 7H55" fill="#69b88b"/>`,
+fang:`<path d="M22 69Q3 48 8 36Q20 47 36 49" fill="#9ab8ed"/><path d="M28 62Q15 53 22 43L20 10 43 26Q55 22 66 26L85 9 84 43Q98 58 90 72Q78 88 51 86Q26 87 22 74Z" fill="#a5c5fa"/><path d="m26 20 5 21 12-11m34-11-3 20-12-10" fill="#f4c0d7"/><path d="M22 71Q34 56 50 69Q63 54 88 66Q86 85 52 86Q28 87 22 71Z" fill="#fff5eb"/><path d="M31 85l-5 7h18m27-7 5 7H58" fill="#7d9bd5"/>`,
+golem:`<path d="M30 37L17 47 9 67 18 80 33 74M70 37l13 10 8 20-9 13-15-6" fill="#c89b73"/><rect x="27" y="31" width="46" height="54" rx="12" fill="#d5ac85"/><rect x="31" y="12" width="38" height="42" rx="12" fill="#efd0a2"/><path d="M50 58l10 10-10 10-10-10Z" fill="#83dac9"/><path d="M33 83l-5 9h21m18-9 5 9H53" fill="#b98e73"/>`,
+wyrm:`<path d="M29 49 8 22 12 64 31 68M71 49 92 22 88 64 69 68" fill="#b8a4ed"/><path d="M28 72Q3 83 13 92Q20 96 38 82" fill="#ef9b88"/><path d="M25 57Q20 26 50 23Q80 26 75 57Q90 86 50 89Q10 86 25 57Z" fill="#efaa98"/><path d="M34 28l-6-17 16 12m12 0 16-12-6 17" fill="#f5d28e"/><ellipse cx="50" cy="76" rx="18" ry="11" fill="#fff0d1"/><path d="M32 87l-4 6h17m23-6 4 6H55" fill="#dc887b"/>`,
+slime:`<path d="M12 74Q12 59 26 48Q44 37 50 15Q56 37 74 48Q88 59 88 74Q86 89 50 89Q14 89 12 74Z" fill="#9ce3b7"/><path d="M32 49q7-11 17-13" stroke="#fff9e8" stroke-width="6" fill="none"/>`,
+bat:`<path d="M36 53 7 25 10 66 21 58 29 74 42 64M64 53 93 25 90 66 79 58 71 74 58 64" fill="#a89cdd"/><path d="M29 40 28 20 43 32 57 32 72 20 71 40Q84 72 50 84Q16 72 29 40Z" fill="#cec0ee"/>`,
+mushroom:`<path d="M34 54 28 79Q28 91 50 91Q72 91 72 79L66 54" fill="#fff0d7"/><path d="M8 53Q10 16 50 14Q90 16 92 53Q90 65 50 65Q10 65 8 53Z" fill="#f5a4a8"/><circle cx="28" cy="39" r="8" fill="#fff8e8" stroke="none"/><circle cx="58" cy="28" r="7" fill="#fff8e8" stroke="none"/><circle cx="76" cy="49" r="5" fill="#fff8e8" stroke="none"/>`,
+goblin:`<path d="M29 44 6 29 12 60 31 64M71 44 94 29 88 60 69 64" fill="#9ad2a0"/><path d="M26 69Q12 48 26 31Q50 12 74 31Q88 48 74 69Q81 91 50 91Q19 91 26 69Z" fill="#b5df95"/><path d="M32 83l-4 9h17m23-9 4 9H55" fill="#7bab79"/>`
+};
+const eyes={moss:58,fang:53,golem:35,wyrm:49,slime:64,bat:54,mushroom:75,goblin:52};const y=eyes[id]||58;const d=shapes[id]||shapes.moss;
+return svg(`<ellipse cx="50" cy="93" rx="35" ry="4" fill="#51456b" opacity=".16"/><g stroke="#49405c" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">${d}</g><g fill="#49405c"><ellipse cx="39" cy="${y}" rx="3.7" ry="5"/><ellipse cx="61" cy="${y}" rx="3.7" ry="5"/></g><g fill="#fff"><circle cx="40" cy="${y-2}" r="1.4"/><circle cx="62" cy="${y-2}" r="1.4"/></g><path d="M46 ${y+8}q4 5 8 0" stroke="#49405c" stroke-width="2.2" fill="none" stroke-linecap="round"/>`);
 }
+function soulIcon(id){const d=sdef(id);if(!d)return legacySoulIcon(id);const mark={focus:'<path d="M50 24 56 43 76 50 56 57 50 76 44 57 24 50 44 43Z"/>',frost:'<path d="M50 22v56M26 36l48 28M26 64l48-28" fill="none" stroke-width="5" stroke-linecap="round"/>',fortune:'<path d="M50 25C31 12 18 40 39 49 16 65 40 84 50 62 60 84 84 65 61 49 82 40 69 12 50 25Z"/><path d="M50 54v24" fill="none" stroke-width="4"/>',echo:'<path d="M27 40q23-22 46 0M22 51q28-28 56 0M32 62q18-17 36 0" fill="none" stroke-width="5" stroke-linecap="round"/>',meteor:'<path d="m70 23-22 30 10-3-9 13"/><circle cx="39" cy="66" r="13"/>',giant:'<path d="M29 66V39l12-11 9 9 9-9 12 11v27l-21 13Z"/>'}[id];const old=legacySoulIcon(id).match(/<g fill="[^"]+" stroke="[^"]+" stroke-width="1.6" stroke-linejoin="round">([\s\S]*?)<\/g>/);const symbol=mark||(old?old[1]:'<circle cx="50" cy="50" r="18"/>');return `<span class="asset-soul pop-jewel" data-soul="${d.id}">${svg(`<path d="M50 5 82 23 94 56 72 88 28 88 6 56 18 23Z" fill="${d.color}" stroke="#504361" stroke-width="4"/><path d="M50 5 50 20 18 23 6 56 22 56 34 34Z" fill="#fff" opacity=".58"/><path d="M50 15 76 31 83 56 66 77 34 77 17 56 24 31Z" fill="#fff" opacity=".23"/><g fill="#fffaf2" stroke="#554762" stroke-width="2.1" stroke-linejoin="round">${symbol}</g>`)}</span>`}
 const REGION_ART={forest:'meadow.jpg',ruins:'tower.png',desert:'desert.png',frost:'mountain.png',demon:'swamp.png',sky:'mountain.png',abyss:'tower.png',other:'desert.png'};
 function monsterSigil(id){return `<img class="monster-sigil" src="./assets/icons/${mdef(id)?.id||'moss'}.svg" alt="" aria-hidden="true" draggable="false">`;}
 function navArt(id){return `<img class="nav-art" src="./assets/icons/${id}.svg" alt="" aria-hidden="true" draggable="false">`;}
-function monsterIllustration(id){
-  const d=mdef(id)||MONSTERS[0];
-  return `<img class="monster-illustration" data-monster-art="${d.id}" src="./assets/portraits/${d.id}.webp" alt="" aria-hidden="true" draggable="false">`;
-}
+function monsterIllustration(id){const d=mdef(id)||MONSTERS[0];return `<img class="monster-illustration" data-monster-art="${d.id}" src="data:image/svg+xml,${encodeURIComponent(popCreature(d.id))}" alt="" aria-hidden="true" draggable="false">`}
 function currencyIcon(){return svg('<path d="M50 6 83 35 72 73 50 94 28 73 17 35Z" fill="#b47a48" stroke="#f8dca4" stroke-width="5"/><path d="M50 6 62 36 50 94 38 36Z" fill="#ffdb98"/><path d="M17 35 38 36 50 94 28 73Z" fill="#d39857"/><path d="M83 35 62 36 50 94 72 73Z" fill="#a96b47"/>')}
 function monsterIcon(id){const c=(mdef(id)||MONSTERS[0]).color;const body={moss:`<path d="M24 69Q4 55 13 36q7 15 18 18" fill="#477d69"/><path d="M31 36 19 11 44 25 58 25 79 12 75 39" fill="#588f73" stroke="#254b42" stroke-width="3"/><path d="M17 66q0-20 16-27 3-17 23-17 27 0 33 28 9 16-3 34-10 11-29 8-35 4-40-26Z" fill="${c}" stroke="#2d5950" stroke-width="3"/><path d="M24 78 18 91h20l3-9m35-5 6 14H62l-1-7" fill="#497a68"/><path d="M40 48 54 40 67 47" fill="none" stroke="#b6e5b0" stroke-width="4"/><path d="M58 57 73 53" stroke="#254c46" stroke-width="6" stroke-linecap="round"/><path d="M77 65q8 3 5 9l-7-1" fill="#edc1b0"/><path d="M29 63q7-11 17-9" stroke="#a4d7a5" stroke-width="6" stroke-linecap="round"/>`,fang:`<path d="M19 69Q2 47 13 31l7 16 16 5" fill="#4e759b"/><path d="M31 39 33 10 52 27 72 14 79 38 91 47 97 61 81 66 76 81 34 84 14 75Z" fill="${c}" stroke="#324b6c" stroke-width="3"/><path d="m38 20 11 14-13 1m36-11-12 11 17 2" fill="#d9dfed"/><path d="M26 78 22 92H42l6-10m20-1 4 11h20l-9-17" fill="#557a9c"/><path d="M70 49 84 46" stroke="#29435d" stroke-width="5" stroke-linecap="round"/><path d="m84 62 5 8 4-9" fill="#fff0dc"/><path d="M39 60 51 50 62 60 51 72Z" fill="#d3eaf2"/>`,golem:`<path d="M16 55 28 35 45 32 50 15 75 18 83 40 94 51 91 78 75 82 69 93H42l-8-12-21-4Z" fill="${c}" stroke="#5b5045" stroke-width="3"/><path d="M17 56 6 65 13 85 34 84 41 67 27 53Z M77 56 94 54 99 75 85 90 68 80Z" fill="#9f8a70" stroke="#5b5045" stroke-width="3"/><path d="M49 22 67 26 76 45 59 53 43 42Z" fill="#ebcf9d"/><path d="M58 36 73 36" stroke="#79e3c4" stroke-width="5" stroke-linecap="round"/><path d="m45 63 11-12 15 12-12 15Z" fill="#8ae9cb" stroke="#4c8178" stroke-width="2"/><path d="M32 92 46 82m19 0 12 10" stroke="#655344" stroke-width="4"/>`,wyrm:`<path d="M37 58Q11 16 8 27L15 65 36 76M51 49Q65 8 95 16l-11 39-21 18" fill="#a35d6b" stroke="#673e50" stroke-width="3"/><path d="M15 34 36 57 19 62M86 24 64 52 81 47" fill="#e8a18d"/><path d="M26 79Q6 84 8 69l-7 12q15 19 38 3" fill="#b96360"/><path d="M33 56 31 38 49 23 46 9 64 25 79 19 76 34 93 45 96 63 81 72 73 88 46 92 25 79Z" fill="${c}" stroke="#754750" stroke-width="3"/><path d="M47 80 51 91H35l2-13m36 1 9 12H63l-1-10" fill="#b96d68"/><path d="M68 45 84 42" stroke="#4b3448" stroke-width="6" stroke-linecap="round"/><path d="m82 62 6 9 4-9" fill="#ffe6b5"/><path d="M44 62 58 55 67 69 55 82 43 76Z" fill="#f2c38b"/>`};return svg(`<ellipse cx="50" cy="94" rx="35" ry="5" fill="#050b13" opacity=".35"/>${body[id]||body.moss}`)}
-function enemyIcon(i,stage){const boss=stage.boss&&i===stage.count-1,elite=stage.n%5===3;const col=boss?'#bb7b95':elite?'#a9a3bf':['#9a879c','#8896b1','#9cae9a'][i%3];return svg(`<ellipse cx="50" cy="91" rx="35" ry="6" fill="#000" opacity=".24"/><path d="M19 57 13 34 33 43Q36 23 50 24t17 19l20-9-6 23 8 16-14 18H25L11 73Z" fill="${col}" stroke="#4c465a" stroke-width="3"/>${boss?'<path d="m26 35 5-20 16 13 12-15 17 22" fill="#f0c787" stroke="#7d5754" stroke-width="3"/>':''}<path d="M33 58 44 62 M56 62 67 58" stroke="#363240" stroke-width="6" stroke-linecap="round"/><path d="M42 75h16" stroke="#514658" stroke-width="3" stroke-linecap="round"/><path d="M22 78 19 91h17m28 0h17l-3-13" fill="#675e76"/>`)}
+function enemyIcon(i,stage){return popCreature(({xs:'slime',s:'bat',m:'mushroom',l:'goblin',xl:'golem',xxl:'wyrm'})[enemySize(i,stage).id])}
 function updateHeader(){
   $('money').textContent=num(state.money);
   $('titleHint').textContent=hadSave?`到達ステージ ${state.unlocked} · 累計撃破 ${num(state.totalKills)} 体`:'モンスターに魂を宿し、24秒の限界を超えろ。';
@@ -836,7 +912,7 @@ function soulCard(s,shop){const lv=state.souls[s.id]||0,equipped=state.monsters[
 function renderBuild(){renderMonster('buildMonster',true);$('ownedCount').textContent=`${Object.keys(state.monsters).length} / ${MONSTERS.length}`;$('soulCount').textContent=`${Object.keys(state.souls).length} / ${SOULS.length}`;$('monsterList').innerHTML=MONSTERS.filter(d=>state.monsters[d.id]).map(d=>monsterCard(d,false)).join('');$('soulList').innerHTML=SOULS.map(s=>soulCard(s,false)).join('')}
 function renderShop(){$('monsterShop').innerHTML=MONSTERS.map(d=>monsterCard(d,true)).join('');$('soulShop').innerHTML=SOULS.map(s=>soulCard(s,true)).join('')}
 function renderCodex(){ $('codexMonsterList').innerHTML=MONSTERS.map(d=>{const owned=!!state.monsters[d.id];return `<article class="monster-card ${owned?'selected':''}"><div class="avatar">${monsterSigil(d.id)}${monsterIllustration(d.id)}</div><h3>${d.name}${owned?' <small class="green">所持</small>':''}</h3><p class="quiet">${d.role}</p><div class="mini-stats"><span>攻撃 ${d.atk}</span><span>速度 ${d.speed.toFixed(2)}</span></div><p class="quiet" style="margin-top:4px">魂枠 ${d.slots}</p><p class="tiny">${d.trait}</p></article>`}).join(''); $('codexSoulList').innerHTML=SOULS.map(s=>{const lv=state.souls[s.id]||0; return `<article class="soul-card ${lv?'':'soul-locked'}"><div class="row"><div class="soul-icon">${soulIcon(s.id)}</div><div class="grow"><h3>${s.name}</h3><span class="type">${s.type} · ${lv?'Lv.'+lv:'未取得'}</span></div></div><p>${s.desc(Math.max(1,lv||1))}</p></article>`}).join('')}
-function renderEnemies(stage,hp){const alive=hp.map((h,i)=>h>0?i:-1).filter(i=>i>=0),visible=alive.slice(0,5);const key=stage.n+':'+visible.join(',');if(key!==lastEnemyKey){$('enemyline').innerHTML=visible.map((i,j)=>`<div class="enemy ${j===0?'first':''}" data-enemy="${i}"><div class="meter redmeter"><i style="width:100%"></i></div>${enemyIcon(i,stage)}</div>`).join('');lastEnemyKey=key}visible.forEach(i=>{const e=$('enemyline').querySelector(`[data-enemy="${i}"] .meter i`);if(e)e.style.width=(100*hp[i]/stage.hp[i])+'%'});$('enemycount').textContent=alive.length?`残り ${alive.length} 体`:'全敵撃破'}
+function renderEnemies(stage,hp){const alive=hp.map((h,i)=>h>0?i:-1).filter(i=>i>=0),visible=alive.slice(0,5);const key=stage.n+':'+visible.join(',');if(key!==lastEnemyKey){$('enemyline').innerHTML=visible.map((i,j)=>`<div class="enemy ${j===0?'first':''}" data-enemy="${i}" style="--enemy-size:${enemySize(i,stage).px}px" title="${enemySize(i,stage).name}"><div class="meter redmeter"><i style="width:100%"></i></div>${enemyIcon(i,stage)}</div>`).join('');lastEnemyKey=key}visible.forEach(i=>{const e=$('enemyline').querySelector(`[data-enemy="${i}"] .meter i`);if(e)e.style.width=(100*hp[i]/stage.hp[i])+'%'});$('enemycount').textContent=(alive.length?`残り ${alive.length} 体`:'全敵撃破')+` · 魂 ${battle?.loot.length||0}`}
 function renderStageHistory(target, n){const r=state.records[n];$(target).innerHTML=`<div><small>挑戦回数</small><b>${r?.attempts||0}</b></div><div><small>前回の撃破</small><b>${r?`${r.last.kills}/${r.last.count}`:'—'}</b></div><div><small>最速クリア</small><b>${r?.bestTime!=null?r.bestTime.toFixed(2)+'s':'—'}</b></div>`}
 
 function renderMap(){
@@ -896,7 +972,8 @@ function refreshTerminal(){
 function setScene(next){if(!SCENE_META[next]||((running||loadingBattle)&&next!=='battle'))return;if(next==='result'&&!resultData)return;scene=next;for(const sec of document.querySelectorAll('.scene')){sec.hidden=sec.id!==next+'Scene';if(!sec.hidden)sec.scrollTop=0} $('loading').hidden=true;$('titleScreen').hidden=true;$('game').hidden=false;updateHeader();if(next==='terminal')refreshTerminal();if(next==='stage'){mapPage=REGIONS.indexOf(regionForStage(state.selectedStage));renderStageScene()}if(next==='build')renderBuild();if(next==='shop')renderShop();if(next==='codex')renderCodex();if(next==='settings'){updateSaveStatus();updateSoundButton();updateMusicButton()}if(next==='battle'){renderBattleBuild();renderBattle()}if(next==='result')renderResult(resultData);syncMusic()}
 function finishBattle(){if(!running||!battle?.done)return;running=false;cancelAnimationFrame(raf);const r=applyResult(state,battle);if(!r)return;resultData=r;save();return playTransition('result',()=>{setScene('result');playSound(r.mission.success?'clear':'reward')})}
 
-function frame(now){if(!running)return;advanceBattle(battle,(now-startedAt)/1000);renderBattle();animateVisual(battle);if(battle.done)finishBattle();else raf=requestAnimationFrame(frame)}
+function emitBattleLoot(b){const from=b.uiLootSeen||0;b.uiLootSeen=b.loot.length;if(document.hidden||(typeof matchMedia==='function'&&matchMedia('(prefers-reduced-motion: reduce)').matches))return;const a=$('arena'),ar=a.getBoundingClientRect?.();for(const drop of b.loot.slice(from,from+8)){const e=$('enemyline').querySelector(`[data-enemy="${drop.i}"]`),r=e?.getBoundingClientRect?.(),el=document.createElement('div');el.className='loot-fly';el.innerHTML=soulIcon(drop.id);if(ar&&r){el.style.left=(r.left-ar.left+r.width/2)+'px';el.style.top=(r.top-ar.top+r.height/2)+'px'}else{el.style.left='65%';el.style.top='48%'}a.appendChild(el);setTimeout(()=>el.remove(),800)}}
+function frame(now){if(!running)return;advanceBattle(battle,(now-startedAt)/1000);emitBattleLoot(battle);renderBattle();animateVisual(battle);if(battle.done)finishBattle();else raf=requestAnimationFrame(frame)}
 function showCover(which){$('game').hidden=true;$('loading').hidden=which!=='loading';$('titleScreen').hidden=which!=='titleScreen';syncMusic()}
 function beginBattle(n=state.selectedStage,type=state.selectedMission){
   if(transitioning||running||loadingBattle||!['stage','terminal','result'].includes(scene)||$('game').hidden||!canMission(state,n,type))return;
