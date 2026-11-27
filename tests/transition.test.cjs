@@ -1,229 +1,40 @@
-const fs=require('node:fs');
-const vm=require('node:vm');
-const assert=require('node:assert/strict');
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const {test}=require('node:test');
 const html=fs.readFileSync(require('node:path').join(__dirname,'../index.html'),'utf8');
 const engine=html.match(/<script id="engine">([\s\S]*?)<\/script>/)[1];
+const run=code=>vm.runInNewContext(engine+'\n'+code,{console});
+
 const ui=html.match(/<script id="ui">([\s\S]*?)<\/script>/)[1];
-const freshSave=()=>vm.runInNewContext(engine+'\nfresh()',{});
-function environment({reduced=false,animate=true,seed=null,legacy=null,writeFail=false}={}){
-  const elements=new Map(),events=new Map(),animations=[],frames=new Map(),writes=[];
-  const ids=new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]));
-  const sceneNames=['terminal','stage','build','shop','codex','settings','battle','result'];
-  let now=0,seq=0;
-  const encode=v=>v===null?null:typeof v==='string'?v:JSON.stringify(v);
-  const slots=new Map([['soul_rush_prototype_v2',encode(seed)],['soul_rush_prototype_v1',encode(legacy)]]);
-  function get(id){
-    if(!ids.has(id))throw Error('Missing HTML element: '+id);
-    if(!elements.has(id)){
-      const el={id,hidden:['game','titleScreen','sceneTransition',...sceneNames.filter(x=>x!=='terminal').map(x=>x+'Scene')].includes(id),style:{},dataset:{},textContent:'',innerHTML:'',value:'',scrollTop:0,classList:{add(){},remove(){},toggle(){}},setAttribute(){},addEventListener(){},querySelector(){return null},appendChild(){},showModal(){},close(){},remove(){},select(){}};
-      if(id==='sceneTransition'&&animate)el.animate=(keyframes,options)=>{
-        let resolve,reject;
-        const finished=new Promise((a,b)=>{resolve=a;reject=b});
-        animations.push({keyframes,options,resolve,reject});
-        return {finished,cancel(){}};
-      };
-      elements.set(id,el);
-    }
-    return elements.get(id);
-  }
-  const document={hidden:false,getElementById:get,querySelectorAll:s=>s==='.scene'?sceneNames.map(n=>get(n+'Scene')):[],addEventListener:(name,fn,capture)=>events.set(name,{fn,capture}),createElement:()=>({style:{},remove(){}}),head:{appendChild(){}}};
-  const storage={getItem:key=>slots.get(key)??null,setItem:(key,value)=>{assert.equal(key,'soul_rush_prototype_v2');if(writeFail)throw Error('write denied');slots.set(key,value);writes.push(value)}};
-  const context={document,localStorage:storage,location:{protocol:'http:',hostname:'example.test'},navigator:{},performance:{now:()=>now},matchMedia:()=>({matches:reduced}),console,setTimeout:()=>++seq,clearTimeout(){},requestAnimationFrame:fn=>{const id=++seq;frames.set(id,fn);return id},cancelAnimationFrame:id=>frames.delete(id)};
-  const api=vm.runInNewContext(engine+'\n'+ui+'\n({enter,goTitle,navigateScene,beginBattle,actionNext,finishBattle,transitionScene,selectStage,selectRegion,selectMission,backupJSON,persistReplacement,snapshot:()=>({scene,running,loadingBattle,transitioning,startedAt,elapsed:battle?.elapsed,stage:battle?.stage.n,clear:battle?.clear,mission:battle?.mission,protectSave,saveOK,money:state.money,state:JSON.stringify(state),overlayHidden:$("sceneTransition").hidden,gameHidden:$("game").hidden,titleHidden:$("titleScreen").hidden,timer:$("timer").textContent})})',context);
-  function frame(delta=0){now+=delta;const queued=[...frames.values()];frames.clear();queued.forEach(fn=>fn(now))}
-  frame();frame();
-  async function step(duration,fail=false){
-    const a=animations.shift();
-    assert.ok(a,'expected an animation');
-    assert.equal(a.options.duration,duration);
-    now+=duration;
-    if(fail)a.reject(Error('cancelled'));else a.resolve();
-    for(let i=0;i<8;i++)await Promise.resolve();
-  }
-  async function white(){await step(400);await step(100);await step(500)}
-  async function menu(){await step(150);await step(150)}
-  async function result(){await step(250);await step(250)}
-  return {api,get,events,animations,frame,step,white,menu,result,writes,raw:()=>storage.getItem('soul_rush_prototype_v2'),legacyRaw:()=>storage.getItem('soul_rush_prototype_v1'),now:()=>now};
+const makeFresh=()=>run('fresh()');
+function environment(seed={},writeFail=false){
+ const storage=new Map(Object.entries(seed).map(([k,v])=>[k,typeof v==='string'?v:JSON.stringify(v)])),nodes=new Map(),frames=new Map(),events=new Map();let now=0,seq=0;
+ function ensure(id=''){if(id&&nodes.has(id))return nodes.get(id);const cls=new Set(),el={id,hidden:false,disabled:false,open:false,style:{setProperty(k,v){this[k]=String(v)}},dataset:{},children:[],scrollLeft:0,scrollTop:0,value:'',textContent:'',files:[],classList:{add(k){cls.add(k)},remove(k){cls.delete(k)},contains(k){return cls.has(k)},toggle(k,v){if(v)cls.add(k);else cls.delete(k)}},getBoundingClientRect(){return {left:0,top:0,width:320,height:220}},setAttribute(){},removeAttribute(){},addEventListener(k,fn){events.set(id+':'+k,fn)},querySelectorAll(s){return s==='.character-card'?Array.from({length:4},()=>({scrollIntoView(){}})):[]},appendChild(x){this.children.push(x)},remove(){},showModal(){this.open=true},close(){this.open=false},select(){},click(){}};let str='';Object.defineProperty(el,'innerHTML',{get(){return str},set(v){str=String(v);for(const m of str.matchAll(/\bid="([^"]+)"/g))ensure(m[1]);if(!str)el.children=[]}});if(id)nodes.set(id,el);return el}
+ for(const m of html.slice(0,html.indexOf('<script id="engine">')).matchAll(/\bid="([^"]+)"/g))ensure(m[1]);
+ const context={console,document:{hidden:false,getElementById:id=>nodes.get(id)||null,createElement:()=>ensure(),addEventListener(k,fn){events.set(k,fn)}},localStorage:{getItem:k=>storage.get(k)??null,setItem(k,v){if(writeFail)throw Error('denied');storage.set(k,v)}},location:{protocol:'http:',hostname:'example.test'},navigator:{},performance:{now:()=>now},requestAnimationFrame(fn){const n=++seq;frames.set(n,fn);return n},cancelAnimationFrame(n){frames.delete(n)},setTimeout:()=>++seq,clearTimeout(){},confirm:()=>true};
+ const api=vm.runInNewContext(engine+'\n'+ui+'\n({dispatch,showScene,startBattle,pauseBattle,resumeBattle,abortBattle,settleBattle,updateBattle,renderResult,openSoul,selectPreset,seed:x=>{state=x},state:()=>state,battle:()=>battle,result:()=>resultData,scene:()=>scene,paused:()=>paused,running:()=>running,protect:()=>protectSave,snapshot:()=>JSON.stringify(state)})',context);
+ return {api,nodes,storage,events,context,el:id=>nodes.get(id),advance(ms){now+=ms;const jobs=[...frames.values()];frames.clear();jobs.forEach(fn=>fn(now))},clock(ms){now+=ms},get now(){return now}};
 }
-test('whiteout swaps at full opacity and locks input for 1000ms',async()=>{
-  const e=environment(),a=e.api,p=a.enter();
-  assert.equal(a.snapshot().titleHidden,false);
-  assert.equal(a.snapshot().transitioning,true);
-  assert.equal(e.get('sceneTransition').style.backgroundColor,'#effff9');
-  assert.equal(a.enter(),undefined);
-  let prevented=0,stopped=0;
-  for(const name of ['click','keydown']){
-    const listener=e.events.get(name);
-    assert.equal(listener.capture,true);
-    listener.fn({preventDefault(){prevented++},stopImmediatePropagation(){stopped++}});
-  }
-  assert.equal(prevented,2);assert.equal(stopped,2);
-  await e.step(400);
-  assert.equal(a.snapshot().titleHidden,true);
-  assert.equal(a.snapshot().scene,'terminal');
-  assert.equal(a.snapshot().transitioning,true);
-  await e.step(100);await e.step(500);
-  assert.equal(await p,true);assert.equal(e.now(),1000);
-  assert.equal(a.snapshot().overlayHidden,true);assert.equal(a.snapshot().transitioning,false);
-  e.events.get('click').fn({preventDefault(){prevented++},stopImmediatePropagation(){stopped++}});
-  assert.equal(prevented,2);
+test("home only displays current equipment and five preset buttons",()=>{
+ const e=environment(),a=e.api;a.dispatch('enter');assert.equal(a.scene(),'terminal');assert.equal((e.el('presets').innerHTML.match(/data-action="preset"/g)||[]).length,5);assert.equal((e.el('slots').innerHTML.match(/data-action="slot"/g)||[]).length,3);assert.ok(e.el('heroSelect').innerHTML.includes('モス'));assert.equal(e.el('charactersScene').hidden,true);assert.equal(e.el('soulsScene').hidden,true)
 });
-test('menu and return-to-title durations; same scene is a no-op',async()=>{
-  const e=environment(),a=e.api;
-  let p=a.enter();await e.white();await p;
-  assert.equal(a.navigateScene('terminal'),undefined);
-  p=a.navigateScene('settings');assert.equal(a.snapshot().scene,'terminal');
-  assert.equal(e.get('sceneTransition').style.backgroundColor,'#0d1119');
-  assert.equal(a.navigateScene('shop'),undefined);
-  await e.step(150);assert.equal(a.snapshot().scene,'settings');
-  await e.step(150);await p;
-  p=a.goTitle();await e.white();await p;
-  assert.equal(a.snapshot().titleHidden,false);assert.equal(a.snapshot().gameHidden,true);
-  assert.equal(e.now(),2300);
+test("character and soul selectors are separate screens and return to home",()=>{
+ const e=environment(),a=e.api;a.dispatch('enter');a.dispatch('characters');assert.equal(a.scene(),'characters');assert.equal((e.el('characters').innerHTML.match(/data-character="/g)||[]).length,4);a.dispatch('home');a.dispatch('slot',{index:'0'});assert.equal(a.scene(),'souls');assert.equal((e.el('soulGrid').innerHTML.match(/data-action="choose-soul"/g)||[]).length,13);a.dispatch('home');assert.equal(a.scene(),'terminal')
 });
-test('battle clock starts after whiteout; 24-second reward is granted once before result fade',async()=>{
-  const e=environment(),a=e.api;
-  let p=a.enter();await e.white();await p;
-  p=a.beginBattle();assert.equal(a.beginBattle(),undefined);
-  await e.step(400);
-  assert.equal(a.snapshot().scene,'battle');assert.equal(a.snapshot().timer,'24.00');
-  assert.equal(a.snapshot().running,false);assert.equal(a.snapshot().loadingBattle,true);
-  await e.step(100);await e.step(500);await p;
-  assert.equal(a.snapshot().startedAt,2000);assert.equal(a.snapshot().running,true);
-  assert.equal(a.snapshot().overlayHidden,true);
-  e.frame(23999);assert.equal(a.snapshot().running,true);
-  e.frame(1);assert.equal(a.snapshot().running,false);assert.equal(a.snapshot().elapsed,24);
-  assert.equal(a.snapshot().money,60);assert.equal(JSON.parse(e.raw()).money,60);
-  assert.equal(a.finishBattle(),undefined);assert.equal(a.snapshot().scene,'battle');
-  await e.step(250);assert.equal(a.snapshot().scene,'result');
-  await e.step(250);assert.equal(a.snapshot().overlayHidden,true);
-  assert.equal(a.snapshot().money,60);assert.equal(JSON.parse(e.raw()).records[1].attempts,1);
+test("all stage enemies rendered; no five-enemy truncation and passive gauge absent",()=>{
+ const seed=makeFresh();seed.unlocked=4;seed.selectedStage=4;seed.souls.spark=1;seed.souls.burst=1;seed.monsters.moss.equip=['might','spark','burst'];seed.presets[0].equip=['might','spark','burst'];const e=environment({'soul_rush_prototype_v3':seed}),a=e.api;a.dispatch('enter');a.dispatch('start');assert.equal(a.scene(),'battle');assert.equal((e.el('enemyTrack').innerHTML.match(/id="enemy-/g)||[]).length,a.battle().stage.count);assert.ok(a.battle().stage.count>5);assert.ok(e.el('gauge-spark'));assert.ok(e.el('count-spark'));assert.ok(e.el('gauge-burst'));assert.equal(e.el('gauge-might'),undefined);assert.equal(e.el('count-burst'),undefined);assert.equal(e.el('topbar').hidden,true);e.advance(3000);assert.equal(e.el('count-spark').textContent,'発動')
 });
-test('next stage and retry retain the timer and correct stage',async()=>{
-  const seed=freshSave();seed.monsters.moss.level=30;
-  const e=environment({seed}),a=e.api;
-  let p=a.enter();await e.white();await p;
-  p=a.beginBattle();await e.white();await p;
-  e.frame(24000);await e.result();
-  assert.equal(a.snapshot().clear,true);assert.equal(JSON.parse(e.raw()).unlocked,2);
-  p=a.actionNext('next');await e.step(400);
-  assert.equal(a.snapshot().stage,2);assert.equal(a.snapshot().running,false);
-  await e.step(100);await e.step(500);await p;
-  assert.equal(a.snapshot().running,true);
-  e.frame(24000);await e.result();
-  p=a.actionNext('retry');await e.white();await p;
-  assert.equal(a.snapshot().stage,2);assert.equal(a.snapshot().elapsed,0);
+test("pause stops clock, settings preserves pause, resume and abort settle once",()=>{
+ const e=environment(),a=e.api;a.dispatch('enter');a.dispatch('start');e.advance(8000);a.dispatch('pause');const elapsed=a.battle().elapsed,kills=a.battle().kills;assert.ok(elapsed>0);assert.equal(a.paused(),true);assert.equal(a.running(),false);assert.equal(e.el('pauseDialog').open,true);e.advance(60000);assert.equal(a.battle().elapsed,elapsed);a.dispatch('pause-settings');assert.equal(e.el('settingsDialog').open,true);a.dispatch('close-settings');assert.equal(e.el('pauseDialog').open,true);a.dispatch('resume');e.advance(1000);assert.ok(Math.abs(a.battle().elapsed-elapsed-1)<.00001);a.dispatch('pause');a.dispatch('abort');assert.equal(a.scene(),'result');assert.equal(a.result().aborted,true);assert.ok(a.result().kills>=kills);assert.equal(a.result().gems,0);assert.equal(a.result().reward.bonus,0);const before=a.snapshot();assert.equal(a.settleBattle(),false);assert.equal(a.snapshot(),before)
 });
-test('reduced motion skips animations and retains combat timing',async()=>{
-  const e=environment({reduced:true}),a=e.api;
-  await a.enter();await a.navigateScene('stage');await a.beginBattle();
-  assert.equal(e.animations.length,0);assert.equal(a.snapshot().startedAt,0);
-  assert.equal(a.snapshot().running,true);assert.equal(a.snapshot().overlayHidden,true);
-  e.frame(24000);for(let i=0;i<8;i++)await Promise.resolve();
-  assert.equal(a.snapshot().scene,'result');assert.equal(a.snapshot().money,60);
+test("enemy kill generates ether and soul notices; reward scatter contains every soul",()=>{
+ const e=environment(),a=e.api;a.dispatch('enter');a.dispatch('start');e.advance(24000);assert.equal(a.scene(),'result');assert.ok(e.el('effects').children.some(x=>x.innerHTML.includes('エーテル')));assert.ok(e.el('effects').children.some(x=>x.innerHTML.includes('の魂')));assert.equal((e.el('scatter').innerHTML.match(/class="loot-token"/g)||[]).length,a.result().loot.length);assert.ok(e.el('rewardStrip').innerHTML.includes('ジェム'))
 });
-test('missing animation API falls back to immediate navigation',async()=>{
-  const e=environment({animate:false}),a=e.api;
-  await a.enter();await a.navigateScene('build');
-  assert.equal(a.snapshot().scene,'build');assert.equal(a.snapshot().transitioning,false);
-  assert.equal(e.animations.length,0);
+test("boss result displays chest and all chest souls",()=>{
+ const s=makeFresh();s.unlocked=10;s.selectedStage=10;s.monsters.moss.level=500;const e=environment({'soul_rush_prototype_v3':s}),a=e.api;a.dispatch('enter');a.dispatch('start');e.advance(24000);assert.equal(a.scene(),'result');assert.equal(a.result().gems,20);assert.equal(e.el('bossChest').hidden,false);assert.ok(e.el('bossChest').innerHTML.includes('宝箱'));assert.equal((e.el('scatter').innerHTML.match(/class="loot-token"/g)||[]).length,a.result().loot.length+5)
 });
-test('cancelled animation or failing scene callback releases lock',async()=>{
-  const e=environment(),a=e.api;
-  let p=a.enter();await e.step(400,true);await e.step(100);await e.step(500);await p;
-  assert.equal(a.snapshot().transitioning,false);
-  p=a.transitionScene('menu',()=>{throw Error('test error')});
-  const rejected=assert.rejects(p,/test error/);
-  await e.step(150);await rejected;
-  assert.equal(a.snapshot().overlayHidden,true);assert.equal(a.snapshot().transitioning,false);
-  p=a.navigateScene('shop');await e.menu();await p;
-  assert.equal(a.snapshot().scene,'shop');
+test("old v2 storage remains intact and new v3 key written on migration",()=>{
+ const s=makeFresh();s.version=2;s.money=717;s.unlocked=4;s.selectedStage=4;delete s.gems;delete s.presets;delete s.firstClears;const raw=JSON.stringify(s),e=environment({'soul_rush_prototype_v2':raw});e.api.dispatch('enter');assert.equal(e.storage.get('soul_rush_prototype_v2'),raw);const v=JSON.parse(e.storage.get('soul_rush_prototype_v3'));assert.equal(v.version,3);assert.equal(v.money,717);assert.equal(v.gems,15);assert.equal(v.selectedStage,4)
 });
-test('existing version 2 save survives navigation with unchanged data and key',async()=>{
-  const seed=freshSave();
-  seed.money=812;seed.unlocked=4;seed.selectedStage=3;seed.monsters.moss.level=9;seed.souls.haste=2;seed.monsters.moss.equip.push('haste');
-  const e=environment({seed}),a=e.api;
-  let p=a.enter();await e.white();await p;
-  assert.equal(a.snapshot().state,JSON.stringify(seed));
-  p=a.navigateScene('settings');await e.menu();await p;
-  p=a.goTitle();await e.white();await p;
-  assert.equal(e.raw(),JSON.stringify(seed));assert.equal(JSON.parse(e.raw()).version,2);
-  assert.ok(e.writes.length>=2);
-});
-
-test('legacy migration preserves raw v1 and prefers v2 on subsequent startup',async()=>{
-  const expected=freshSave();expected.money=812;expected.unlocked=12;expected.selectedStage=11;expected.monsters.moss.level=9;
-  const legacy=JSON.parse(JSON.stringify(expected));legacy.version=1;delete legacy.selectedMission;delete legacy.missionRecords;delete legacy.materials;
-  const e=environment({legacy,reduced:true}),a=e.api;
-  assert.equal(e.raw(),null);await a.enter();
-  assert.equal(a.snapshot().state,JSON.stringify(expected));assert.equal(e.legacyRaw(),JSON.stringify(legacy));
-  const next=JSON.parse(e.raw());next.money=999;
-  const e2=environment({seed:next,legacy,reduced:true});await e2.api.enter();
-  assert.equal(e2.api.snapshot().money,999);assert.equal(e2.legacyRaw(),JSON.stringify(legacy));
-});
-test('world selection, locked region and side mission retry do not unlock campaign',async()=>{
-  const seed=freshSave();seed.unlocked=2;
-  const e=environment({seed,reduced:true}),a=e.api;await a.enter();await a.navigateScene('stage');
-  assert.ok(e.get('worldMap').innerHTML.includes('始まりの森林'));
-  a.selectRegion(1);assert.equal(JSON.parse(a.snapshot().state).selectedStage,1);
-  a.selectMission('collect');assert.equal(JSON.parse(a.snapshot().state).selectedMission,'collect');
-  await a.beginBattle();assert.equal(a.snapshot().mission,'collect');
-  e.frame(24000);for(let i=0;i<8;i++)await Promise.resolve();
-  const saved=JSON.parse(e.raw());
-  assert.equal(saved.unlocked,2);assert.equal(saved.materials.soulFragment,2);assert.equal(saved.missionRecords['1:collect'].attempts,1);
-  assert.equal(saved.records[1],undefined);assert.ok(e.get('result').innerHTML.includes('魂の欠片'));
-  assert.equal(a.actionNext('next'),undefined);await a.actionNext('retry');
-  assert.equal(a.snapshot().mission,'collect');assert.equal(a.snapshot().stage,1);assert.equal(a.snapshot().elapsed,0);
-});
-test('unknown v2 is protected and never falls back to v1',async()=>{
-  const raw='{"version":999,"money":400}';
-  const e=environment({seed:raw,legacy:freshSave(),reduced:true}),a=e.api;await a.enter();
-  assert.equal(a.snapshot().protectSave,true);assert.equal(e.raw(),raw);assert.equal(a.backupJSON(),raw);assert.equal(e.writes.length,0);
-});
-test('write failure leaves the legacy and current state untouched on replacement',async()=>{
-  const seed=freshSave();seed.money=812;const legacy={...seed,version:1};
-  const e=environment({legacy,reduced:true,writeFail:true}),a=e.api;await a.enter();
-  assert.equal(a.snapshot().saveOK,false);assert.equal(e.raw(),null);assert.equal(e.legacyRaw(),JSON.stringify(legacy));
-  const before=a.snapshot().state;assert.throws(()=>a.persistReplacement(freshSave()));
-  assert.equal(a.snapshot().state,before);assert.equal(e.legacyRaw(),JSON.stringify(legacy));
-});
-
-test('guild board renders actual monster, equipped souls and selected request',async()=>{
-  const seed=freshSave();seed.unlocked=12;seed.selectedStage=11;seed.selectedMission='hunt';seed.monsters.moss.level=9;
-  const e=environment({seed,reduced:true}),a=e.api;await a.enter();
-  assert.ok(e.get('terminalMonster').innerHTML.includes('Lv.9'));
-  assert.ok(e.get('terminalMonster').innerHTML.includes('装着魂'));
-  assert.ok(e.get('terminalStage').innerHTML.includes('忘却の遺跡'));
-  assert.ok(e.get('terminalStage').innerHTML.includes('討伐'));
-  assert.ok(e.get('terminalStage').innerHTML.includes('data-scene="stage"'));
-  assert.ok(e.get('terminalStage').innerHTML.includes('data-launch-battle="1"'));
-  assert.equal(a.snapshot().state,JSON.stringify(seed));
-  await a.beginBattle();assert.equal(a.snapshot().mission,'hunt');assert.equal(a.snapshot().stage,11);
-});
-
-test('illustrated world, equipment and report preserve actual mission data',async()=>{
-  const seed=freshSave();seed.unlocked=2;seed.selectedMission='collect';
-  const e=environment({seed,reduced:true}),a=e.api;await a.enter();
-  assert.ok(e.get('terminalMonster').innerHTML.includes('assets/icons/moss.svg'));
-  assert.ok(e.get('terminalMonster').innerHTML.includes('data-soul="might"'));
-  assert.ok(e.get('terminalStage').innerHTML.includes('assets/art/meadow.jpg'));
-  await a.navigateScene('stage');
-  assert.ok(e.get('worldMap').innerHTML.includes('data-region-art="forest"'));
-  assert.ok(e.get('worldMap').innerHTML.includes('data-region-art="frost"'));
-  await a.beginBattle();assert.equal(e.get('arena').dataset.regionArt,'forest');
-  e.frame(24000);for(let i=0;i<8;i++)await Promise.resolve();
-  assert.ok(e.get('result').innerHTML.includes('report-emblem rank-A'));
-  const saved=JSON.parse(e.raw());assert.equal(saved.materials.soulFragment,2);assert.equal(saved.money,78);
-});
-
-test('large portrait card uses real local illustration without changing saved progress',async()=>{
-  const seed=freshSave();seed.monsters.moss.level=9;seed.money=812;
-  const e=environment({seed,reduced:true}),a=e.api;await a.enter();
-  const card=e.get('terminalMonster').innerHTML;
-  assert.ok(card.includes('data:image/svg+xml,'));
-  assert.ok(card.includes('contract-title'));assert.ok(card.includes('Lv.9'));
-  assert.ok(card.includes('装着魂'));assert.ok(card.includes('data-scene="build"'));
-  assert.equal(a.snapshot().state,JSON.stringify(seed));
-  await a.beginBattle();assert.ok(e.get('fighter').innerHTML.includes('data:image/svg+xml,'));
+test("invalid latest save protects existing bytes; write failure preserves legacy",()=>{
+ const raw='{"version":999}',old=JSON.stringify(makeFresh()),e=environment({'soul_rush_prototype_v3':raw,'soul_rush_prototype_v2':old});e.api.dispatch('enter');assert.equal(e.api.protect(),true);assert.equal(e.storage.get('soul_rush_prototype_v3'),raw);assert.equal(e.el('startBtn').disabled,true);const w=environment({'soul_rush_prototype_v2':old},true);w.api.dispatch('enter');assert.equal(w.storage.get('soul_rush_prototype_v2'),old);assert.equal(w.storage.has('soul_rush_prototype_v3'),false)
 });
