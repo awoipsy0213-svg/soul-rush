@@ -18,5 +18,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: soul-rush-v012-ui-screenshots
+          name: soul-rush-v013-ui-screenshots
           path: ui-screenshots/
