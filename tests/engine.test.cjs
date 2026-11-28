@@ -3,16 +3,16 @@ const {test}=require('node:test');
 const html=fs.readFileSync(require('node:path').join(__dirname,'../index.html'),'utf8');
 const engine=html.match(/<script id="engine">([\s\S]*?)<\/script>/)[1];
 const run=code=>vm.runInNewContext(engine+'\n'+code,{console});
-test("24-second initial battle, partial rewards, no auto-level and loot",()=>{
- const x=run(`(()=>{const s=fresh(),b=createBattle(s);advanceBattle(b,24);const r=applyResult(s,b);return {done:b.done,kills:b.kills,elapsed:b.elapsed,clear:b.clear,ether:r.reward.total,dropSum:b.etherDrops.reduce((a,x)=>a+x.amount,0),xp:r.xp,lv:s.monsters.moss.level,loot:r.loot.length,again:applyResult(s,b),gems:r.gems}})()`);
- assert.equal(x.done,true);assert.equal(x.elapsed,24);assert.equal(x.clear,false);assert.equal(x.kills,11);assert.equal(x.ether,82);assert.equal(x.dropSum,x.ether);assert.equal(x.xp,0);assert.equal(x.lv,1);assert.ok(x.loot>0);assert.equal(x.again,null);assert.equal(x.gems,0)
+test("30-second initial battle, partial rewards, no auto-level and loot",()=>{
+ const x=run(`(()=>{const s=fresh(),b=createBattle(s);advanceBattle(b,30);const r=applyResult(s,b);return {done:b.done,kills:b.kills,elapsed:b.elapsed,clear:b.clear,ether:r.reward.total,dropSum:b.etherDrops.reduce((a,x)=>a+x.amount,0),xp:r.xp,lv:s.monsters.moss.level,loot:r.loot.length,again:applyResult(s,b),gems:r.gems}})()`);
+ assert.equal(x.done,true);assert.ok(x.elapsed<30);assert.equal(x.clear,true);assert.equal(x.kills,12);assert.equal(x.ether,145);assert.equal(x.dropSum,90);assert.equal(x.xp,0);assert.equal(x.lv,1);assert.ok(x.loot>0);assert.equal(x.again,null);assert.equal(x.gems,4)
 });
 test("early clear grants stage reward and 4 gems exactly once",()=>{
- const x=run(`(()=>{const s=fresh();s.monsters.moss.level=30;const a=createBattle(s);advanceBattle(a,24);const r=applyResult(s,a);const b=createBattle(s,1);advanceBattle(b,24);const t=applyResult(s,b);return {first:r.gems,repeat:t.gems,clear:a.clear,elapsed:a.elapsed,gems:s.gems,unlocked:s.unlocked,bonus:r.reward.bonus,again:applyResult(s,a)}})()`);
- assert.equal(x.first,4);assert.equal(x.repeat,0);assert.equal(x.clear,true);assert.ok(x.elapsed<24);assert.equal(x.gems,4);assert.equal(x.unlocked,2);assert.ok(x.bonus>0);assert.equal(x.again,null)
+ const x=run(`(()=>{const s=fresh();s.monsters.moss.level=30;const a=createBattle(s);advanceBattle(a,30);const r=applyResult(s,a);const b=createBattle(s,1);advanceBattle(b,30);const t=applyResult(s,b);return {first:r.gems,repeat:t.gems,clear:a.clear,elapsed:a.elapsed,gems:s.gems,unlocked:s.unlocked,bonus:r.reward.bonus,again:applyResult(s,a)}})()`);
+ assert.equal(x.first,4);assert.equal(x.repeat,0);assert.equal(x.clear,true);assert.ok(x.elapsed<30);assert.equal(x.gems,4);assert.equal(x.unlocked,2);assert.ok(x.bonus>0);assert.equal(x.again,null)
 });
 test("boss first clear grants 4 gems, five souls once",()=>{
- const x=run(`(()=>{const s=fresh();s.unlocked=10;s.selectedStage=10;s.monsters.moss.level=500;const a=createBattle(s);advanceBattle(a,24);const r=applyResult(s,a);const b=createBattle(s,10);advanceBattle(b,24);const t=applyResult(s,b);return {clear:r.clear,first:r.gems,repeat:t.gems,chars:r.chest.filter(x=>x.kind==='character').length,souls:r.chest.filter(x=>x.kind==='soul').length,loot:r.loot.length,repeatChest:t.chest.length,gems:s.gems,owned:Object.keys(s.monsters).length,unlocked:s.unlocked}})()`);
+ const x=run(`(()=>{const s=fresh();s.unlocked=10;s.selectedStage=10;s.monsters.moss.level=500;const a=createBattle(s);advanceBattle(a,30);const r=applyResult(s,a);const b=createBattle(s,10);advanceBattle(b,30);const t=applyResult(s,b);return {clear:r.clear,first:r.gems,repeat:t.gems,chars:r.chest.filter(x=>x.kind==='character').length,souls:r.chest.filter(x=>x.kind==='soul').length,loot:r.loot.length,repeatChest:t.chest.length,gems:s.gems,owned:Object.keys(s.monsters).length,unlocked:s.unlocked}})()`);
  assert.equal(x.clear,true);assert.equal(x.first,4);assert.equal(x.repeat,0);assert.equal(x.chars,0);assert.equal(x.souls,5);assert.ok(x.loot>=1);assert.equal(x.repeatChest,0);assert.equal(x.gems,4);assert.equal(x.owned,1);assert.equal(x.unlocked,11)
 });
 test("stopping mid-run preserves earned rewards without first clear or unlock",()=>{
@@ -24,16 +24,16 @@ test("unfinished battles cannot award rewards",()=>{
  assert.equal(x.result,null);assert.equal(x.unchanged,true)
 });
 test("fixed simulation seed, incremental and single-jump results match",()=>{
- const x=run(`(()=>{const s=fresh();s.souls.spark=1;s.souls.burst=1;s.monsters.moss.equip=['might','spark','burst'];const a=createBattle(s),b=createBattle(s);advanceBattle(a,24);for(let i=1;i<=240;i++)advanceBattle(b,i/10);return {a:JSON.stringify(a),b:JSON.stringify(b)}})()`);
+ const x=run(`(()=>{const s=fresh();s.souls.spark=1;s.souls.burst=1;s.monsters.moss.equip=['might','spark','burst'];const a=createBattle(s),b=createBattle(s);advanceBattle(a,30);for(let i=1;i<=300;i++)advanceBattle(b,i/10);return {a:JSON.stringify(a),b:JSON.stringify(b)}})()`);
  assert.equal(x.a,x.b)
 });
-test("24-second boundary counts exactly at limit and rejects later hit",()=>{
- const x=run(`(()=>{const make=t=>{const b=createBattle(fresh());b.stage={...b.stage,count:1,hp:[10]};b.hp=[10];b.stats={atk:10,speed:1/t,levels:{}};b.nextAttack=t;return b};const a=make(24),b=make(24.01);advanceBattle(a,23.999);const before=a.done;advanceBattle(a,24);advanceBattle(b,24);return {before,clear:a.clear,elapsed:a.elapsed,late:b.clear,lateKills:b.kills}})()`);
- assert.equal(x.before,false);assert.equal(x.clear,true);assert.equal(x.elapsed,24);assert.equal(x.late,false);assert.equal(x.lateKills,0)
+test("30-second boundary counts hit at limit but requires goal, rejects later hit",()=>{
+ const x=run(`(()=>{const make=t=>{const b=createBattle(fresh());b.stage={...b.stage,count:1,hp:[10]};b.hp=[10];b.stats={atk:10,speed:1/t,levels:{}};b.nextAttack=t;return b};const a=make(30),b=make(30.01);advanceBattle(a,29.999);const before=a.done;advanceBattle(a,30);advanceBattle(b,30);return {before,clear:a.clear,kills:a.kills,elapsed:a.elapsed,late:b.clear,lateKills:b.kills}})()`);
+ assert.equal(x.before,false);assert.equal(x.clear,false);assert.equal(x.kills,1);assert.equal(x.elapsed,30);assert.equal(x.late,false);assert.equal(x.lateKills,0)
 });
-test("next enemy is immediately targetable",()=>{
- const x=run(`(()=>{const b=createBattle(fresh());b.stage={...b.stage,count:2,hp:[10,10]};b.hp=[10,10];b.stats={atk:10,speed:1,levels:{}};b.nextAttack=1;advanceBattle(b,1);const a={kills:b.kills,front:front(b),done:b.done};advanceBattle(b,2);return {a,kills:b.kills,clear:b.clear,elapsed:b.elapsed}})()`);
- assert.equal(x.a.kills,1);assert.equal(x.a.front,1);assert.equal(x.a.done,false);assert.equal(x.kills,2);assert.equal(x.clear,true);assert.equal(x.elapsed,2)
+test("next enemy is reached during cooldown",()=>{
+ const x=run(`(()=>{const b=createBattle(fresh());b.stage={...b.stage,count:2,hp:[10,10]};b.hp=[10,10];b.stats={atk:10,speed:1,levels:{}};b.nextAttack=1;advanceBattle(b,1);const a={kills:b.kills,front:front(b),done:b.done};advanceBattle(b,2.3);return {a,kills:b.kills,clear:b.clear,elapsed:b.elapsed}})()`);
+ assert.equal(x.a.kills,1);assert.equal(x.a.front,1);assert.equal(x.a.done,false);assert.equal(x.kills,2);assert.equal(x.clear,true);assert.ok(x.elapsed>2&&x.elapsed<2.3)
 });
 test("soul duplicates do not auto-level and require both resources",()=>{
  const x=run(`(()=>{const s=fresh();s.money=200;const denied=!purchaseSoul(s,'might'),first=grantSoul(s,'haste'),duplicate=grantSoul(s,'haste');grantSoul(s,'haste');const before=s.souls.haste,cost=soulCost('haste',before);const oldMoney=s.money,ok=purchaseSoul(s,'haste');return {denied,first,duplicate,before,ok,lv:s.souls.haste,copies:s.copies.haste||0,paid:oldMoney-s.money,cost,unowned:purchaseSoul(s,'pulse')}})()`);
