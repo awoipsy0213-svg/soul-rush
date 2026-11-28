@@ -36,6 +36,8 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
     await sleep(120);await noOverflow('terminalScene');
     assert.ok(await evaluate('(()=>{const b=document.querySelector("#startBtn").getBoundingClientRect();return b.height>=40&&b.bottom<=innerHeight&&b.top>=0})()'),'launch visible');
     assert.equal(await evaluate('document.querySelectorAll("#presets button").length'),5);
+    assert.equal(await evaluate('document.querySelectorAll("#heroSockets .socket").length'),5);
+    assert.ok(await evaluate('(()=>{const p=document.querySelector(".hero-board").getBoundingClientRect();return [...document.querySelectorAll("#heroSockets .socket")].every(n=>{const r=n.getBoundingClientRect();return r.left>=p.left-1&&r.right<=p.right+1&&r.top>=p.top-1&&r.bottom<=p.bottom+1})})()'),'sockets within monster board');
     await screenshot('home-'+width+'x'+height);
   }
   await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true,screenWidth:390,screenHeight:844});
@@ -44,7 +46,7 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   assert.equal(await evaluate('getComputedStyle(document.getElementById("characters")).overflowX'),'auto');
   assert.ok(await evaluate('document.getElementById("characters").scrollWidth>document.getElementById("characters").clientWidth'));
   await screenshot('characters');await click('#backBtn');await scene('terminal');
-  await click('#slots [data-index="0"]');await scene('souls');
+  await click('#heroSockets [data-index="0"]');await scene('souls');
   assert.equal(await evaluate('document.querySelectorAll(".soul-tile").length'),33);
   assert.equal(await evaluate('getComputedStyle(document.getElementById("soulScroll")).overflowY'),'auto');
   await noOverflow('soulsScene');await screenshot('souls');
@@ -52,7 +54,7 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   assert.equal(await evaluate('document.querySelectorAll(".soul-tile").length'),1);
   await click('.soul-tile[data-id="burst"]');await click('[data-action="soul-range"]');
   assert.ok(await evaluate('document.getElementById("infoDialog").open&&document.getElementById("infoContent").innerHTML.includes("svg")'));
-  await screenshot('soul-range');await click('[data-action="close-info"]');
+  await screenshot('soul-range');await click('[data-action="range-mode"][data-id="small"]');await click('[data-action="range-shrink"]');assert.ok(await evaluate('document.getElementById("infoContent").innerText.includes("55%")'));await screenshot('soul-range-shrink');await click('[data-action="close-info"]');
   await evaluate('document.getElementById("soulSearch").value="";document.getElementById("soulSearch").dispatchEvent(new Event("input"))');
   await send('Emulation.setDeviceMetricsOverride',{width:320,height:568,deviceScaleFactor:1,mobile:true,screenWidth:320,screenHeight:568});await sleep(120);await noOverflow('soulsScene');await screenshot('souls-small');
   await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true,screenWidth:390,screenHeight:844});
@@ -62,6 +64,7 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   assert.equal(await evaluate('document.querySelectorAll(".compare-table tbody tr").length'),5);
   assert.equal(await evaluate('JSON.stringify(state)'),beforeCompare);
   await screenshot('five-build-comparison');await click('[data-action="close-info"]');
+  const beforeLab=await evaluate('JSON.stringify(state)');await click('[data-action="lab-open"]');assert.equal(await evaluate('document.querySelectorAll(".lab-card").length'),5);await screenshot('build-lab');await click('[data-action="lab-bench"]');assert.equal(await evaluate('document.querySelectorAll(".lab-matrix tbody tr").length'),7);await screenshot('balance-lab');assert.equal(await evaluate('JSON.stringify(state)'),beforeLab);await click('[data-action="close-info"]');
   // Synthetic test-only data in this isolated browser profile.
   await evaluate('state.unlocked=4;state.selectedStage=4;state.souls.spark=1;state.souls.burst=1;state.monsters.moss.equip=["might","spark","burst"];capturePreset(state);save();renderHome()');
   await click('#startBtn');await scene('battle');
@@ -144,14 +147,16 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   await evaluate('advanceBattle(battle,battle.limit);updateBattle();settleBattle()');await scene('result');
   await click('[data-action="battle-detail"]');assert.ok(await evaluate('document.getElementById("infoContent").innerText.includes("実ダメージ")'));
   await screenshot('battle-detail');await click('[data-action="close-info"]');await click('#resultActions [data-action="home"]');await scene('terminal');
+  const beforeReplay=await evaluate('JSON.stringify(state)');await click('[data-action="lab-open"]');await click('[data-action="lab-history"]');await click('[data-action="lab-replay"][data-index="0"]');assert.ok(await evaluate('document.getElementById("infoTitle").textContent.includes("戦闘再計算")'));await screenshot('history-replay');assert.equal(await evaluate('JSON.stringify(state)'),beforeReplay);await click('[data-action="close-info"]');
+  await evaluate('state.unlocked=Math.max(state.unlocked,20);state.selectedStage=20;state.monsters.moss.level=100;state.souls.burst=10;state.souls.shrink=1;state.monsters.moss.equip=["might","burst","shrink"];capturePreset(state);save();renderHome()');await click('#startBtn');await scene('battle');assert.equal(await evaluate('document.querySelectorAll("#enemyTrack .enemy").length'),310);assert.ok(await evaluate('document.querySelectorAll("#enemyTrack .enemy[data-offscreen=\"0\"]").length<50'));await evaluate('cancelAnimationFrame(raf);advanceBattle(battle,5);updateBattle();floatEffects(battle);attackEffect(battle)');assert.ok(await evaluate('fxCreated<=BALANCE_MASTER.effects.poolSize&&document.getElementById("effects").children.length<=BALANCE_MASTER.effects.maxNodes'));await screenshot('swarm-battle');await evaluate('cancelAnimationFrame(raf);advanceBattle(battle,battle.limit);updateBattle();settleBattle()');await scene('result');await click('#resultActions [data-action="home"]');await scene('terminal');
   const saved=await evaluate('localStorage.getItem(SAVE_KEY)');
   assert.ok(await until(()=>evaluate('navigator.serviceWorker.controller!==null'),15000));
-  assert.ok(await evaluate('caches.keys().then(keys=>keys.some(k=>k.endsWith(":0.15.0")))'));
+  assert.ok(await evaluate('caches.keys().then(keys=>keys.some(k=>k.endsWith(":0.16.0")))'));
   await send('Network.emulateNetworkConditions',{offline:true,latency:0,downloadThroughput:0,uploadThroughput:0});
   await send('Page.reload');await until(()=>evaluate('document.getElementById("titleScreen")&&!document.getElementById("titleScreen").hidden'),15000);
   await click('#enterBtn');await scene('terminal');
   assert.equal(await evaluate('JSON.parse(localStorage.getItem(SAVE_KEY)).gems'),JSON.parse(saved).gems);
   await send('Network.emulateNetworkConditions',{offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1});
   assert.equal(errors.length,0,errors.join('\n'));
-  console.log('v0.15 browser smoke passed: four home viewports, horizontal character list, soul grid, full enemy track, pause/abort, boss chest, scatter bounds, arena entry/fight/claim, nine supplies, AREA3040 jump, gifts, cosmetics, combat breakdown and offline save.');
+  console.log('v0.16 browser smoke passed: four home viewports, horizontal character list, soul grid, full enemy track, pause/abort, boss chest, scatter bounds, arena entry/fight/claim, nine supplies, AREA3040 jump, gifts, cosmetics, combat breakdown and offline save.');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(()=>{ws?.close();proc?.kill('SIGTERM');server.close();setTimeout(()=>{try{fs.rmSync(profiles,{recursive:true,force:true})}catch{}},250).unref()});
