@@ -1,4 +1,4 @@
-# SOUL RUSH CLASSIC 0.1.0
+# SOUL RUSH CLASSIC 0.1.1
 
 原作 Rune Rider (111%, 2017) を参考にした非公式の独立再構築版。既存のSOUL RUSH v0.18は変更しない。通常24秒、特殊6秒、武器7種、ルーン33種、5ビルド、同種素材+ゴールドによる育成。ホーム/装備/戦闘/報酬画面を参考画面の構造に寄せ、自作SVGで武器・キャラ・敵・ルーンを描画。元のロゴ、画像、コード、音楽は使用していない。
 
@@ -7,5 +7,11 @@
 - 追加した独自の魂工房・自動編成は再現版では無効。攻撃範囲の表示と詳細分析は検証用途として残す。アリーナは従来NPC対戦。
 - 参考: https://appget.com/appli/view/70954/ / https://www.behance.net/gallery/66921429/Rune-Rider-UI-Weapons-Helmets-and- / https://forum.gamer.com.tw/B.php?bsn=33387
 - 起動: リポジトリルートで python -m http.server 8000 を実行し http://localhost:8000/classic/ を開く。
-- reference.json は既存ベースの変更点を管理する。独立HTML内マスターへの同期は下記スクリプトで検証。
+- reference.json は既存ベースの変更点を管理する。独立HTML内マスターは現時点で手動同期。
 - テスト: node --test tests/classic.test.cjs ; node tests/classic-browser-smoke.cjs
+
+## 画面構成の照合（0.1.1）
+- 装備画面: 黒/黄、銅色の武器背景、番号1〜5、武器上の色別ルーン、4列ルーン、LEVEL/LOCKヘッダー、装着チェック、素材数ゲージ（必要個数に達すると緑）、新規入手N、下部5アイコン。
+- 戦闘: 上44%を街並みと道路、左上獲得箱・中央AREAとタイマー・右上ポーズ/ゴールド、下56%を左ATK/SPDとルーン進捗・右斜め大型武器。表示比率は公開画像を基にした近似値。戦闘計算は0.1.0と同一。
+- 参考画像: https://toucharcade.com/games/rune-rider / https://rawg.io/games/rune-rider / https://www.behance.net/gallery/66921429/Rune-Rider-UI-Weapons-Helmets-and-
+- 画像/アイコン/ソース/商標は直接流用せず自作SVG。原作の完全な画面ピクセル一致、実機性能、正確なパラメータは未確認。原作未確認のヘルメット解放、戦闘数値は暫定。mainの既存30秒版は変更しない。
