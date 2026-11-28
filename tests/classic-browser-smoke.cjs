@@ -82,6 +82,25 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   assert.equal(await evaluate('localStorage.getItem("soul_rush_prototype_v9")'),null);
   const saved=await evaluate('localStorage.getItem(SAVE_KEY)');assert.equal(JSON.parse(saved).edition,'classic-reference-v1');
   assert.ok(await until(()=>evaluate('navigator.serviceWorker.controller?.scriptURL.includes("/classic/sw.js")'),15000));
+
+  // Real Chrome demo interaction; preserve all persistent keys byte-for-byte.
+  await send('Network.emulateNetworkConditions',{offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1});
+  const store=await evaluate('JSON.stringify(Object.keys(localStorage).sort().map(k=>[k,localStorage.getItem(k)]))');
+  for(const n of [29,30,20,60]){
+    await send('Page.navigate',{url:url+'?demo='+n});await until(()=>evaluate('location.search==='+JSON.stringify('?demo='+n)+'&&document.getElementById("app")?.dataset.scene==="title"&&typeof CLASSIC_DEMO!=="undefined"&&CLASSIC_DEMO'));await screen(390,844);
+    assert.equal(await evaluate('document.getElementById("classicDemoPanel").hidden'),false);
+    await noOverflow('titleScreen');if(n===29)await screenshot('classic-demo-menu');
+    await click('#enterBtn');await scene('battle');await evaluate('cancelAnimationFrame(raf)');
+    assert.equal(await evaluate('battle.stage.n'),n);assert.equal(await evaluate('battle.initialSeed'),123);
+    assert.ok(await evaluate('document.querySelector(".rider-weapon")&&document.querySelector(".city-near")&&document.querySelector("#goalMarker svg")'));
+    await evaluate('advanceBattle(battle,Math.min(battle.limit,5));updateBattle();attackEffect(battle)');
+    await noOverflow('battleScene');await screenshot('classic-demo-'+n+'-battle');
+    await evaluate('advanceBattle(battle,battle.limit);updateBattle();settleBattle()');await scene('result');assert.equal(await evaluate('resultData.clear'),true);await screenshot('classic-demo-'+n+'-result');
+    assert.equal(await evaluate('JSON.stringify(Object.keys(localStorage).sort().map(k=>[k,localStorage.getItem(k)]))'),store);
+    await click('[data-action="title"]');await scene('title');
+  }
+  await send('Page.navigate',{url});await until(()=>evaluate('location.search===""&&document.getElementById("app")?.dataset.scene==="title"&&typeof CLASSIC_DEMO!=="undefined"&&!CLASSIC_DEMO'));assert.equal(await evaluate('JSON.stringify(Object.keys(localStorage).sort().map(k=>[k,localStorage.getItem(k)]))'),store);await click('#enterBtn');await scene('terminal');
+
   await send('Network.emulateNetworkConditions',{offline:true,latency:0,downloadThroughput:0,uploadThroughput:0});
   await send('Page.reload');await until(()=>evaluate('document.getElementById("titleScreen")&&!document.getElementById("titleScreen").hidden'),15000);
   await click('#enterBtn');await scene('terminal');assert.equal(await evaluate('JSON.parse(localStorage.getItem(SAVE_KEY)).gems'),JSON.parse(saved).gems);
