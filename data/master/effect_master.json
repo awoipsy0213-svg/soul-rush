@@ -1,0 +1,20 @@
+{
+  "normal": "slash",
+  "focus": "critical",
+  "assassin": "summon",
+  "echo": "slash",
+  "spark": "bolt",
+  "fixedbolt": "bolt",
+  "meteor": "meteor",
+  "starfall": "meteor",
+  "plane": "flyby",
+  "sniper": "snipe",
+  "ufo": "ufo",
+  "burst": "flame",
+  "pillar": "flame",
+  "dragon": "dragon",
+  "frost": "ice",
+  "maxNodes": 36,
+  "maxDraw": 4,
+  "poolSize": 36
+}
