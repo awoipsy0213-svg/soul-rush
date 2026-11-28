@@ -1,6 +1,6 @@
 {
   "edition": "classic-reference-v1",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "combat": {
     "limit": 24
   },
