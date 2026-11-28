@@ -414,7 +414,7 @@
     "swarmHP": 0.065,
     "barrierFrontHP": 6,
     "barrierRearHP": 0.6,
-    "sprintHP": 2.5,
+    "sprintHP": 1.65,
     "eliteHP": 1.65,
     "crowdHP": 0.65,
     "initialHP": 38,
