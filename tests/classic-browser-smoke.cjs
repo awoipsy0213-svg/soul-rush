@@ -94,11 +94,30 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
     assert.equal(await evaluate('battle.stage.n'),n);assert.equal(await evaluate('battle.initialSeed'),123);
     assert.ok(await evaluate('document.querySelector(".rider-weapon")&&document.querySelector(".city-near")&&document.querySelector("#goalMarker svg")'));
     await evaluate('advanceBattle(battle,Math.min(battle.limit,5));updateBattle();attackEffect(battle)');
-    await noOverflow('battleScene');await screenshot('classic-demo-'+n+'-battle');
-    await evaluate('advanceBattle(battle,battle.limit);updateBattle();settleBattle()');await scene('result');assert.equal(await evaluate('resultData.clear'),true);await screenshot('classic-demo-'+n+'-result');
+    await noOverflow('battleScene');assert.ok(await evaluate('(()=>{const a=document.getElementById("classicBattleWeapon").getBoundingClientRect();return [...document.querySelectorAll("#classicBattleWeapon .classic-static-socket")].every(e=>{const r=e.getBoundingClientRect();return r.left>=a.left-2&&r.right<=a.right+2&&r.top>=a.top-2&&r.bottom<=a.bottom+2})})()'),'weapon sockets inside viewport');await screenshot('classic-demo-'+n+'-battle');
+    await evaluate('advanceBattle(battle,battle.limit);updateBattle();settleBattle()');await scene('result');assert.equal(await evaluate('resultData.clear'),true);await noOverflow('resultScene');await screenshot('classic-demo-'+n+'-result');if(n===20){assert.equal(await evaluate('document.getElementById("scatter").dataset.grouped'),'1');await screen(320,568);await noOverflow('resultScene');await screenshot('classic-demo-20-result-small');await screen(390,844)}
     assert.equal(await evaluate('JSON.stringify(Object.keys(localStorage).sort().map(k=>[k,localStorage.getItem(k)]))'),store);
     await click('[data-action="title"]');await scene('title');
   }
+
+  // Capture a complete real-time browser playthrough, not a synthetic animation.
+  if(process.env.RECORD_DEMO==='1'){
+    const dir=path.resolve(process.env.DEMO_DIR||'classic-demo-recording'),framesDir=path.join(profiles,'video-frames');fs.mkdirSync(dir,{recursive:true});fs.mkdirSync(framesDir,{recursive:true});
+    await send('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'no-preference'}]});await screen(390,844);
+    await send('Page.navigate',{url:url+'?demo=29'});await until(()=>evaluate('location.search==="?demo=29"&&typeof CLASSIC_DEMO!=="undefined"&&CLASSIC_DEMO&&document.getElementById("app")?.dataset.scene==="title"'));
+    const frames=[],capture=async()=>{const p=await send('Page.captureScreenshot',{format:'jpeg',quality:92});const file='frame-'+String(frames.length).padStart(5,'0')+'.jpg';fs.writeFileSync(path.join(framesDir,file),Buffer.from(p.data,'base64'));frames.push({file,t:Date.now()})};
+    const hold=async ms=>{const end=Date.now()+ms;do{const start=Date.now();await capture();await sleep(Math.max(0,100-(Date.now()-start)))}while(Date.now()<end)};
+    await hold(1100);await click('[data-action="demo-preview"]');await scene('terminal');await hold(1600);
+    await click('#heroSockets [data-index="0"]');await scene('souls');await hold(1000);
+    await click('#classicRuneHeader [data-action="soul-slot"][data-index="0"]');await hold(1600);
+    await click('[data-action="classic-rune-close"]');await click('#backBtn');await scene('terminal');await hold(650);
+    await click('#startBtn');await scene('battle');
+    const deadline=Date.now()+32000;while(await evaluate('scene==="battle"')){await hold(100);assert.ok(Date.now()<deadline,'real-time demonstration exceeded limit')}
+    await scene('result');assert.equal(await evaluate('resultData.clear'),true);assert.ok(await evaluate('resultData.elapsed>0&&resultData.elapsed<=24'));await hold(2400);
+    assert.ok(frames.length>=80,'enough recorded browser frames');const lines=[];for(let i=0;i<frames.length;i++){lines.push('file '+frames[i].file);lines.push('duration '+(i+1<frames.length?Math.max(.02,(frames[i+1].t-frames[i].t)/1000):.12).toFixed(4))}lines.push('file '+frames.at(-1).file);fs.writeFileSync(path.join(framesDir,'frames.txt'),lines.join('\n')+'\n');
+    const out=path.join(dir,'classic-014-area29.mp4'),ff=cp.spawnSync('ffmpeg',['-hide_banner','-loglevel','error','-y','-f','concat','-safe','1','-i',path.join(framesDir,'frames.txt'),'-vf','fps=24,format=yuv420p','-c:v','libx264','-crf','20','-movflags','+faststart',out],{encoding:'utf8',timeout:120000});assert.equal(ff.status,0,ff.stderr||String(ff.error));assert.ok(fs.statSync(out).size>20000);assert.equal(await evaluate('JSON.stringify(Object.keys(localStorage).sort().map(k=>[k,localStorage.getItem(k)]))'),store);console.log('Real-time browser demonstration recorded: '+frames.length+' frames; '+fs.statSync(out).size+' bytes; actual AREA29 clear.');
+  }
+
   await send('Page.navigate',{url});await until(()=>evaluate('location.search===""&&document.getElementById("app")?.dataset.scene==="title"&&typeof CLASSIC_DEMO!=="undefined"&&!CLASSIC_DEMO'));assert.equal(await evaluate('JSON.stringify(Object.keys(localStorage).sort().map(k=>[k,localStorage.getItem(k)]))'),store);await click('#enterBtn');await scene('terminal');
 
   await send('Network.emulateNetworkConditions',{offline:true,latency:0,downloadThroughput:0,uploadThroughput:0});
