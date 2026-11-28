@@ -94,11 +94,35 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
     assert.equal(await evaluate('battle.stage.n'),n);assert.equal(await evaluate('battle.initialSeed'),123);
     assert.ok(await evaluate('document.querySelector(".rider-weapon")&&document.querySelector(".city-near")&&document.querySelector("#goalMarker svg")'));
     await evaluate('advanceBattle(battle,Math.min(battle.limit,5));updateBattle();attackEffect(battle)');
-    await noOverflow('battleScene');await screenshot('classic-demo-'+n+'-battle');
-    await evaluate('advanceBattle(battle,battle.limit);updateBattle();settleBattle()');await scene('result');assert.equal(await evaluate('resultData.clear'),true);await screenshot('classic-demo-'+n+'-result');
+    await noOverflow('battleScene');assert.ok(await evaluate('(()=>{const a=document.getElementById("classicBattleWeapon").getBoundingClientRect();return [...document.querySelectorAll("#classicBattleWeapon .classic-static-socket")].every(e=>{const r=e.getBoundingClientRect();return r.left>=a.left-2&&r.right<=a.right+2&&r.top>=a.top-2&&r.bottom<=a.bottom+2})})()'),'weapon sockets inside viewport');await screenshot('classic-demo-'+n+'-battle');
+    await evaluate('advanceBattle(battle,battle.limit);updateBattle();settleBattle()');await scene('result');assert.equal(await evaluate('resultData.clear'),true);await noOverflow('resultScene');await screenshot('classic-demo-'+n+'-result');if(n===20){assert.equal(await evaluate('document.getElementById("scatter").dataset.grouped'),'1');await screen(320,568);await noOverflow('resultScene');await screenshot('classic-demo-20-result-small');await screen(390,844)}
     assert.equal(await evaluate('JSON.stringify(Object.keys(localStorage).sort().map(k=>[k,localStorage.getItem(k)]))'),store);
     await click('[data-action="title"]');await scene('title');
   }
+
+  // Capture a complete real-time browser playthrough, not a synthetic animation.
+  if(process.env.RECORD_DEMO==='1'){
+    const dir=path.resolve(process.env.DEMO_DIR||'classic-demo-recording'),framesDir=path.join(profiles,'video-frames');fs.mkdirSync(dir,{recursive:true});fs.mkdirSync(framesDir,{recursive:true});
+    await send('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'no-preference'}]});await screen(390,844);
+    await send('Page.navigate',{url:url+'?demo=29'});await until(()=>evaluate('location.search==="?demo=29"&&typeof CLASSIC_DEMO!=="undefined"&&CLASSIC_DEMO&&document.getElementById("app")?.dataset.scene==="title"'));
+    const frames=[],capture=async()=>{const p=await send('Page.captureScreenshot',{format:'jpeg',quality:92});const file='frame-'+String(frames.length).padStart(5,'0')+'.jpg';fs.writeFileSync(path.join(framesDir,file),Buffer.from(p.data,'base64'));frames.push({file,t:Date.now()})};
+    const hold=async ms=>{const end=Date.now()+ms;do{const start=Date.now();await capture();await sleep(Math.max(0,100-(Date.now()-start)))}while(Date.now()<end)};
+    await hold(1100);await click('[data-action="demo-preview"]');await scene('terminal');await hold(1600);
+    await click('#heroSockets [data-index="0"]');await scene('souls');await hold(1000);
+    await click('#classicRuneHeader [data-action="soul-slot"][data-index="0"]');await hold(1600);
+    await click('[data-action="classic-rune-close"]');await click('#backBtn');await scene('terminal');await hold(650);
+    await click('#startBtn');await scene('battle');
+    const deadline=Date.now()+32000;while(await evaluate('scene==="battle"')){await hold(100);assert.ok(Date.now()<deadline,'real-time demonstration exceeded limit')}
+    await scene('result');assert.equal(await evaluate('resultData.clear'),true);assert.ok(await evaluate('resultData.elapsed>0&&resultData.elapsed<=24'));await hold(2400);
+    assert.ok(frames.length>=80,'enough recorded browser frames');const lines=[];for(let i=0;i<frames.length;i++){lines.push('file '+frames[i].file);lines.push('duration '+(i+1<frames.length?Math.max(.02,(frames[i+1].t-frames[i].t)/1000):.12).toFixed(4))}lines.push('file '+frames.at(-1).file);fs.writeFileSync(path.join(framesDir,'frames.txt'),lines.join('\n')+'\n');
+    // Chrome MediaRecorder encodes the real captured frames when FFmpeg is absent.
+    const out=path.join(dir,'classic-014-area29.webm');
+    await evaluate('window.__demoFrames=[]');
+    for(let i=0;i<frames.length;i+=8){const batch=frames.slice(i,i+8).map(f=>({data:fs.readFileSync(path.join(framesDir,f.file)).toString('base64'),t:f.t-frames[0].t}));await evaluate('window.__demoFrames.push(...'+JSON.stringify(batch)+');true')}
+    const recording=await send('Runtime.evaluate',{expression:String.raw`(async()=>{const frames=window.__demoFrames;const canvas=document.createElement('canvas');canvas.width=390;canvas.height=844;const ctx=canvas.getContext('2d',{alpha:false});const images=await Promise.all(frames.map(f=>new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src='data:image/jpeg;base64,'+f.data})));const stream=canvas.captureStream(24);const mime=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(x=>MediaRecorder.isTypeSupported(x));const recorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:1600000});const chunks=[];recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};const done=new Promise((resolve,reject)=>{recorder.onstop=resolve;recorder.onerror=reject});ctx.drawImage(images[0],0,0,390,844);recorder.start();const start=performance.now();for(let i=0;i<frames.length;i++){const delay=frames[i].t-(performance.now()-start);if(delay>0)await new Promise(r=>setTimeout(r,delay));ctx.drawImage(images[i],0,0,390,844)}await new Promise(r=>setTimeout(r,160));recorder.stop();await done;stream.getTracks().forEach(t=>t.stop());const blob=new Blob(chunks,{type:mime});window.__demoVideo=new Uint8Array(await blob.arrayBuffer());window.__demoFrames=[];return {size:window.__demoVideo.length,mime}})()`,returnByValue:false,awaitPromise:false,userGesture:true});assert.ok(recording.result.objectId,'recorder promise');
+    const encoded=await until(()=>evaluate('window.__demoVideo?.length||0'),90000);const fd=fs.openSync(out,'w');try{for(let offset=0;offset<encoded;offset+=65536){const part=await evaluate('(()=>{const a=window.__demoVideo.subarray('+offset+','+(offset+65536)+');let s="";for(let i=0;i<a.length;i++)s+=String.fromCharCode(a[i]);return btoa(s)})()');fs.writeSync(fd,Buffer.from(part,'base64'))}}finally{fs.closeSync(fd)}await evaluate('delete window.__demoVideo');assert.ok(fs.statSync(out).size>20000);assert.equal(await evaluate('JSON.stringify(Object.keys(localStorage).sort().map(k=>[k,localStorage.getItem(k)]))'),store);console.log('Real-time browser demonstration recorded: '+frames.length+' frames; '+fs.statSync(out).size+' bytes; actual AREA29 clear.');
+  }
+
   await send('Page.navigate',{url});await until(()=>evaluate('location.search===""&&document.getElementById("app")?.dataset.scene==="title"&&typeof CLASSIC_DEMO!=="undefined"&&!CLASSIC_DEMO'));assert.equal(await evaluate('JSON.stringify(Object.keys(localStorage).sort().map(k=>[k,localStorage.getItem(k)]))'),store);await click('#enterBtn');await scene('terminal');
 
   await send('Network.emulateNetworkConditions',{offline:true,latency:0,downloadThroughput:0,uploadThroughput:0});

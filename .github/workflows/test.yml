@@ -21,6 +21,8 @@ jobs:
         run: node tests/classic-browser-smoke.cjs
         env:
           SCREENSHOT_DIR: classic-ui-screenshots
+          RECORD_DEMO: '1'
+          DEMO_DIR: classic-demo-recording
       - uses: actions/upload-artifact@v4
         if: success()
         with:
@@ -28,6 +30,11 @@ jobs:
           path: |
             ui-screenshots/
             classic-ui-screenshots/
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: classic-v014-real-play-demo
+          path: classic-demo-recording/
       - uses: actions/upload-artifact@v4
         if: success()
         with:
