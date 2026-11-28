@@ -58,7 +58,7 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   await click('#backBtn');await scene('terminal');
   await evaluate('state.souls.haste=1;state.copies.haste=2;state.money=1000;save();renderHome()');
   await click('#heroSockets [data-index="1"]');await scene('souls');
-  await click('[data-action="choose-soul"][data-id="haste"]');assert.ok(await evaluate('document.querySelector("#soulDetail .classic-compare .better")'));await screenshot('classic-rune-preview');
+  await click('[data-action="choose-soul"][data-id="haste"]');assert.ok(await evaluate('document.querySelector("#soulDetail .classic-compare .better")'));assert.ok(await evaluate('document.querySelector("#soulDetail .classic-slot-context")&&document.querySelector(".soul-tile.selected")'));await screenshot('classic-rune-preview');
   {const before=await evaluate('JSON.stringify(state)'),saved=await evaluate('localStorage.getItem(SAVE_KEY)');await click('[data-action="rune-trial"]');assert.ok(await evaluate('document.getElementById("infoDialog").open&&document.querySelectorAll(".classic-trial-compare>div").length===3&&document.querySelectorAll(".classic-trial-chart svg").length===2'));assert.equal(await evaluate('JSON.stringify(state)'),before);assert.equal(await evaluate('localStorage.getItem(SAVE_KEY)'),saved);await screenshot('classic-rune-trial');await click('[data-action="close-info"]');}
   await click('[data-action="equip-soul"]');
   assert.ok(await evaluate('state.monsters.moss.equip.includes("haste")&&document.getElementById("soulDetail").hidden'));
