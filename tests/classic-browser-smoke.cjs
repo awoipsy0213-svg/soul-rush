@@ -28,7 +28,9 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   await send('Page.navigate',{url});
   await until(()=>evaluate('document.getElementById("titleScreen")&&!document.getElementById("titleScreen").hidden'));
   await click('#enterBtn');await scene('terminal');
+
   const screenshot=async name=>{if(process.env.SCREENSHOT_DIR){fs.mkdirSync(process.env.SCREENSHOT_DIR,{recursive:true});const pic=await send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(process.env.SCREENSHOT_DIR,name+'.png'),Buffer.from(pic.data,'base64'))}};
+  {const before=await evaluate('JSON.stringify(state)'),saved=await evaluate('localStorage.getItem(SAVE_KEY)');await click('[data-action="stage-info"]');assert.ok(await evaluate('document.getElementById("infoDialog").open&&document.querySelector(".classic-stage-card")'));assert.equal(await evaluate('JSON.stringify(state)'),before);assert.equal(await evaluate('localStorage.getItem(SAVE_KEY)'),saved);await screenshot('classic-stage-info');await click('[data-action="close-info"]');}
   const geometry=async id=>evaluate('(()=>{const a=document.getElementById("app"),s=document.getElementById('+JSON.stringify(id)+'),r=s.getBoundingClientRect();return {vw:innerWidth,vh:innerHeight,docW:document.documentElement.scrollWidth,docH:document.documentElement.scrollHeight,appW:a.clientWidth,appSW:a.scrollWidth,sceneH:s.clientHeight,sceneSH:s.scrollHeight,sceneW:s.clientWidth,sceneSW:s.scrollWidth,bottom:r.bottom}})()');
   const noOverflow=async id=>{const g=await geometry(id);assert.ok(g.docW<=g.vw+2&&g.docH<=g.vh+2,'outer viewport overflow '+JSON.stringify(g));assert.ok(g.sceneSW<=g.sceneW+2&&g.sceneSH<=g.sceneH+3,'screen overflow '+id+' '+JSON.stringify(g));assert.ok(g.bottom<=g.vh+2,'screen bottom outside viewport '+JSON.stringify(g));return g};
 
@@ -88,10 +90,10 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   // Real Chrome demo interaction; preserve all persistent keys byte-for-byte.
   await send('Network.emulateNetworkConditions',{offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1});
   const store=await evaluate('JSON.stringify(Object.keys(localStorage).sort().map(k=>[k,localStorage.getItem(k)]))');
-  for(const n of [29,30,20,60]){
+  for(const n of [29,30,20,60,40,80]){
     await send('Page.navigate',{url:url+'?demo='+n});await until(()=>evaluate('location.search==='+JSON.stringify('?demo='+n)+'&&document.getElementById("app")?.dataset.scene==="title"&&typeof CLASSIC_DEMO!=="undefined"&&CLASSIC_DEMO'));await screen(390,844);
     assert.equal(await evaluate('document.getElementById("classicDemoPanel").hidden'),false);
-    await noOverflow('titleScreen');if(n===29)await screenshot('classic-demo-menu');
+    await noOverflow('titleScreen');if(n===29)await screenshot('classic-demo-menu');assert.equal(await evaluate('document.querySelectorAll(".classic-demo-options button").length'),6);
     await click('#enterBtn');await scene('battle');await evaluate('cancelAnimationFrame(raf)');
     assert.equal(await evaluate('battle.stage.n'),n);assert.equal(await evaluate('battle.initialSeed'),123);
     assert.ok(await evaluate('document.querySelector(".rider-weapon")&&document.querySelector(".city-near")&&document.querySelector("#goalMarker svg")'));

@@ -26,19 +26,19 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: soul-rush-classic-v020-ui-screenshots
+          name: soul-rush-classic-v021-ui-screenshots
           path: |
             ui-screenshots/
             classic-ui-screenshots/
       - uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: classic-v020-real-play-demo
+          name: classic-v021-real-play-demo
           path: classic-demo-recording/
       - uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: soul-rush-classic-v020-playable
+          name: soul-rush-classic-v021-playable
           path: |
             index.html
             manifest.webmanifest
