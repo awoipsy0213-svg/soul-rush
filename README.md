@@ -43,7 +43,7 @@ node --test tests/*.test.cjs
 node tests/browser-smoke.cjs
 ```
 
-v0.15は131件のJS互換回帰試験合格。実Node/Chromiumの最新結果はPR #1のActionsで確認。初期モスAREA1は26.72秒、130戦楽観試算でAREA129到達。原作数値・全AREA攻略・iPhone実機は未確認。
+v0.15はNode.js回帰131件合格・実ChromiumのUI/オフライン試験合格・マスター同期確認合格（Actions run 46087558860）。[画面キャプチャ](https://github.com/awoipsy0213-svg/soul-rush/actions/runs/46087558860/artifacts/15239985886)。初期モスAREA1は26.72秒、130戦楽観試算でAREA129到達。原作数値・全AREA攻略・iPhone実機は未確認。
 原作の配信説明でデイリーギフト/Gift Run、2017年の攻略記事でヘルメット/ショップ連打による隠し外観を確認。具体的な仕様は仮設定。
 原作と同じシステムを優先し、武器はモンスター、ルーンは魂として置換。アリーナ報酬・9物資の価格と数量は2017年Ver.1.9のプレイヤー実測に基づく。武器/ルーンの正確な全種類・効果量・必要素材数・対戦HP・後半敵HPは暫定または未確認。独自名称・コード・素材を維持。
 この版は再現専用開発ブランチ。公開URLはmain版を指す。
