@@ -151,14 +151,47 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   await screenshot('battle-detail');await click('[data-action="close-info"]');await click('#resultActions [data-action="home"]');await scene('terminal');
   const beforeReplay=await evaluate('JSON.stringify(state)');await click('[data-action="lab-open"]');await click('[data-action="lab-history"]');await click('[data-action="lab-replay"][data-index="0"]');assert.ok(await evaluate('document.getElementById("infoTitle").textContent.includes("戦闘再計算")'));await screenshot('history-replay');assert.equal(await evaluate('JSON.stringify(state)'),beforeReplay);await click('[data-action="close-info"]');
   await evaluate('state.unlocked=Math.max(state.unlocked,20);state.selectedStage=20;state.monsters.moss.level=100;state.souls.burst=10;state.souls.shrink=1;state.monsters.moss.equip=["might","burst","shrink"];capturePreset(state);save();renderHome()');await click('#startBtn');await scene('battle');assert.equal(await evaluate('document.querySelectorAll("#enemyTrack .enemy").length'),310);assert.ok(await evaluate('Array.from(document.querySelectorAll("#enemyTrack .enemy")).filter(n=>n.dataset.offscreen==="0").length<50'));await evaluate('cancelAnimationFrame(raf);advanceBattle(battle,5);updateBattle();floatEffects(battle);attackEffect(battle)');assert.ok(await evaluate('fxCreated<=BALANCE_MASTER.effects.poolSize&&document.getElementById("effects").children.length<=BALANCE_MASTER.effects.maxNodes'));await screenshot('swarm-battle');await evaluate('cancelAnimationFrame(raf);advanceBattle(battle,battle.limit);updateBattle();settleBattle()');await scene('result');await click('#resultActions [data-action="home"]');await scene('terminal');
+
+  // Isolated presentation fixtures: use the actual renderer, not a mock DOM.
+  await send('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'no-preference'}]});
+  await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true,screenWidth:390,screenHeight:844});
+  for(const [id,kind] of [['moss','sweep'],['fang','dash'],['golem','slam'],['wyrm','breath'],['lancet','thrust'],['saw','spin'],['cross','radiance']]){
+    await evaluate('state.selectedStage=1;grantCharacter(state,'+JSON.stringify(id)+');state.active='+JSON.stringify(id)+';state.monsters[state.active].level=1;state.monsters[state.active].rank=0;state.monsters[state.active].equip=["might"];state.options.fx="normal";capturePreset(state);save();renderHome()');
+    await click('#startBtn');await scene('battle');
+    await evaluate('cancelAnimationFrame(raf);advanceBattle(battle,2.5);updateBattle();attackEffect(battle)');
+    assert.equal(await evaluate('document.getElementById("fighter").dataset.motion'),kind);
+    assert.equal(await evaluate('getComputedStyle(document.getElementById("fighter")).animationName'),'motion-'+kind);
+    assert.ok(await evaluate('Array.from(document.querySelectorAll(".spell-fx[data-source=normal]")).some(el=>el.dataset.kind==='+JSON.stringify(kind)+')'));
+    assert.equal(await evaluate('document.getElementById("traceTrack").dataset.live'),'1');
+    assert.ok(await evaluate('document.getElementById("traceNote").textContent.includes("対象")'));
+    await noOverflow('battleScene');await screenshot('motion-'+id);
+    await evaluate('cancelAnimationFrame(raf);stopBattle(battle);settleBattle()');await scene('result');await click('#resultActions [data-action="home"]');await scene('terminal');
+  }
+  await send('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
+  await send('Emulation.setDeviceMetricsOverride',{width:320,height:568,deviceScaleFactor:1,mobile:true,screenWidth:320,screenHeight:568});
+  for(const [n,kind] of [[10,'standard'],[20,'swarm'],[40,'onehit'],[60,'barrier'],[80,'sprint'],[100,null]]){
+    await evaluate('state.unlocked=Math.max(state.unlocked,100);state.selectedStage='+n+';state.active="moss";state.monsters.moss.level=1;state.monsters.moss.equip=["might"];capturePreset(state);save();renderHome()');
+    await click('#startBtn');await scene('battle');await evaluate('cancelAnimationFrame(raf);updateBattle()');
+    assert.equal(await evaluate('document.getElementById("bossHud").hidden'),false);
+    if(kind)assert.equal(await evaluate('document.getElementById("arena").dataset.bossKind'),kind);
+    else assert.equal(await evaluate('document.getElementById("arena").dataset.bossKind'),await evaluate('battle.stage.bossKind'));
+    if(n===60)assert.equal(await evaluate('document.querySelectorAll("#bossSeals .seal").length'),3);
+    if(n===80)assert.equal(await evaluate('battle.limit'),6);
+    if(n===20)assert.equal(await evaluate('battle.stage.count'),310);
+    await noOverflow('battleScene');
+    assert.ok(await evaluate('(()=>{const a=document.getElementById("arena").getBoundingClientRect(),b=document.getElementById("bossHud").getBoundingClientRect(),f=document.querySelector(".field-travel").getBoundingClientRect();return b.left>=a.left&&b.right<=a.right&&b.top>=a.top&&b.bottom<f.top&&f.bottom<=a.bottom})()'),'boss and field readouts within arena');
+    await screenshot('boss-hud-'+n+'-320x568');
+    await evaluate('cancelAnimationFrame(raf);stopBattle(battle);settleBattle()');await scene('result');await click('#resultActions [data-action="home"]');await scene('terminal');
+  }
+  await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true,screenWidth:390,screenHeight:844});
   const saved=await evaluate('localStorage.getItem(SAVE_KEY)');
   assert.ok(await until(()=>evaluate('navigator.serviceWorker.controller!==null'),15000));
-  assert.ok(await evaluate('caches.keys().then(keys=>keys.some(k=>k.endsWith(":0.17.0")))'));
+  assert.ok(await evaluate('caches.keys().then(keys=>keys.some(k=>k.endsWith(":0.18.0")))'));
   await send('Network.emulateNetworkConditions',{offline:true,latency:0,downloadThroughput:0,uploadThroughput:0});
   await send('Page.reload');await until(()=>evaluate('document.getElementById("titleScreen")&&!document.getElementById("titleScreen").hidden'),15000);
   await click('#enterBtn');await scene('terminal');
   assert.equal(await evaluate('JSON.parse(localStorage.getItem(SAVE_KEY)).gems'),JSON.parse(saved).gems);
   await send('Network.emulateNetworkConditions',{offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1});
   assert.equal(errors.length,0,errors.join('\n'));
-  console.log('v0.17 browser smoke passed: four home viewports, horizontal character list, soul grid, full enemy track, pause/abort, boss chest, scatter bounds, arena entry/fight/claim, nine supplies, AREA3040 jump, gifts, cosmetics, combat breakdown and offline save.');
+  console.log('v0.18 browser smoke passed: four home viewports, horizontal character list, soul grid, full enemy track, pause/abort, boss chest, scatter bounds, arena entry/fight/claim, nine supplies, AREA3040 jump, gifts, cosmetics, combat breakdown, seven motion profiles, six boss HUD cases, small viewport and offline save.');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(()=>{ws?.close();proc?.kill('SIGTERM');server.close();setTimeout(()=>{try{fs.rmSync(profiles,{recursive:true,force:true})}catch{}},250).unref()});
