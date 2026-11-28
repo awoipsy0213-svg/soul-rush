@@ -1,5 +1,26 @@
 {
   "monsterBase": 150,
   "monsterStep": 100,
-  "soulCopiesOffset": 1
+  "soulCopiesOffset": 1,
+  "workshop": {
+    "recentAreas": 10,
+    "base": 1,
+    "clearBonus": 1,
+    "killsPerBonus": 50,
+    "maxPerBattle": 4,
+    "batchLimit": 20,
+    "salvage": {
+      "N": 1,
+      "R": 2,
+      "SR": 4,
+      "UR": 8
+    },
+    "craft": {
+      "N": 6,
+      "R": 10,
+      "SR": 20,
+      "UR": 50
+    },
+    "unlockMultiplier": 2
+  }
 }
