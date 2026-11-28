@@ -7,7 +7,9 @@
     "speedCap": 40,
     "eventCap": 12000,
     "openingSeconds": 3,
-    "hitDelay": 0.16
+    "hitDelay": 0.16,
+    "minPeriod": 0.2,
+    "maxMultiplier": 1000000000
   },
   "monsters": {
     "moss": {
@@ -424,7 +426,55 @@
     "lateExponent": 0.65,
     "oneHitStart": 500,
     "oneHitGrowth": 2000,
-    "oneHitSpan": 3000
+    "oneHitSpan": 3000,
+    "bossKinds": {
+      "20": "swarm",
+      "40": "onehit",
+      "60": "barrier",
+      "80": "sprint"
+    },
+    "randomBossKinds": [
+      "standard",
+      "swarm",
+      "onehit",
+      "barrier",
+      "sprint"
+    ],
+    "commonGrowth": {
+      "firstPhase": 9,
+      "midEnd": 30,
+      "midRate": 1.12,
+      "lateScale": 40,
+      "lateExponent": 0.85
+    },
+    "enemyPatterns": {
+      "normal": [
+        2,
+        1,
+        2,
+        3,
+        2,
+        0
+      ],
+      "elite": [
+        4,
+        3,
+        3
+      ],
+      "swarm": [
+        0,
+        1,
+        1,
+        2,
+        0,
+        1
+      ],
+      "bossSwarm": [
+        1,
+        0,
+        0
+      ]
+    }
   },
   "reward": {
     "initial": 90,
@@ -449,37 +499,51 @@
     "rage": {
       "field": "atkBonus",
       "base": 0.08,
-      "growth": 0.02
+      "growth": 0.02,
+      "mode": "add",
+      "maxStacks": 1200
     },
     "tempo": {
       "field": "tempoBonus",
       "base": 0.12,
-      "growth": 0.03
+      "growth": 0.03,
+      "mode": "add",
+      "maxStacks": 1200
     },
     "clockatk": {
       "field": "atkBonus",
       "base": 0.1,
-      "growth": 0.03
+      "growth": 0.03,
+      "mode": "add",
+      "maxStacks": 1200
     },
     "tempoPct": {
       "field": "tempoPctBonus",
       "base": 0.1,
-      "growth": 0.03
+      "growth": 0.03,
+      "mode": "add",
+      "maxStacks": 1200
     },
     "rageFlat": {
       "field": "flatAtkBonus",
       "base": 3,
-      "growth": 2
+      "growth": 2,
+      "mode": "add",
+      "maxStacks": 1200
     },
     "clockSpeed": {
       "field": "tempoPctBonus",
       "base": 0.08,
-      "growth": 0.02
+      "growth": 0.02,
+      "mode": "add",
+      "maxStacks": 1200
     },
     "clockFlat": {
       "field": "flatAtkBonus",
       "base": 4,
-      "growth": 2
+      "growth": 2,
+      "mode": "add",
+      "maxStacks": 1200
     }
   },
   "passive": {
@@ -531,5 +595,107 @@
       "growth": 3,
       "cap": 75
     }
+  },
+  "arena": {
+    "fee": 20,
+    "limit": 24,
+    "maxWins": 1000,
+    "goldPerWin": 60,
+    "soulsPerWin": 7,
+    "monsterEvery": 10,
+    "hpBase": 600,
+    "hpLevelGrowth": 0.15,
+    "hpLegacyRankGrowth": 0.1
+  },
+  "gift": {
+    "count": 24,
+    "limit": 24,
+    "dailyEtherPerArea": 20,
+    "dailyGems": 4,
+    "dailySouls": 3,
+    "runEtherPerKillPerArea": 1,
+    "runGemsEvery": 6,
+    "runSoulsEvery": 3,
+    "enemyWidth": 24,
+    "hpRate": 0.42,
+    "hpStep": 0.05
+  },
+  "shop": [
+    {
+      "id": "soul100",
+      "kind": "soul",
+      "price": 100,
+      "count": 100
+    },
+    {
+      "id": "soul700",
+      "kind": "soul",
+      "price": 600,
+      "count": 700
+    },
+    {
+      "id": "soul3000",
+      "kind": "soul",
+      "price": 2700,
+      "count": 3000
+    },
+    {
+      "id": "monster1",
+      "kind": "character",
+      "price": 200,
+      "count": 1
+    },
+    {
+      "id": "monster4",
+      "kind": "character",
+      "price": 700,
+      "count": 4
+    },
+    {
+      "id": "monster10",
+      "kind": "character",
+      "price": 1700,
+      "count": 10
+    },
+    {
+      "id": "ether20",
+      "kind": "ether",
+      "price": 100,
+      "multiplier": 20
+    },
+    {
+      "id": "ether200",
+      "kind": "ether",
+      "price": 500,
+      "multiplier": 200
+    },
+    {
+      "id": "ether2000",
+      "kind": "ether",
+      "price": 4700,
+      "multiplier": 2000
+    }
+  ],
+  "cosmetics": {
+    "secretTaps": 20
+  },
+  "effects": {
+    "normal": "slash",
+    "focus": "slash",
+    "assassin": "slash",
+    "echo": "slash",
+    "spark": "bolt",
+    "fixedbolt": "bolt",
+    "meteor": "meteor",
+    "starfall": "meteor",
+    "plane": "projectile",
+    "sniper": "projectile",
+    "ufo": "projectile",
+    "burst": "flame",
+    "pillar": "flame",
+    "dragon": "flame",
+    "frost": "ice",
+    "maxNodes": 36,
+    "maxDraw": 4
   }
 }
