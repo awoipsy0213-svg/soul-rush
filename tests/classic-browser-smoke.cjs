@@ -87,7 +87,7 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   await send('Network.emulateNetworkConditions',{offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1});
   const store=await evaluate('JSON.stringify(Object.keys(localStorage).sort().map(k=>[k,localStorage.getItem(k)]))');
   for(const n of [29,30,20,60]){
-    await send('Page.navigate',{url:url+'?demo='+n});await scene('title');await screen(390,844);
+    await send('Page.navigate',{url:url+'?demo='+n});await until(()=>evaluate('location.search==='+JSON.stringify('?demo='+n)+'&&document.getElementById("app")?.dataset.scene==="title"&&typeof CLASSIC_DEMO!=="undefined"&&CLASSIC_DEMO'));await screen(390,844);
     assert.equal(await evaluate('document.getElementById("classicDemoPanel").hidden'),false);
     await noOverflow('titleScreen');if(n===29)await screenshot('classic-demo-menu');
     await click('#enterBtn');await scene('battle');await evaluate('cancelAnimationFrame(raf)');
@@ -99,8 +99,7 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
     assert.equal(await evaluate('JSON.stringify(Object.keys(localStorage).sort().map(k=>[k,localStorage.getItem(k)]))'),store);
     await click('[data-action="title"]');await scene('title');
   }
-  await send('Page.navigate',{url});await scene('title');await click('#enterBtn');await scene('terminal');
-  assert.equal(await evaluate('JSON.stringify(Object.keys(localStorage).sort().map(k=>[k,localStorage.getItem(k)]))'),store);
+  await send('Page.navigate',{url});await until(()=>evaluate('location.search===""&&document.getElementById("app")?.dataset.scene==="title"&&typeof CLASSIC_DEMO!=="undefined"&&!CLASSIC_DEMO'));assert.equal(await evaluate('JSON.stringify(Object.keys(localStorage).sort().map(k=>[k,localStorage.getItem(k)]))'),store);await click('#enterBtn');await scene('terminal');
 
   await send('Network.emulateNetworkConditions',{offline:true,latency:0,downloadThroughput:0,uploadThroughput:0});
   await send('Page.reload');await until(()=>evaluate('document.getElementById("titleScreen")&&!document.getElementById("titleScreen").hidden'),15000);
