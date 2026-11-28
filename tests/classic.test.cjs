@@ -76,7 +76,7 @@ test('rune simulation agrees with direct engine for all 33 runes and six represe
  }
 });
 test('locked rune trial is read-only, shows replacement and actual shortened period',()=>{
- const s=makeFresh();s.souls.timewarp=3;s.monsters.moss.equip=['might','timewarp'];const e=environment({'soul_rush_classic_v9':s}),a=e.api;a.dispatch('enter');a.dispatch('slot',{index:'0'});a.dispatch('choose-soul',{id:'burst'});const before=a.snapshot(),store=JSON.stringify([...e.storage]);a.dispatch('rune-trial');assert.ok(e.el('infoDialog').open);const h=e.el('infoContent').innerHTML;assert.ok(h.includes('未所持Lv1'));assert.ok(h.includes('交換: 攻撃力UP'));assert.ok(h.includes('3.70秒'));assert.ok(h.includes('次Lv 2'));assert.equal(a.snapshot(),before);assert.equal(JSON.stringify([...e.storage]),store)
+ const s=makeFresh();s.souls.timewarp=3;s.monsters.moss.equip=['might','timewarp'];s.presets[0]={monster:'moss',equip:['might','timewarp']};const e=environment({'soul_rush_classic_v9':s}),a=e.api;a.dispatch('enter');a.dispatch('slot',{index:'0'});a.dispatch('choose-soul',{id:'burst'});const before=a.snapshot(),store=JSON.stringify([...e.storage]);a.dispatch('rune-trial');assert.ok(e.el('infoDialog').open);const h=e.el('infoContent').innerHTML;assert.ok(h.includes('未所持Lv1'));assert.ok(h.includes('交換: 攻撃力UP'));assert.ok(h.includes('3.70秒'));assert.ok(h.includes('次Lv 2'));assert.equal(a.snapshot(),before);assert.equal(JSON.stringify([...e.storage]),store)
 });
 test('stopped gauges end and do not keep a false live socket',()=>{
  const e=environment({},false,'?demo=29'),a=e.api;a.dispatch('enter');e.advance(30000);const b=a.battle();if(b){for(const id of Object.keys(b.stats.levels)){const g=a.classicGaugeState(b,id);if(g){assert.equal(g.live,false);assert.equal(g.text,'END')}}}
