@@ -220,6 +220,21 @@ button{border-radius:4px;background:#404144;color:#f0eee4;border:1px solid #6e6e
 .classic-trial{display:grid;gap:8px}.classic-trial p{margin:4px 0;font-size:12px;color:#e2dbc5}.classic-trial-head,.classic-trial-compare>div{background:#303135;border:1px solid #736b56;border-radius:5px;padding:8px;display:grid;gap:4px}
 .classic-trial-head strong,.classic-trial-compare strong{color:#f0d67c}.classic-trial-metrics{display:grid;grid-template-columns:1fr 1fr;gap:5px}.classic-trial-metrics>div{padding:7px;background:#292a2b;border:1px solid #6b6250;display:grid;gap:3px}.classic-trial-metrics b{color:#f1ce67;font-size:18px}.classic-trial-metrics small,.classic-trial-compare small{font-size:11px;color:#d8d0bc}
 .classic-trial-chart{display:grid;gap:3px;background:#252628;padding:6px;border-radius:5px}.classic-trial-chart strong{font-size:12px;color:#eee2bb}.classic-trial-chart svg{width:100%;height:76px}.classic-trial-compare{display:grid;gap:4px}
+/* 0.1.9: distinct weapon movement and event-specific effects */
+#app #battleScene .fighter[data-motion="dash"].attack .rider-weapon{animation-name:classic-dagger-dash}
+#app #battleScene .fighter[data-motion="breath"].attack .rider-weapon{animation-name:classic-polearm}
+#app #battleScene .fighter[data-motion="radiance"].attack .rider-weapon{animation-name:classic-cross-surge}
+@keyframes classic-dagger-dash{0%{transform:translateX(-9px) rotate(-12deg)}28%{transform:translateX(33px) rotate(8deg)}55%{transform:translateX(10px) rotate(-5deg)}100%{transform:none}}
+@keyframes classic-polearm{0%{transform:rotate(-48deg) translateX(-5px)}45%{transform:rotate(18deg) translateX(20px)}100%{transform:none}}
+@keyframes classic-cross-surge{0%{transform:rotate(-25deg) scale(.96)}48%{transform:rotate(21deg) scale(1.17)}100%{transform:none}}
+#app #battleScene .spell-fx[data-source="meteor"],#app #battleScene .spell-fx[data-source="starfall"]{animation:classic-meteor-v19 .48s ease-out both}
+#app #battleScene .spell-fx[data-source="pulse"]{animation:classic-pulse-v19 .46s ease-out both;height:clamp(55px,18dvh,110px)}
+#app #battleScene .spell-fx[data-source="frost"]{filter:drop-shadow(0 0 5px #a2eaff)}
+#app #battleScene .spell-fx[data-source="fixedbolt"]{filter:drop-shadow(0 0 5px #a2eaff)}
+@keyframes classic-meteor-v19{0%{opacity:0;transform:translate(-105%,-150%) scale(.8)}32%{opacity:1;transform:translate(-50%,-66%) scale(1)}100%{opacity:0;transform:translate(-50%,-48%) scale(1.25)}}
+@keyframes classic-pulse-v19{0%{opacity:0;transform:translate(-50%,-50%) scale(.35)}25%{opacity:1;transform:translate(-50%,-50%) scale(.9)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.35)}}
+#app #battleScene .arena[data-paused="1"] .rider-weapon,#app #battleScene .arena[data-paused="1"] .rider-leg-a,#app #battleScene .arena[data-paused="1"] .rider-leg-b{animation-play-state:paused!important}
+@media(prefers-reduced-motion:reduce){#app #battleScene .fighter .rider-weapon{animation:none!important}#app #battleScene .spell-fx{display:none!important}}
 </style></head><body>
 
 <div id="app" class="app" data-scene="title">
@@ -230,7 +245,7 @@ button{border-radius:4px;background:#404144;color:#f0eee4;border:1px solid #6e6e
 </header>
 <div id="saveWarning" class="save-warning" hidden></div><div id="demoBanner" class="classic-demo-banner" hidden>DEMO · NO SAVE</div>
 <section id="titleScreen" class="screen title-screen" aria-label="タイトル">
-  <div class="eyebrow">24 SECOND · WEAPON BUILD RPG</div><div class="title-logo">SOUL<br>RUSH <span class="classic-word">CLASSIC</span></div><div class="subtitle">非公式参考再構築版</div><div id="titleArt" class="title-art"></div><button class="primary" id="enterBtn" data-action="enter">冒険開始</button><div id="classicDemoPanel" class="classic-demo-panel" hidden><p>DEMO · 育成済み装備で実演。通常のセーブには影響しません。</p><div class="classic-demo-options"><button data-action="demo-select" data-id="29">AREA 29<br><small>高速攻撃</small></button><button data-action="demo-select" data-id="30">AREA 30<br><small>大型ボス</small></button><button data-action="demo-select" data-id="20">AREA 20<br><small>310体</small></button><button data-action="demo-select" data-id="60">AREA 60<br><small>障壁</small></button></div><button data-action="demo-preview" class="ghost">装備を確認する</button><a href="./">通常版に戻る</a></div><div class="version">VERSION CLASSIC 0.1.8</div><button class="ghost" data-action="settings" style="width:auto;min-height:32px;font-size:11px">設定・セーブ</button>
+  <div class="eyebrow">24 SECOND · WEAPON BUILD RPG</div><div class="title-logo">SOUL<br>RUSH <span class="classic-word">CLASSIC</span></div><div class="subtitle">非公式参考再構築版</div><div id="titleArt" class="title-art"></div><button class="primary" id="enterBtn" data-action="enter">冒険開始</button><div id="classicDemoPanel" class="classic-demo-panel" hidden><p>DEMO · 育成済み装備で実演。通常のセーブには影響しません。</p><div class="classic-demo-options"><button data-action="demo-select" data-id="29">AREA 29<br><small>高速攻撃</small></button><button data-action="demo-select" data-id="30">AREA 30<br><small>大型ボス</small></button><button data-action="demo-select" data-id="20">AREA 20<br><small>310体</small></button><button data-action="demo-select" data-id="60">AREA 60<br><small>障壁</small></button></div><button data-action="demo-preview" class="ghost">装備を確認する</button><a href="./">通常版に戻る</a></div><div class="version">VERSION CLASSIC 0.1.9</div><button class="ghost" data-action="settings" style="width:auto;min-height:32px;font-size:11px">設定・セーブ</button>
 </section>
 <section id="terminalScene" class="screen home-screen" hidden aria-label="ビルド">
   <div class="stage-panel panel"><button id="prevStage" data-action="stage-prev" aria-label="前のステージ">‹</button><div class="stage-center"><select id="stageSelect" class="stage-select" aria-label="通常ステージ選択"></select><div class="stage-meta" id="stageMeta"></div><small id="stageAdvice" class="stage-advice"></small></div><button id="nextStage" data-action="stage-next" aria-label="次のステージ">›</button></div>
@@ -965,7 +980,64 @@ function classicHitGroups(visuals){
 function classicTargetVisible(i){const a=$('arena').getBoundingClientRect(),r=$('enemy-'+i)?.getBoundingClientRect();return !!r&&r.right!==undefined?r.right>=a.left&&r.left<=a.right:!!r}
 function classicWorldScale(){return clamp(($('arena').getBoundingClientRect().width||320)/245,1.05,1.72)}
 
-function attackEffect(b){const fresh=b.visuals.filter(v=>v.serial>seenVisual);if(!fresh.length)return;seenVisual=b.visualSerial;if(document.hidden||state.options.fx==='low')return;const fighter=$('fighter'),profile=attackMotion(b),special=fresh.filter(v=>v.special).slice(-3),normal=fresh.filter(v=>!v.special).at(-1),draw=[...(normal?[normal]:[]),...special].slice(-BALANCE_MASTER.effects.maxDraw),trace=fresh.filter(v=>!v.buff).at(-1);if(trace)renderAttackTrace(b,trace);if(normal&&b.elapsed-lastMotionAt>=Math.max(.07,profile.ms/2000)){lastMotionAt=b.elapsed;fighter.style.setProperty('--motion-ms',profile.ms+'ms');fighter.classList.remove('attack');void fighter.offsetWidth;fighter.classList.add('attack')}const damage=classicHitGroups(fresh);for(const v of draw){const kind=v.special?fxKind(v):profile.kind,pos=v.buff?{x:Math.max(28,$('arena').getBoundingClientRect().width*.18),y:$('arena').getBoundingClientRect().height*.48}:effectPosition(v.target??Math.max(0,front(b))),last=v.targets.length>1?effectPosition(v.targets.at(-1)):pos,color=v.source==='normal'?profile.color:sdef(v.source)?.color||'#a183d1',el=takeEffect('spell-fx',v.special?540:profile.ms+60);if(!el)break;el.dataset.kind=kind;el.dataset.source=v.source;el.style.left=((pos.x+last.x)/2)+'px';el.style.top=(pos.y+10)+'px';el.style.setProperty('--fxw',Math.max(65,Math.min(260,Math.abs(last.x-pos.x)+65))+'px');el.style.setProperty('--fxcolor',color);el.style.setProperty('--fx-ms',(v.special?460:profile.ms)+'ms');el.style.color=color;el.innerHTML=classicCombatGlyph(kind,v.special);if(v.special){announceCombat(b,sdef(v.source).name+(v.buff?' · 強化':' 発動'));if(v.kills>=3||b.stage.boss&&v.actual>0){$('arena').dataset.shake='1';const gen=fxGeneration;setTimeout(()=>{if(gen===fxGeneration)$('arena').dataset.shake='0'},140)}}for(const i of v.targets.slice(0,6)){const node=$('enemy-'+i);if(node&&b.hp[i]>0&&node.dataset.offscreen!=='1'){node.dataset.hit='0';void node.offsetWidth;node.dataset.hit='1';const gen=fxGeneration;setTimeout(()=>{if(gen===fxGeneration)node.dataset.hit='0'},180)}}}for(const [i,g] of [...damage].filter(([i])=>classicTargetVisible(i)).slice(0,8)){const pos=effectPosition(i),n=takeEffect('damage-text',500);if(!n)break;n.dataset.block=g.blocked&&!g.actual?'1':'0';n.dataset.special=g.special?'1':'0';n.dataset.multi=g.multi||g.events>1?'1':'0';n.style.left=pos.x+'px';n.style.top=(pos.y-26)+'px';n.textContent=g.actual>0?(g.actual<100?Number(g.actual.toFixed(1)).toString():shortNum(g.actual)):g.blocked?'BLOCK':'MISS';if(g.kills){const spark=takeEffect('defeat-sparks',420);if(spark){spark.style.left=pos.x+'px';spark.style.top=pos.y+'px';spark.innerHTML=svg('<g fill="#fff4c5" stroke="#d6a465" stroke-width="2"><path d="m50 3 6 21-6 7-6-7ZM97 50 76 56 69 50 76 44ZM50 97 44 76 50 69 56 76ZM3 50 24 44 31 50 24 56Z"/><circle cx="50" cy="50" r="15"/></g>')}}}playSound(special.length?'soul':'hit')}
+function classicImpactGlyph(kind,special,source='normal'){
+ const wrap=body=>svg(body,'0 0 120 100'),normal={
+ sweep:'<path d="M5 77Q39 6 116 17Q72 34 37 64L12 94Z" fill="#ffe89a"/><path d="M6 77Q49 2 116 17" fill="none" stroke="#fff" stroke-width="7"/><path d="M28 80 63 38" stroke="#fff7d2" stroke-width="3"/>',
+ dash:'<path d="M3 41 98 25 117 39 90 48 4 57 44 45Z" fill="#e4dbff"/><path d="M10 24 88 19M3 67 89 59" stroke="#f8f6ff" stroke-width="4"/><path d="M101 19 105 34 118 40 105 46 101 63 96 46 84 40 96 34Z" fill="#fff"/>',
+ slam:'<path d="M51 1 71 1 79 66 61 83 39 66Z" fill="#ffc06b" stroke="#fff0bc" stroke-width="5"/><path d="m61 62-38 9 9 10-29 13 55-6 22 9-3-13 39-5-34-12Z" fill="#fff0a8"/><path d="M2 90 30 81M87 90 118 84" stroke="#fff" stroke-width="4"/>',
+ breath:'<path d="M6 55Q30 12 65 18L117 35 81 47 119 58 75 66 106 84 48 78Z" fill="#8ee5ef" opacity=".85"/><path d="M4 55Q54 17 116 34M10 64Q58 82 109 75" stroke="#f0ffff" stroke-width="5" fill="none"/>',
+ thrust:'<path d="M1 45 87 38 117 50 87 62 1 55 43 50Z" fill="#b6f4ed"/><path d="M25 50H105" stroke="#fff" stroke-width="5"/><path d="M4 31 69 36M4 69 69 64" stroke="#78cfcd" stroke-width="4"/>',
+ spin:'<ellipse cx="60" cy="51" rx="45" ry="36" fill="none" stroke="#ffe3a1" stroke-width="10" stroke-dasharray="8 4"/><path d="M18 46Q61 0 110 43M16 61Q63 99 110 60" fill="none" stroke="#fff" stroke-width="5"/><circle cx="60" cy="51" r="8" fill="#fff"/>',
+ radiance:'<path d="M60 3 69 36 104 16 86 49 119 59 84 68 97 96 65 81 60 99 53 80 23 96 37 68 1 59 33 49 16 16 50 36Z" fill="#dbc5fc"/><path d="M60 20V86M25 54H95" stroke="#fff" stroke-width="7"/><circle cx="60" cy="54" r="17" fill="#fff8d9"/>'
+ };
+ if(!special)return normal[kind]?wrap(normal[kind]):classicCombatGlyph(kind,false);
+ const unique={
+ burst:'<circle cx="60" cy="62" r="34" fill="#ff9a37" opacity=".8"/><path d="m60 11 10 26 25-15-5 27 27 9-25 13 8 25-30-10-10 14-11-14-30 10 8-25L2 58l27-9-5-27 25 15Z" fill="#ffce52"/><circle cx="60" cy="60" r="21" fill="#fff8c4"/><path d="M8 13 20 27M111 12 101 25" stroke="#ffcf63" stroke-width="5"/>',
+ meteor:'<path d="M6 3 67 45 82 57 65 76 43 62Z" fill="#ff8b35"/><path d="M10 0 67 48 58 57Z" fill="#fff1a2"/><circle cx="76" cy="65" r="23" fill="#e96329" stroke="#ffe9a2" stroke-width="6"/><path d="M27 91 65 79 108 91M86 33l22 11" stroke="#ffdf7c" stroke-width="5" fill="none"/>',
+ starfall:'<path d="M9 2 53 38M49 0 82 31M88 4 111 45" stroke="#ffc461" stroke-width="11" stroke-linecap="round"/><g fill="#fff4a5" stroke="#e88837" stroke-width="3"><circle cx="53" cy="38" r="11"/><circle cx="82" cy="31" r="10"/><circle cx="111" cy="45" r="8"/></g><path d="m3 91 24-25 15 14 17-28 18 28 18-15 23 25Z" fill="#f6ac3b"/>',
+ pulse:'<g fill="none" stroke="#f4e6ff"><circle cx="60" cy="51" r="42" opacity=".65" stroke-width="4"/><circle cx="60" cy="51" r="30" stroke-width="7"/><circle cx="60" cy="51" r="15" stroke-width="5"/></g><path d="M60 13 67 43 97 51 67 59 60 89 53 59 23 51 53 43Z" fill="#fff"/>',
+ frost:'<g stroke="#efffff" stroke-width="5" fill="#93dbf5"><path d="M60 7 69 35 95 22 81 48 111 51 81 57 94 82 69 68 60 95 51 68 26 82 39 57 9 51 39 48 25 22 51 35Z"/><path d="M60 10V92M25 25 95 80M95 25 25 80"/></g>',
+ echo:'<g fill="none" stroke="#fff4ce" stroke-width="5"><path d="M12 18Q77 50 12 82"/><path d="M40 10Q116 50 40 90"/><path d="M76 6Q142 50 76 94"/></g>',
+ pillar:'<path d="M31 94 24 61 41 37 34 12 56 24 62 0 78 34 97 16 90 56 106 75 91 95Z" fill="#ef8031"/><path d="M46 94 42 65 56 46 58 26 73 49 76 76 86 94Z" fill="#ffe472"/><ellipse cx="65" cy="93" rx="46" ry="5" fill="#fff1a1"/>',
+ fixedbolt:'<path d="M54 0H78L57 34H84L48 67H69L36 100 45 64H25L54 31H33Z" fill="#b6ebff" stroke="#fff" stroke-width="4"/>',
+ assassin:'<path d="M34 67Q26 30 60 18Q94 30 86 67L75 83H45Z" fill="#53495f" stroke="#f7e5ff" stroke-width="4"/><path d="M43 43H77L68 56H52Z" fill="#e6daef"/><path d="M7 86 112 22M10 96 116 43" stroke="#fff2c0" stroke-width="5"/>'
+ };
+ return unique[source]?wrap(unique[source]):classicCombatGlyph(kind,true);
+}
+function classicImpactPlan(visuals,visible,events,maxDraw=4){
+ const isProc=v=>v.special&&events.some(e=>e.special&&Math.abs(e.t-v.t)<1e-7&&e.text===sdef(v.source)?.name+' 発動');
+ const planned=visuals.map(v=>({v,targets:[...new Set((v.hits||[]).filter(h=>(h.actual>0||h.blocked>0)&&visible(h.i)).map(h=>h.i))],proc:isProc(v)}));
+ const eligible=planned.filter(p=>p.v.buff||p.targets.length),normal=eligible.filter(p=>!p.v.special).at(-1),special=eligible.filter(p=>p.v.special).slice(-Math.max(1,maxDraw-(normal?1:0)));
+ const draw=[...(normal?[normal]:[]),...special].sort((a,b)=>a.v.serial-b.v.serial).slice(-maxDraw);
+ return {draw,activation:planned.filter(p=>p.proc).at(-1)||null,normal:visuals.filter(v=>!v.special).at(-1)||null};
+}
+function classicRiderFxPosition(){
+ const a=$('arena').getBoundingClientRect(),r=$('fighter').getBoundingClientRect(),w=a.width||320,h=a.height||200;
+ return {x:clamp(r.left-a.left+r.width*.5,20,w-20),y:clamp(r.top-a.top+r.height*.4,25,h-25)};
+}
+function classicImpactPosition(targets){
+ const points=targets.map(effectPosition),xs=points.map(p=>p.x),ys=points.map(p=>p.y),min=Math.min(...xs),max=Math.max(...xs);
+ return {x:(min+max)/2,y:Math.min(...ys),width:Math.max(48,Math.min(260,max-min+64))};
+}
+function attackEffect(b){
+ const fresh=b.visuals.filter(v=>v.serial>seenVisual);if(!fresh.length)return;seenVisual=b.visualSerial;if(document.hidden||state.options.fx==='low')return;
+ const fighter=$('fighter'),profile=attackMotion(b),plan=classicImpactPlan(fresh,classicTargetVisible,b.events,BALANCE_MASTER.effects.maxDraw),trace=fresh.filter(v=>!v.buff).at(-1);
+ if(trace)renderAttackTrace(b,trace);
+ if(plan.normal&&b.elapsed-lastMotionAt>=Math.max(.07,profile.ms/2000)){lastMotionAt=b.elapsed;fighter.style.setProperty('--motion-ms',profile.ms+'ms');fighter.classList.remove('attack');void fighter.offsetWidth;fighter.classList.add('attack')}
+ if(plan.activation){const v=plan.activation.v;announceCombat(b,sdef(v.source).name+(v.buff?' · 強化':v.targets.length?' 発動':' · 範囲外'))}
+ const damage=classicHitGroups(fresh);
+ for(const {v,targets,proc} of plan.draw){
+  const kind=v.special?fxKind(v):profile.kind,pos=v.buff?{...classicRiderFxPosition(),width:90}:classicImpactPosition(targets),color=v.source==='normal'?profile.color:sdef(v.source)?.color||'#a183d1',el=takeEffect('spell-fx',v.special?540:profile.ms+60);if(!el)break;
+  el.dataset.kind=kind;el.dataset.source=v.source;el.dataset.proc=proc?'1':'0';el.style.left=pos.x+'px';el.style.top=(pos.y+10)+'px';el.style.setProperty('--fxw',pos.width+'px');el.style.setProperty('--fxcolor',color);el.style.setProperty('--fx-ms',(v.special?460:profile.ms)+'ms');el.style.color=color;el.innerHTML=classicImpactGlyph(kind,v.special,v.source);
+  if(v.special&&(v.kills>=3||b.stage.boss&&v.actual>0)){$('arena').dataset.shake='1';const gen=fxGeneration;setTimeout(()=>{if(gen===fxGeneration)$('arena').dataset.shake='0'},140)}
+  for(const i of targets.slice(0,6)){const node=$('enemy-'+i);if(node&&b.hp[i]>0&&node.dataset.offscreen!=='1'){node.dataset.hit='0';void node.offsetWidth;node.dataset.hit='1';const gen=fxGeneration;setTimeout(()=>{if(gen===fxGeneration)node.dataset.hit='0'},180)}}
+ }
+ for(const [i,g] of [...damage].filter(([i])=>classicTargetVisible(i)).slice(0,8)){
+  const pos=effectPosition(i),n=takeEffect('damage-text',500);if(!n)break;n.dataset.block=g.blocked&&!g.actual?'1':'0';n.dataset.special=g.special?'1':'0';n.dataset.multi=g.events>1?'1':'0';n.style.left=pos.x+'px';n.style.top=(pos.y-26)+'px';n.textContent=g.actual>0?(g.actual<100?Number(g.actual.toFixed(1)).toString():shortNum(g.actual)):g.blocked?'BLOCK':'MISS';
+  if(g.kills){const spark=takeEffect('defeat-sparks',420);if(spark){spark.style.left=pos.x+'px';spark.style.top=pos.y+'px';spark.innerHTML=svg('<g fill="#fff4c5" stroke="#d6a465" stroke-width="2"><path d="m50 3 6 21-6 7-6-7ZM97 50 76 56 69 50 76 44ZM50 97 44 76 50 69 56 76ZM3 50 24 44 31 50 24 56Z"/><circle cx="50" cy="50" r="15"/></g>')}}
+ }
+ if(plan.draw.length||plan.normal)playSound(plan.draw.some(p=>p.v.special)?'soul':'hit');
+}
 function advanceClock(now){if(!battle||!running)return;advanceBattle(battle,Math.max(0,(now-startedAt)/1000));updateBattle();floatEffects(battle);attackEffect(battle)}
 function frame(now){if(!running)return;advanceClock(now);if(battle.done){settleBattle();return}raf=requestAnimationFrame(frame)}
 function pauseBattle(show=true){if(!running||!battle)return false;advanceClock(performance.now());if(battle.done){settleBattle();return false}running=false;paused=true;$('arena').dataset.paused='1';cancelAnimationFrame(raf);if(show)openDialog('pauseDialog');syncMusic();return true}
