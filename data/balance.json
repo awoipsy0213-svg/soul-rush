@@ -1,0 +1,535 @@
+{
+  "combat": {
+    "limit": 30,
+    "walkSpeed": 720,
+    "singleReach": 240,
+    "goalGap": 12,
+    "speedCap": 40,
+    "eventCap": 12000,
+    "openingSeconds": 3,
+    "hitDelay": 0.16
+  },
+  "monsters": {
+    "moss": {
+      "atk": 11,
+      "speed": 1.35,
+      "slots": 5,
+      "range": 44,
+      "engage": 10,
+      "cap": 6,
+      "atkGrowth": 0.12,
+      "speedGrowth": 0.025
+    },
+    "fang": {
+      "atk": 8,
+      "speed": 2.4,
+      "slots": 3,
+      "range": 24,
+      "engage": 7,
+      "cap": 4,
+      "atkGrowth": 0.12,
+      "speedGrowth": 0.025
+    },
+    "golem": {
+      "atk": 39,
+      "speed": 0.55,
+      "slots": 4,
+      "range": 62,
+      "engage": 14,
+      "cap": 6,
+      "atkGrowth": 0.12,
+      "speedGrowth": 0.025
+    },
+    "wyrm": {
+      "atk": 16,
+      "speed": 1.25,
+      "slots": 5,
+      "range": 96,
+      "engage": 28,
+      "cap": 10,
+      "atkGrowth": 0.12,
+      "speedGrowth": 0.025
+    },
+    "lancet": {
+      "atk": 15,
+      "speed": 1.95,
+      "slots": 4,
+      "range": 34,
+      "engage": 12,
+      "cap": 5,
+      "atkGrowth": 0.12,
+      "speedGrowth": 0.025
+    },
+    "saw": {
+      "atk": 19,
+      "speed": 1.65,
+      "slots": 4,
+      "range": 52,
+      "engage": 15,
+      "cap": 8,
+      "atkGrowth": 0.12,
+      "speedGrowth": 0.025
+    },
+    "cross": {
+      "atk": 13,
+      "speed": 1.05,
+      "slots": 6,
+      "range": 75,
+      "engage": 20,
+      "cap": 8,
+      "atkGrowth": 0.12,
+      "speedGrowth": 0.025
+    }
+  },
+  "souls": {
+    "might": {
+      "cost": 45,
+      "rarity": "N",
+      "legacyArea": 1
+    },
+    "haste": {
+      "cost": 65,
+      "rarity": "N",
+      "legacyArea": 1
+    },
+    "spark": {
+      "cost": 90,
+      "rarity": "N",
+      "legacyArea": 1,
+      "every": 4,
+      "targets": 1,
+      "power": 120,
+      "growth": 40,
+      "shape": "single",
+      "search": 240
+    },
+    "burst": {
+      "cost": 110,
+      "rarity": "R",
+      "legacyArea": 1,
+      "period": 5,
+      "targets": 3,
+      "power": 90,
+      "growth": 30,
+      "range": 110,
+      "shape": "blast",
+      "search": 180,
+      "radius": 72
+    },
+    "feast": {
+      "cost": 125,
+      "rarity": "R",
+      "legacyArea": 1
+    },
+    "pierce": {
+      "cost": 140,
+      "rarity": "R",
+      "legacyArea": 1
+    },
+    "pulse": {
+      "cost": 160,
+      "rarity": "SR",
+      "legacyArea": 1,
+      "period": 10,
+      "targets": 1,
+      "power": 300,
+      "growth": 90,
+      "shape": "single",
+      "search": 240
+    },
+    "focus": {
+      "cost": 95,
+      "rarity": "N",
+      "legacyArea": 3,
+      "every": 6,
+      "targets": 1,
+      "power": 180,
+      "growth": 50,
+      "shape": "single",
+      "search": 240
+    },
+    "frost": {
+      "cost": 115,
+      "rarity": "R",
+      "legacyArea": 5,
+      "period": 4,
+      "targets": 2,
+      "power": 75,
+      "growth": 25,
+      "range": 72,
+      "shape": "forward",
+      "search": 72
+    },
+    "fortune": {
+      "cost": 80,
+      "rarity": "N",
+      "legacyArea": 2
+    },
+    "echo": {
+      "cost": 150,
+      "rarity": "SR",
+      "legacyArea": 10,
+      "every": 5,
+      "targets": 3,
+      "power": 70,
+      "growth": 25,
+      "range": 110,
+      "shape": "forward",
+      "search": 110
+    },
+    "meteor": {
+      "cost": 200,
+      "rarity": "UR",
+      "legacyArea": 15,
+      "period": 8,
+      "range": 210,
+      "power": 160,
+      "growth": 45,
+      "shape": "blast",
+      "search": 260,
+      "radius": 130
+    },
+    "giant": {
+      "cost": 170,
+      "rarity": "R",
+      "legacyArea": 8
+    },
+    "rage": {
+      "cost": 100,
+      "rarity": "R",
+      "legacyArea": 1,
+      "every": 5,
+      "buff": true
+    },
+    "tempo": {
+      "cost": 120,
+      "rarity": "R",
+      "legacyArea": 1,
+      "every": 10,
+      "buff": true
+    },
+    "clockatk": {
+      "cost": 130,
+      "rarity": "R",
+      "legacyArea": 1,
+      "period": 3,
+      "buff": true
+    },
+    "opening": {
+      "cost": 240,
+      "rarity": "UR",
+      "legacyArea": 5
+    },
+    "timewarp": {
+      "cost": 230,
+      "rarity": "UR",
+      "legacyArea": 5
+    },
+    "shrink": {
+      "cost": 230,
+      "rarity": "UR",
+      "legacyArea": 5
+    },
+    "assassin": {
+      "cost": 240,
+      "rarity": "UR",
+      "legacyArea": 5,
+      "every": 3,
+      "range": 150,
+      "power": 65,
+      "growth": 20,
+      "double": true,
+      "shape": "forward",
+      "search": 150
+    },
+    "starfall": {
+      "cost": 260,
+      "rarity": "SR",
+      "legacyArea": 10,
+      "every": 100,
+      "range": 260,
+      "power": 500,
+      "growth": 80,
+      "shape": "forward",
+      "search": 260
+    },
+    "fixedbolt": {
+      "cost": 110,
+      "rarity": "N",
+      "legacyArea": 3,
+      "period": 4,
+      "targets": 1,
+      "power": 70,
+      "growth": 25,
+      "fixed": true,
+      "shape": "single",
+      "search": 240
+    },
+    "flatAtk": {
+      "cost": 90,
+      "rarity": "N",
+      "legacyArea": 1
+    },
+    "flatSpeed": {
+      "cost": 90,
+      "rarity": "N",
+      "legacyArea": 1
+    },
+    "tempoPct": {
+      "cost": 130,
+      "rarity": "R",
+      "legacyArea": 1,
+      "every": 10,
+      "buff": true
+    },
+    "rageFlat": {
+      "cost": 110,
+      "rarity": "N",
+      "legacyArea": 1,
+      "every": 5,
+      "buff": true
+    },
+    "clockSpeed": {
+      "cost": 125,
+      "rarity": "R",
+      "legacyArea": 1,
+      "period": 3,
+      "buff": true
+    },
+    "clockFlat": {
+      "cost": 110,
+      "rarity": "N",
+      "legacyArea": 1,
+      "period": 3,
+      "buff": true
+    },
+    "plane": {
+      "cost": 145,
+      "rarity": "R",
+      "legacyArea": 1,
+      "period": 6,
+      "range": 180,
+      "power": 75,
+      "growth": 20,
+      "hits": 3,
+      "shape": "forward",
+      "search": 180
+    },
+    "pillar": {
+      "cost": 140,
+      "rarity": "R",
+      "legacyArea": 1,
+      "period": 5,
+      "range": 120,
+      "power": 145,
+      "growth": 35,
+      "shape": "forward",
+      "search": 120
+    },
+    "dragon": {
+      "cost": 220,
+      "rarity": "SR",
+      "legacyArea": 1,
+      "period": 12,
+      "range": 240,
+      "power": 450,
+      "growth": 80,
+      "shape": "forward",
+      "search": 240
+    },
+    "sniper": {
+      "cost": 180,
+      "rarity": "SR",
+      "legacyArea": 1,
+      "period": 6,
+      "targets": 1,
+      "power": 360,
+      "growth": 80,
+      "shape": "single",
+      "search": 240
+    },
+    "ufo": {
+      "cost": 180,
+      "rarity": "SR",
+      "legacyArea": 1,
+      "period": 5,
+      "targets": 1,
+      "power": 240,
+      "growth": 60,
+      "shape": "single",
+      "search": 240
+    }
+  },
+  "enemySizes": [
+    {
+      "id": "xs",
+      "name": "極小",
+      "px": 19
+    },
+    {
+      "id": "s",
+      "name": "小",
+      "px": 28
+    },
+    {
+      "id": "m",
+      "name": "中",
+      "px": 40
+    },
+    {
+      "id": "l",
+      "name": "大",
+      "px": 53
+    },
+    {
+      "id": "xl",
+      "name": "特大",
+      "px": 69
+    },
+    {
+      "id": "xxl",
+      "name": "超特大",
+      "px": 96
+    }
+  ],
+  "stage": {
+    "pattern": [
+      12,
+      17,
+      9,
+      25,
+      15,
+      13,
+      18,
+      11,
+      26,
+      15
+    ],
+    "extraCap": 80,
+    "gap": 5,
+    "swarmCount": 310,
+    "barrierCount": 4,
+    "sprintLimit": 6,
+    "standardBossHP": 15,
+    "swarmHP": 0.065,
+    "barrierFrontHP": 6,
+    "barrierRearHP": 0.6,
+    "sprintHP": 2.5,
+    "eliteHP": 1.65,
+    "crowdHP": 0.65,
+    "initialHP": 38,
+    "earlyGrowth": 1.22,
+    "lateStart": 20,
+    "lateScale": 60,
+    "lateExponent": 0.65,
+    "oneHitStart": 500,
+    "oneHitGrowth": 2000,
+    "oneHitSpan": 3000
+  },
+  "reward": {
+    "initial": 90,
+    "earlyGrowth": 1.2,
+    "bonus": 55,
+    "bonusGrowth": 1.23,
+    "firstGems": 4,
+    "dropChance": 0.42,
+    "weights": {
+      "N": 68,
+      "R": 24,
+      "SR": 7,
+      "UR": 1
+    }
+  },
+  "upgrade": {
+    "monsterBase": 150,
+    "monsterStep": 100,
+    "soulCopiesOffset": 1
+  },
+  "buffs": {
+    "rage": {
+      "field": "atkBonus",
+      "base": 0.08,
+      "growth": 0.02
+    },
+    "tempo": {
+      "field": "tempoBonus",
+      "base": 0.12,
+      "growth": 0.03
+    },
+    "clockatk": {
+      "field": "atkBonus",
+      "base": 0.1,
+      "growth": 0.03
+    },
+    "tempoPct": {
+      "field": "tempoPctBonus",
+      "base": 0.1,
+      "growth": 0.03
+    },
+    "rageFlat": {
+      "field": "flatAtkBonus",
+      "base": 3,
+      "growth": 2
+    },
+    "clockSpeed": {
+      "field": "tempoPctBonus",
+      "base": 0.08,
+      "growth": 0.02
+    },
+    "clockFlat": {
+      "field": "flatAtkBonus",
+      "base": 4,
+      "growth": 2
+    }
+  },
+  "passive": {
+    "might": {
+      "base": 15,
+      "growth": 8
+    },
+    "haste": {
+      "base": 30,
+      "growth": 7
+    },
+    "flatAtk": {
+      "base": 4,
+      "growth": 2
+    },
+    "flatSpeed": {
+      "base": 0.25,
+      "growth": 0.05
+    },
+    "feast": {
+      "base": 5,
+      "growth": 2,
+      "cap": 20
+    },
+    "pierce": {
+      "base": 65,
+      "growth": 10,
+      "cap": 100
+    },
+    "fortune": {
+      "base": 12,
+      "growth": 5
+    },
+    "giant": {
+      "base": 35,
+      "growth": 10
+    },
+    "opening": {
+      "base": 2,
+      "growth": 0.1
+    },
+    "timewarp": {
+      "base": 20,
+      "growth": 3,
+      "cap": 75
+    },
+    "shrink": {
+      "base": 45,
+      "growth": 3,
+      "cap": 75
+    }
+  }
+}
