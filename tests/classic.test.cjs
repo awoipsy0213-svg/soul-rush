@@ -11,7 +11,7 @@ function environment(seed={},writeFail=false,search=''){
  function ensure(id=''){if(id&&nodes.has(id))return nodes.get(id);const cls=new Set(),el={id,hidden:false,disabled:false,open:false,style:{setProperty(k,v){this[k]=String(v)}},dataset:{},children:[],scrollLeft:0,scrollTop:0,value:'',textContent:'',files:[],classList:{add(k){cls.add(k)},remove(k){cls.delete(k)},contains(k){return cls.has(k)},toggle(k,v){if(v)cls.add(k);else cls.delete(k)}},getBoundingClientRect(){return {left:0,top:0,width:320,height:220}},setAttribute(){},removeAttribute(){},addEventListener(k,fn){events.set(id+':'+k,fn)},querySelectorAll(s){return s==='.character-card'?Array.from({length:7},()=>({scrollIntoView(){}})):[]},appendChild(x){this.children.push(x)},remove(){},showModal(){this.open=true},close(){this.open=false},select(){},click(){}};let str='';Object.defineProperty(el,'innerHTML',{get(){return str},set(v){str=String(v);for(const m of str.matchAll(/\bid="([^"]+)"/g))ensure(m[1]);if(!str)el.children=[]}});if(id)nodes.set(id,el);return el}
  for(const m of html.slice(0,html.indexOf('<script id="engine">')).matchAll(/\bid="([^"]+)"/g))ensure(m[1]);
  const context={console,document:{hidden:false,getElementById:id=>nodes.get(id)||null,createElement:()=>ensure(),addEventListener(k,fn){events.set(k,fn)}},localStorage:{getItem:k=>storage.get(k)??null,setItem(k,v){if(writeFail)throw Error('denied');storage.set(k,v)}},location:{protocol:'http:',hostname:'example.test',search},navigator:{},performance:{now:()=>now},requestAnimationFrame(fn){const n=++seq;frames.set(n,fn);return n},cancelAnimationFrame(n){frames.delete(n)},setTimeout:()=>++seq,clearTimeout(){},confirm:()=>true};
- const api=vm.runInNewContext(engine+'\n'+ui+'\n({classicRewardGroups,classicArenaModel,classicStageModel,classicBossRole,classicBossDefense,classicImpactGlyph,classicImpactPlan,classicRuneTrial,classicRuneTrialState,classicGaugeState,classicRangeModel,classicRangeDiagram,classicFitGeometry,classicSocketPositions,dispatch,showScene,startBattle,pauseBattle,resumeBattle,abortBattle,settleBattle,updateBattle,renderResult,openSoul,selectPreset,seed:x=>{state=x},state:()=>state,battle:()=>battle,result:()=>resultData,scene:()=>scene,paused:()=>paused,running:()=>running,protect:()=>protectSave,snapshot:()=>JSON.stringify(state)})',context);
+ const api=vm.runInNewContext(engine+'\n'+ui+'\n({classicSlotContext,classicCombatNumber,classicGrowthLabel,soulIcon,classicRewardGroups,classicArenaModel,classicStageModel,classicBossRole,classicBossDefense,classicImpactGlyph,classicImpactPlan,classicRuneTrial,classicRuneTrialState,classicGaugeState,classicRangeModel,classicRangeDiagram,classicFitGeometry,classicSocketPositions,dispatch,showScene,startBattle,pauseBattle,resumeBattle,abortBattle,settleBattle,updateBattle,renderResult,openSoul,selectPreset,seed:x=>{state=x},state:()=>state,battle:()=>battle,result:()=>resultData,scene:()=>scene,paused:()=>paused,running:()=>running,protect:()=>protectSave,snapshot:()=>JSON.stringify(state)})',context);
  return {api,nodes,storage,events,context,el:id=>nodes.get(id),advance(ms){now+=ms;const jobs=[...frames.values()];frames.clear();jobs.forEach(fn=>fn(now))},clock(ms){now+=ms},get now(){return now}};
 }
 
@@ -143,4 +143,25 @@ test('purchase receipt accounts for all items and cannot charge twice without ge
 });
 test('failed arena reward save preserves original pending run and wallet',()=>{
  const s=makeFresh();s.gems=50;s.arena={seed:123,wins:10,maxRune:5,ruleset:102};const e=environment({'soul_rush_classic_v9':s},true),a=e.api;a.dispatch('enter');a.dispatch('arena-open');const before=a.snapshot();a.dispatch('arena-claim');assert.equal(a.snapshot(),before);assert.equal(a.state().arena.wins,10);assert.ok(!e.el('arenaContent').innerHTML.includes('受取完了'))
+});
+
+test('all 33 rune symbols are distinct independent of frame and color',()=>{
+ const a=environment().api,ids=run('SOULS.map(x=>x.id)'),symbols=ids.map(id=>{const m=a.soulIcon(id).match(/transform="translate\(12 12\) scale\(\.76\)">([\s\S]*?)<\/g>/);assert.ok(m);return m[1]});
+ assert.equal(ids.length,33);assert.equal(new Set(symbols).size,33)
+});
+test('slot context distinguishes replacement, swapping, already mounted and locked',()=>{
+ const s=makeFresh();s.souls.haste=1;s.souls.spark=1;s.monsters.moss.equip=['might','haste'];s.presets[0]={monster:'moss',equip:['might','haste']};const a=environment().api;
+ for(const [index,id,mode] of [[0,'might','remove'],[0,'haste','swap'],[0,'spark','replace'],[2,'spark','add'],[2,'might','move-blocked'],[1,'burst','locked']])assert.equal(a.classicSlotContext(s,index,id).mode,mode);
+ assert.equal(a.classicSlotContext(s,4).slot,2);
+ const e=environment({'soul_rush_classic_v9':s}),b=e.api;b.dispatch('enter');b.dispatch('slot',{index:'0'});b.dispatch('choose-soul',{id:'haste'});assert.ok(e.el('soulDetail').innerHTML.includes('枠 2 と入れ替え'));b.dispatch('equip-soul');assert.equal(b.state().monsters.moss.equip[0],'haste');assert.equal(b.state().monsters.moss.equip[1],'might')
+});
+test('switching build closes stale rune selection and preserves both saved builds',()=>{
+ const s=makeFresh();s.souls.haste=1;s.presets[1]={monster:'moss',equip:['haste']};const e=environment({'soul_rush_classic_v9':s}),a=e.api;a.dispatch('enter');a.dispatch('slot',{index:'0'});a.dispatch('choose-soul',{id:'might'});a.dispatch('classic-preset',{index:'1'});assert.equal(a.state().preset,1);assert.equal(a.state().monsters.moss.equip[0],'haste');assert.equal(e.el('soulDetail').hidden,true);assert.equal(e.el('soulContext').textContent,'SLOT 1/5 · 33/33');a.dispatch('classic-preset',{index:'0'});assert.equal(a.state().monsters.moss.equip[0],'might')
+});
+test('failed build switch leaves the current saved build intact',()=>{
+ const s=makeFresh();s.souls.haste=1;s.presets[1]={monster:'moss',equip:['haste']};const e=environment({'soul_rush_classic_v9':s},true),a=e.api;a.dispatch('enter');const before=a.snapshot();a.dispatch('preset',{index:'1'});assert.equal(a.snapshot(),before)
+});
+test('combat growth label preserves fractional base values and reports actual multiplier',()=>{
+ const a=environment().api;assert.equal(a.classicCombatNumber(2.35,2),'2.35');assert.equal(a.classicGrowthLabel('SPD',2,1),'SPD ×2.0');assert.equal(a.classicGrowthLabel('ATK',1,1),'ATK');
+ const e=environment({},false,'?demo=29'),b=e.api;b.dispatch('enter');e.advance(4000);const x=b.battle();assert.ok(e.el('classicSPDLabel').textContent.startsWith('SPD'));assert.ok(Number(e.el('classicSPD').textContent)>0)
 });
