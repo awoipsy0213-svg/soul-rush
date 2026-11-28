@@ -11,7 +11,7 @@ function environment(seed={},writeFail=false,search=''){
  function ensure(id=''){if(id&&nodes.has(id))return nodes.get(id);const cls=new Set(),el={id,hidden:false,disabled:false,open:false,style:{setProperty(k,v){this[k]=String(v)}},dataset:{},children:[],scrollLeft:0,scrollTop:0,value:'',textContent:'',files:[],classList:{add(k){cls.add(k)},remove(k){cls.delete(k)},contains(k){return cls.has(k)},toggle(k,v){if(v)cls.add(k);else cls.delete(k)}},getBoundingClientRect(){return {left:0,top:0,width:320,height:220}},setAttribute(){},removeAttribute(){},addEventListener(k,fn){events.set(id+':'+k,fn)},querySelectorAll(s){return s==='.character-card'?Array.from({length:7},()=>({scrollIntoView(){}})):[]},appendChild(x){this.children.push(x)},remove(){},showModal(){this.open=true},close(){this.open=false},select(){},click(){}};let str='';Object.defineProperty(el,'innerHTML',{get(){return str},set(v){str=String(v);for(const m of str.matchAll(/\bid="([^"]+)"/g))ensure(m[1]);if(!str)el.children=[]}});if(id)nodes.set(id,el);return el}
  for(const m of html.slice(0,html.indexOf('<script id="engine">')).matchAll(/\bid="([^"]+)"/g))ensure(m[1]);
  const context={console,document:{hidden:false,getElementById:id=>nodes.get(id)||null,createElement:()=>ensure(),addEventListener(k,fn){events.set(k,fn)}},localStorage:{getItem:k=>storage.get(k)??null,setItem(k,v){if(writeFail)throw Error('denied');storage.set(k,v)}},location:{protocol:'http:',hostname:'example.test',search},navigator:{},performance:{now:()=>now},requestAnimationFrame(fn){const n=++seq;frames.set(n,fn);return n},cancelAnimationFrame(n){frames.delete(n)},setTimeout:()=>++seq,clearTimeout(){},confirm:()=>true};
- const api=vm.runInNewContext(engine+'\n'+ui+'\n({classicRangeModel,classicRangeDiagram,classicFitGeometry,classicSocketPositions,dispatch,showScene,startBattle,pauseBattle,resumeBattle,abortBattle,settleBattle,updateBattle,renderResult,openSoul,selectPreset,seed:x=>{state=x},state:()=>state,battle:()=>battle,result:()=>resultData,scene:()=>scene,paused:()=>paused,running:()=>running,protect:()=>protectSave,snapshot:()=>JSON.stringify(state)})',context);
+ const api=vm.runInNewContext(engine+'\n'+ui+'\n({classicImpactGlyph,classicImpactPlan,classicRuneTrial,classicRuneTrialState,classicGaugeState,classicRangeModel,classicRangeDiagram,classicFitGeometry,classicSocketPositions,dispatch,showScene,startBattle,pauseBattle,resumeBattle,abortBattle,settleBattle,updateBattle,renderResult,openSoul,selectPreset,seed:x=>{state=x},state:()=>state,battle:()=>battle,result:()=>resultData,scene:()=>scene,paused:()=>paused,running:()=>running,protect:()=>protectSave,snapshot:()=>JSON.stringify(state)})',context);
  return {api,nodes,storage,events,context,el:id=>nodes.get(id),advance(ms){now+=ms;const jobs=[...frames.values()];frames.clear();jobs.forEach(fn=>fn(now))},clock(ms){now+=ms},get now(){return now}};
 }
 
@@ -63,4 +63,40 @@ test('inspect unowned weapon range and toggle layouts without changing the save'
 test('rune range uses selected rune and preserves existing build',()=>{
  const s=makeFresh();s.souls.burst=1;const e=environment({'soul_rush_classic_v9':s}),a=e.api;a.dispatch('enter');a.dispatch('slot',{index:'1'});a.dispatch('choose-soul',{id:'burst'});const before=a.snapshot();a.dispatch('soul-range');
  assert.ok(e.el('infoContent').innerHTML.includes('着弾半径'));assert.ok(e.el('infoContent').innerHTML.includes('探索距離'));assert.equal(a.snapshot(),before)
+});
+
+test('rune simulation agrees with direct engine for all 33 runes and six representative areas',()=>{
+ const a=environment().api;
+ for(const d of run('MONSTERS'))for(const n of [1,20,40,60,80,100]){
+ const s=run(`(()=>{const s=fresh();s.unlocked=${n};s.selectedStage=${n};grantCharacter(s,'${d.id}');s.active='${d.id}';s.monsters[s.active].level=8;s.monsters[s.active].equip=['might','timewarp'];s.souls.might=5;s.souls.timewarp=3;return s})()`),before=JSON.stringify(s);
+ for(const {id} of run('SOULS')){
+ const r=a.classicRuneTrial(s,id,1),p=a.classicRuneTrialState(s,id,1),want=run(`(()=>{const s=${JSON.stringify(s)},c=${JSON.stringify(p.copy)},b=createBattle(c,${n},'main',trialOptions(s,${n}));advanceBattle(b,b.limit);return {summary:replaySummary(b),source:b.sourceStats['${id}']||{},period:TRIGGERS['${id}']?.period?soulPeriod(b,'${id}'):null}})()`);
+ assert.equal(JSON.stringify(r.selected.summary),JSON.stringify(want.summary));assert.equal(r.selected.activations,want.source.activations||0);assert.equal(r.selected.damage,want.source.damage||0);assert.equal(r.selected.period,want.period);assert.equal(r.next.level,r.level+1)
+ }assert.equal(JSON.stringify(s),before)
+ }
+});
+test('locked rune trial is read-only, shows replacement and actual shortened period',()=>{
+ const s=makeFresh();s.souls.timewarp=3;s.monsters.moss.equip=['might','timewarp'];s.presets[0]={monster:'moss',equip:['might','timewarp']};const e=environment({'soul_rush_classic_v9':s}),a=e.api;a.dispatch('enter');a.dispatch('slot',{index:'0'});a.dispatch('choose-soul',{id:'burst'});const before=a.snapshot(),store=JSON.stringify([...e.storage]);a.dispatch('rune-trial');assert.ok(e.el('infoDialog').open);const h=e.el('infoContent').innerHTML;assert.ok(h.includes('未所持Lv1'));assert.ok(h.includes('交換: 攻撃力UP'));assert.ok(h.includes('3.70秒'));assert.ok(h.includes('次Lv 2'));assert.equal(a.snapshot(),before);assert.equal(JSON.stringify([...e.storage]),store)
+});
+test('stopped gauges end and do not keep a false live socket',()=>{
+ const e=environment({},false,'?demo=29'),a=e.api;a.dispatch('enter');e.advance(30000);const b=a.battle();if(b){for(const id of Object.keys(b.stats.levels)){const g=a.classicGaugeState(b,id);if(g){assert.equal(g.live,false);assert.equal(g.text,'END')}}}
+});
+
+test('gauge uses actual activation log instead of delayed impact timestamp',()=>{
+ const a=environment().api,b=run("(()=>{const s=fresh();s.souls.assassin=1;s.monsters.moss.equip=['assassin'];return createBattle(s)})()");
+ b.events=[{special:true,text:'匿名の刺客 発動',t:1}];b.visuals=[{source:'assassin',t:1.16}];b.elapsed=1.2;b.sourceStats.assassin={activations:1};
+ assert.equal(a.classicGaugeState(b,'assassin').activationTime,1)
+});
+
+test('classic attack art differentiates every weapon and nine rune effects',()=>{
+ const a=environment().api,kinds=run('MONSTERS.map(d=>motionProfile(d.id).kind)');
+ assert.equal(new Set(kinds.map(k=>a.classicImpactGlyph(k,false))).size,7);
+ const spells=['burst','meteor','starfall','pulse','frost','echo','pillar','fixedbolt','assassin'];assert.equal(new Set(spells.map(id=>a.classicImpactGlyph('flame',true,id))).size,spells.length);
+});
+test('impact plan uses only visible real hits and separates activation from follow-up',()=>{
+ const a=environment().api,v={source:'assassin',special:true,buff:false,t:1,serial:1,hits:[{i:0,actual:4,blocked:0},{i:1,actual:0,blocked:1},{i:2,actual:0,blocked:0}]},events=[{t:1,special:true,text:'匿名の刺客 発動'}];
+ const p=a.classicImpactPlan([v],i=>i!==0,events);assert.equal(JSON.stringify(p.draw[0].targets),'[1]');assert.equal(p.activation.v.serial,1);
+ const follow={...v,t:1.16,serial:2};assert.equal(a.classicImpactPlan([follow],()=>true,events).activation,null);
+ assert.equal(a.classicImpactPlan([v],()=>false,events).draw.length,0);assert.equal(a.classicImpactPlan([{...v,hits:[]}],()=>true,events).draw.length,0);
+ const batch=Array.from({length:20},(_,i)=>({...v,serial:i+1})),before=JSON.stringify(batch);assert.equal(a.classicImpactPlan(batch,()=>true,events,4).draw.length,4);assert.equal(JSON.stringify(batch),before);
 });

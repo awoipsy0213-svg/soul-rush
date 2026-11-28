@@ -56,7 +56,9 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   await click('#backBtn');await scene('terminal');
   await evaluate('state.souls.haste=1;state.copies.haste=2;state.money=1000;save();renderHome()');
   await click('#heroSockets [data-index="1"]');await scene('souls');
-  await click('[data-action="choose-soul"][data-id="haste"]');assert.ok(await evaluate('document.querySelector("#soulDetail .classic-compare .better")'));await screenshot('classic-rune-preview');await click('[data-action="equip-soul"]');
+  await click('[data-action="choose-soul"][data-id="haste"]');assert.ok(await evaluate('document.querySelector("#soulDetail .classic-compare .better")'));await screenshot('classic-rune-preview');
+  {const before=await evaluate('JSON.stringify(state)'),saved=await evaluate('localStorage.getItem(SAVE_KEY)');await click('[data-action="rune-trial"]');assert.ok(await evaluate('document.getElementById("infoDialog").open&&document.querySelectorAll(".classic-trial-compare>div").length===3&&document.querySelectorAll(".classic-trial-chart svg").length===2'));assert.equal(await evaluate('JSON.stringify(state)'),before);assert.equal(await evaluate('localStorage.getItem(SAVE_KEY)'),saved);await screenshot('classic-rune-trial');await click('[data-action="close-info"]');}
+  await click('[data-action="equip-soul"]');
   assert.ok(await evaluate('state.monsters.moss.equip.includes("haste")&&document.getElementById("soulDetail").hidden'));
   await click('[data-action="choose-soul"][data-id="haste"]');await click('[data-action="upgrade-soul"]');
   assert.equal(await evaluate('state.souls.haste'),2);
@@ -95,6 +97,9 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
     assert.ok(await evaluate('document.querySelector(".rider-weapon")&&document.querySelector(".city-near")&&document.querySelector("#goalMarker svg")'));
     await evaluate('advanceBattle(battle,Math.min(battle.limit,5));updateBattle();attackEffect(battle)');
     await noOverflow('battleScene');assert.ok(await evaluate('(()=>{const a=document.getElementById("classicBattleWeapon").getBoundingClientRect();return [...document.querySelectorAll("#classicBattleWeapon .classic-static-socket")].every(e=>{const r=e.getBoundingClientRect();return r.left>=a.left-2&&r.right<=a.right+2&&r.top>=a.top-2&&r.bottom<=a.bottom+2})})()'),'weapon sockets inside viewport');await screenshot('classic-demo-'+n+'-battle');
+    assert.ok(await evaluate('new Set(MONSTERS.map(d=>classicImpactGlyph(motionProfile(d.id).kind,false))).size===7'));
+    assert.ok(await evaluate('(()=>{const v={source:"assassin",special:true,buff:false,t:1.16,serial:1,hits:[{i:0,actual:4,blocked:0}]};return classicImpactPlan([v],()=>false,[]).draw.length===0&&classicImpactPlan([v],()=>true,[{t:1,special:true,text:"匿名の刺客 発動"}]).activation===null})()'));
+
     await evaluate('advanceBattle(battle,battle.limit);updateBattle();settleBattle()');await scene('result');assert.equal(await evaluate('resultData.clear'),true);await noOverflow('resultScene');await screenshot('classic-demo-'+n+'-result');if(n===29){const before=await evaluate('JSON.stringify(state)');await click('#scatter [data-action="loot-inspect"]');assert.ok(await evaluate('document.getElementById("infoDialog").open&&document.querySelector(".classic-loot-big")'));assert.equal(await evaluate('JSON.stringify(state)'),before);await screenshot('classic-loot-inspect');await click('[data-action="loot-gear"]');await scene('souls');assert.ok(await evaluate('!document.getElementById("soulDetail").hidden'));await screenshot('classic-loot-to-gear');await evaluate('showScene("result")')}if(n===20){assert.equal(await evaluate('document.getElementById("scatter").dataset.grouped'),'1');await screen(320,568);await noOverflow('resultScene');await screenshot('classic-demo-20-result-small');await screen(390,844)}
     assert.equal(await evaluate('JSON.stringify(Object.keys(localStorage).sort().map(k=>[k,localStorage.getItem(k)]))'),store);
     await click('[data-action="title"]');await scene('title');
