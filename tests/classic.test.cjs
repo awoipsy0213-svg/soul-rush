@@ -100,3 +100,16 @@ test('impact plan uses only visible real hits and separates activation from foll
  assert.equal(a.classicImpactPlan([v],()=>false,events).draw.length,0);assert.equal(a.classicImpactPlan([{...v,hits:[]}],()=>true,events).draw.length,0);
  const batch=Array.from({length:20},(_,i)=>({...v,serial:i+1})),before=JSON.stringify(batch);assert.equal(a.classicImpactPlan(batch,()=>true,events,4).draw.length,4);assert.equal(JSON.stringify(batch),before);
 });
+
+test('0.2.0 preserves legacy replay fingerprint and applies the increased speed ceiling only to new runs',()=>{
+ const r=run(`(()=>{const s=fresh();s.unlocked=3040;grantCharacter(s,'lancet');s.active='lancet';s.monsters.lancet.level=20;s.monsters.lancet.equip=['opening','rage','tempoPct','spark'];for(const id of s.monsters.lancet.equip)s.souls[id]=20;const a=createBattle(s,3040,'main',{seed:123}),b=createBattle(s,3040,'main',{seed:123,legacySpeedCap:true});advanceBattle(a,a.limit);advanceBattle(b,b.limit);return {a:replaySummary(a),b:replaySummary(b),legacy:masterFingerprint(LEGACY_SPEED_CAP),replayed:replaySummary(replayBattle(b.replay)),newReplay:replaySummary(replayBattle(a.replay))}})()`);
+ assert.equal(r.legacy,'ff4070a');assert.equal(r.b.peakSpeed,40);assert.ok(r.a.peakSpeed>40);assert.ok(r.a.elapsed<r.b.elapsed);assert.deepEqual(r.replayed,r.b);assert.deepEqual(r.newReplay,r.a)
+});
+test('legacy record and paid arena migration retain assets and rule identity across reloads',()=>{
+ const r=run(`(()=>{const s=fresh();s.unlocked=2;s.money=321;s.gems=100;s.firstClears[1]=true;s.records[1]={attempts:3,last:{stage:1,kills:12,count:12,elapsed:8,clear:true,reward:10,monster:'moss',ruleset:101},bestTime:8,motionBestTime:8,priorMotionBestTime:9};s.arena={seed:123,wins:4,maxRune:56};const v=validate(s),first=JSON.parse(JSON.stringify(v)),b=createBattle(v,1);advanceBattle(b,b.limit);applyResult(v,b);return {first,second:v,reload:validate(v),newArena:(()=>{const q=fresh();q.gems=20;arenaEnter(q,123);return q.arena})()}})()`);
+ assert.equal(r.first.money,321);assert.equal(r.first.gems,100);assert.equal(r.first.records[1].motionBestTime,null);assert.equal(r.first.records[1].priorMotionBestTime,8);assert.equal(r.first.records[1].bestTime,8);assert.equal(r.first.records[1].last.ruleset,101);assert.equal(r.first.arena.ruleset,101);assert.equal(r.second.records[1].motionRuleset,102);assert.equal(r.second.records[1].priorMotionBestTime,8);assert.equal(r.second.gems,100);assert.equal(r.newArena.ruleset,102);assert.deepEqual(r.second,r.reload)
+});
+test('high-level speed stacking remains deterministic within event budget',()=>{
+ const r=run(`(()=>{const s=fresh();s.unlocked=10000;grantCharacter(s,'cross');s.active='cross';s.monsters.cross.level=100;s.monsters.cross.equip=['opening','rage','tempoPct','spark','assassin','haste'];for(const id of s.monsters.cross.equip)s.souls[id]=100;const a=createBattle(s,10000,'main',{seed:123,variant:'barrier'}),b=createBattle(s,10000,'main',{seed:123,variant:'barrier'});for(let t=.137;t<b.limit&&!b.done;t+=.137)advanceBattle(b,t);advanceBattle(b,b.limit);advanceBattle(a,a.limit);return {same:JSON.stringify(a)===JSON.stringify(b),peak:a.peakSpeed,events:a.processedEvents,stop:!!a.safetyStop}})()`);
+ assert.equal(r.same,true);assert.ok(r.peak<=200);assert.ok(r.events<12000);assert.equal(r.stop,false)
+});
