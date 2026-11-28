@@ -19,12 +19,12 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: soul-rush-v016-ui-screenshots
+          name: soul-rush-v017-ui-screenshots
           path: ui-screenshots/
       - uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: soul-rush-v016-playable
+          name: soul-rush-v017-playable
           path: |
             index.html
             manifest.webmanifest
