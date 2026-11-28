@@ -1445,6 +1445,12 @@
       80,
       100
     ],
-    "sampleSeed": 20261128
+    "sampleSeed": 20261128,
+    "optimizer": {
+      "budget": 180,
+      "batch": 4,
+      "passes": 2,
+      "beam": 3
+    }
   }
 }
