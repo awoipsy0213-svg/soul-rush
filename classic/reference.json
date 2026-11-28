@@ -1,13 +1,32 @@
 {
   "edition": "classic-reference-v1",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "combat": {
     "limit": 24,
     "speedCap": 200,
     "eventCap": 12000
   },
   "stage": {
-    "initialHP": 29
+    "initialHP": 29,
+    "swarmCount": 310,
+    "barrierCount": 4,
+    "sprintLimit": 6,
+    "oneHitStart": 500,
+    "oneHitGrowth": 2000,
+    "oneHitSpan": 3000,
+    "bossKinds": {
+      "20": "swarm",
+      "40": "onehit",
+      "60": "barrier",
+      "80": "sprint"
+    },
+    "randomBossKinds": [
+      "standard",
+      "swarm",
+      "onehit",
+      "barrier",
+      "sprint"
+    ]
   },
   "weapons": {
     "moss": {
@@ -81,5 +100,5 @@
     "sniper": "狙撃手",
     "ufo": "UFO"
   },
-  "sourceNote": "通常24秒・特殊6秒・武器7種・確認済みルーン効果・5ビルドは資料に基づく。未確認の数値・名称・ドロップ率・ステージ配置は既存エンジンを基にした仮値。 0.2.0の速度上限200は安全性のための暫定設定。原作上限は未確認。"
+  "sourceNote": "通常24秒・特殊6秒・武器7種・確認済みルーン効果・5ビルドは資料に基づく。未確認の数値・名称・ドロップ率・ステージ配置は既存エンジンを基にした仮値。 0.2.0の速度上限200は安全性のための暫定設定。原作上限は未確認。 X20は300体超、X40は一撃・AREA3040約2500、X60は後方3体、X80は6秒、X100はランダムという2017年攻略に基づく。310体、HP式、抽選方式は暫定。"
 }
