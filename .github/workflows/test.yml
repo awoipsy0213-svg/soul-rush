@@ -11,6 +11,7 @@ jobs:
         with:
           node-version: '22'
       - run: node scripts/sync-balance.cjs --check
+      - run: node scripts/check-classic.cjs
       - run: node --test tests/*.test.cjs
       - name: Browser UI smoke test
         run: node tests/browser-smoke.cjs
