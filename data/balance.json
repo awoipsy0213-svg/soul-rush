@@ -27,7 +27,47 @@
       "shape": "forward",
       "halfWidth": 40,
       "angle": 90,
-      "rarity": "N"
+      "rarity": "N",
+      "name": "モス",
+      "role": "均衡型",
+      "trait": "安定した連続攻撃。多くの魂に適性",
+      "color": "#81c8a0",
+      "cost": 0,
+      "allowed": [
+        "might",
+        "haste",
+        "spark",
+        "burst",
+        "feast",
+        "pierce",
+        "pulse",
+        "focus",
+        "frost",
+        "fortune",
+        "echo",
+        "meteor",
+        "giant",
+        "rage",
+        "tempo",
+        "clockatk",
+        "opening",
+        "timewarp",
+        "shrink",
+        "assassin",
+        "starfall",
+        "fixedbolt",
+        "flatAtk",
+        "flatSpeed",
+        "tempoPct",
+        "rageFlat",
+        "clockSpeed",
+        "clockFlat",
+        "plane",
+        "pillar",
+        "dragon",
+        "sniper",
+        "ufo"
+      ]
     },
     "fang": {
       "atk": 8,
@@ -41,7 +81,47 @@
       "shape": "forward",
       "halfWidth": 40,
       "angle": 90,
-      "rarity": "N"
+      "rarity": "N",
+      "name": "ヴォルフ",
+      "role": "高速型",
+      "trait": "最高速。攻撃回数型と好相性",
+      "color": "#8fb9e6",
+      "cost": 150,
+      "allowed": [
+        "might",
+        "haste",
+        "spark",
+        "burst",
+        "feast",
+        "pierce",
+        "pulse",
+        "focus",
+        "frost",
+        "fortune",
+        "echo",
+        "meteor",
+        "giant",
+        "rage",
+        "tempo",
+        "clockatk",
+        "opening",
+        "timewarp",
+        "shrink",
+        "assassin",
+        "starfall",
+        "fixedbolt",
+        "flatAtk",
+        "flatSpeed",
+        "tempoPct",
+        "rageFlat",
+        "clockSpeed",
+        "clockFlat",
+        "plane",
+        "pillar",
+        "dragon",
+        "sniper",
+        "ufo"
+      ]
     },
     "golem": {
       "atk": 39,
@@ -55,7 +135,47 @@
       "shape": "forward",
       "halfWidth": 40,
       "angle": 90,
-      "rarity": "N"
+      "rarity": "N",
+      "name": "グラント",
+      "role": "重撃型",
+      "trait": "最高の攻撃力。時間型と好相性",
+      "color": "#d8b486",
+      "cost": 270,
+      "allowed": [
+        "might",
+        "haste",
+        "spark",
+        "burst",
+        "feast",
+        "pierce",
+        "pulse",
+        "focus",
+        "frost",
+        "fortune",
+        "echo",
+        "meteor",
+        "giant",
+        "rage",
+        "tempo",
+        "clockatk",
+        "opening",
+        "timewarp",
+        "shrink",
+        "assassin",
+        "starfall",
+        "fixedbolt",
+        "flatAtk",
+        "flatSpeed",
+        "tempoPct",
+        "rageFlat",
+        "clockSpeed",
+        "clockFlat",
+        "plane",
+        "pillar",
+        "dragon",
+        "sniper",
+        "ufo"
+      ]
     },
     "wyrm": {
       "atk": 16,
@@ -69,7 +189,47 @@
       "shape": "forward",
       "halfWidth": 40,
       "angle": 90,
-      "rarity": "N"
+      "rarity": "N",
+      "name": "イグニス",
+      "role": "多能力型",
+      "trait": "全種類の魂を習得でき、5つの魂を組み合わせ可能",
+      "color": "#e6a38e",
+      "cost": 460,
+      "allowed": [
+        "might",
+        "haste",
+        "spark",
+        "burst",
+        "feast",
+        "pierce",
+        "pulse",
+        "focus",
+        "frost",
+        "fortune",
+        "echo",
+        "meteor",
+        "giant",
+        "rage",
+        "tempo",
+        "clockatk",
+        "opening",
+        "timewarp",
+        "shrink",
+        "assassin",
+        "starfall",
+        "fixedbolt",
+        "flatAtk",
+        "flatSpeed",
+        "tempoPct",
+        "rageFlat",
+        "clockSpeed",
+        "clockFlat",
+        "plane",
+        "pillar",
+        "dragon",
+        "sniper",
+        "ufo"
+      ]
     },
     "lancet": {
       "atk": 15,
@@ -83,7 +243,47 @@
       "shape": "forward",
       "halfWidth": 40,
       "angle": 90,
-      "rarity": "N"
+      "rarity": "N",
+      "name": "ランセット",
+      "role": "速撃型",
+      "trait": "高速攻撃",
+      "color": "#88c9c5",
+      "cost": 340,
+      "allowed": [
+        "might",
+        "haste",
+        "spark",
+        "burst",
+        "feast",
+        "pierce",
+        "pulse",
+        "focus",
+        "frost",
+        "fortune",
+        "echo",
+        "meteor",
+        "giant",
+        "rage",
+        "tempo",
+        "clockatk",
+        "opening",
+        "timewarp",
+        "shrink",
+        "assassin",
+        "starfall",
+        "fixedbolt",
+        "flatAtk",
+        "flatSpeed",
+        "tempoPct",
+        "rageFlat",
+        "clockSpeed",
+        "clockFlat",
+        "plane",
+        "pillar",
+        "dragon",
+        "sniper",
+        "ufo"
+      ]
     },
     "saw": {
       "atk": 19,
@@ -97,7 +297,47 @@
       "shape": "forward",
       "halfWidth": 40,
       "angle": 90,
-      "rarity": "N"
+      "rarity": "N",
+      "name": "セイヴ",
+      "role": "連撃型",
+      "trait": "攻撃速度と範囲の均衡",
+      "color": "#dfaa8e",
+      "cost": 390,
+      "allowed": [
+        "might",
+        "haste",
+        "spark",
+        "burst",
+        "feast",
+        "pierce",
+        "pulse",
+        "focus",
+        "frost",
+        "fortune",
+        "echo",
+        "meteor",
+        "giant",
+        "rage",
+        "tempo",
+        "clockatk",
+        "opening",
+        "timewarp",
+        "shrink",
+        "assassin",
+        "starfall",
+        "fixedbolt",
+        "flatAtk",
+        "flatSpeed",
+        "tempoPct",
+        "rageFlat",
+        "clockSpeed",
+        "clockFlat",
+        "plane",
+        "pillar",
+        "dragon",
+        "sniper",
+        "ufo"
+      ]
     },
     "cross": {
       "atk": 13,
@@ -111,7 +351,47 @@
       "shape": "forward",
       "halfWidth": 40,
       "angle": 90,
-      "rarity": "N"
+      "rarity": "N",
+      "name": "クロス",
+      "role": "多枠型",
+      "trait": "最多の魂枠",
+      "color": "#b6a0e2",
+      "cost": 520,
+      "allowed": [
+        "might",
+        "haste",
+        "spark",
+        "burst",
+        "feast",
+        "pierce",
+        "pulse",
+        "focus",
+        "frost",
+        "fortune",
+        "echo",
+        "meteor",
+        "giant",
+        "rage",
+        "tempo",
+        "clockatk",
+        "opening",
+        "timewarp",
+        "shrink",
+        "assassin",
+        "starfall",
+        "fixedbolt",
+        "flatAtk",
+        "flatSpeed",
+        "tempoPct",
+        "rageFlat",
+        "clockSpeed",
+        "clockFlat",
+        "plane",
+        "pillar",
+        "dragon",
+        "sniper",
+        "ufo"
+      ]
     }
   },
   "souls": {
@@ -120,14 +400,26 @@
       "rarity": "N",
       "legacyArea": 1,
       "trigger": "passive",
-      "effect": "passive"
+      "effect": "passive",
+      "name": "力の魂",
+      "type": "常時",
+      "color": "#4c86d2",
+      "icon": "fist",
+      "chance": 1,
+      "target": "nearest"
     },
     "haste": {
       "cost": 65,
       "rarity": "N",
       "legacyArea": 1,
       "trigger": "passive",
-      "effect": "passive"
+      "effect": "passive",
+      "name": "疾風の魂",
+      "type": "常時",
+      "color": "#4c86d2",
+      "icon": "wind",
+      "chance": 1,
+      "target": "nearest"
     },
     "spark": {
       "cost": 90,
@@ -142,7 +434,13 @@
       "trigger": "count",
       "effect": "damage",
       "delivery": "lightning",
-      "falloff": 1
+      "falloff": 1,
+      "name": "雷鳴の魂",
+      "type": "攻撃回数",
+      "color": "#ef893d",
+      "icon": "bolt",
+      "chance": 1,
+      "target": "nearest"
     },
     "burst": {
       "cost": 110,
@@ -159,21 +457,39 @@
       "trigger": "time",
       "effect": "damage",
       "delivery": "blast",
-      "falloff": 1
+      "falloff": 1,
+      "name": "爆炎の魂",
+      "type": "時間経過",
+      "color": "#59ae71",
+      "icon": "flame",
+      "chance": 1,
+      "target": "nearest"
     },
     "feast": {
       "cost": 125,
       "rarity": "R",
       "legacyArea": 1,
       "trigger": "passive",
-      "effect": "passive"
+      "effect": "passive",
+      "name": "捕食の魂",
+      "type": "撃破時",
+      "color": "#4c86d2",
+      "icon": "fang",
+      "chance": 1,
+      "target": "nearest"
     },
     "pierce": {
       "cost": 140,
       "rarity": "R",
       "legacyArea": 1,
       "trigger": "passive",
-      "effect": "passive"
+      "effect": "passive",
+      "name": "貫通の魂",
+      "type": "特殊",
+      "color": "#4c86d2",
+      "icon": "arrow",
+      "chance": 1,
+      "target": "nearest"
     },
     "pulse": {
       "cost": 160,
@@ -188,7 +504,13 @@
       "trigger": "time",
       "effect": "damage",
       "delivery": "instant",
-      "falloff": 1
+      "falloff": 1,
+      "name": "月蝕の魂",
+      "type": "時間経過",
+      "color": "#59ae71",
+      "icon": "moon",
+      "chance": 1,
+      "target": "nearest"
     },
     "focus": {
       "cost": 95,
@@ -203,7 +525,13 @@
       "trigger": "count",
       "effect": "damage",
       "delivery": "instant",
-      "falloff": 1
+      "falloff": 1,
+      "name": "会心の魂",
+      "type": "攻撃回数",
+      "color": "#ef893d",
+      "icon": "star",
+      "chance": 1,
+      "target": "nearest"
     },
     "frost": {
       "cost": 115,
@@ -219,14 +547,26 @@
       "trigger": "time",
       "effect": "damage",
       "delivery": "instant",
-      "falloff": 1
+      "falloff": 1,
+      "name": "氷結の魂",
+      "type": "時間経過",
+      "color": "#59ae71",
+      "icon": "snow",
+      "chance": 1,
+      "target": "nearest"
     },
     "fortune": {
       "cost": 80,
       "rarity": "N",
       "legacyArea": 2,
       "trigger": "passive",
-      "effect": "passive"
+      "effect": "passive",
+      "name": "幸運の魂",
+      "type": "常時",
+      "color": "#4c86d2",
+      "icon": "coin",
+      "chance": 1,
+      "target": "nearest"
     },
     "echo": {
       "cost": 150,
@@ -242,7 +582,13 @@
       "trigger": "count",
       "effect": "damage",
       "delivery": "instant",
-      "falloff": 1
+      "falloff": 1,
+      "name": "反響の魂",
+      "type": "攻撃回数",
+      "color": "#ef893d",
+      "icon": "echo",
+      "chance": 1,
+      "target": "nearest"
     },
     "meteor": {
       "cost": 200,
@@ -258,14 +604,26 @@
       "trigger": "time",
       "effect": "damage",
       "delivery": "meteor",
-      "falloff": 1
+      "falloff": 1,
+      "name": "流星の魂",
+      "type": "時間経過",
+      "color": "#59ae71",
+      "icon": "meteor",
+      "chance": 1,
+      "target": "nearest"
     },
     "giant": {
       "cost": 170,
       "rarity": "R",
       "legacyArea": 8,
       "trigger": "passive",
-      "effect": "passive"
+      "effect": "passive",
+      "name": "巨人の魂",
+      "type": "常時",
+      "color": "#4c86d2",
+      "icon": "shield",
+      "chance": 1,
+      "target": "nearest"
     },
     "rage": {
       "cost": 100,
@@ -274,7 +632,13 @@
       "every": 5,
       "buff": true,
       "trigger": "count",
-      "effect": "buff"
+      "effect": "buff",
+      "name": "闘志の魂",
+      "type": "攻撃回数",
+      "color": "#ef893d",
+      "icon": "fist",
+      "chance": 1,
+      "target": "nearest"
     },
     "tempo": {
       "cost": 120,
@@ -283,7 +647,13 @@
       "every": 10,
       "buff": true,
       "trigger": "count",
-      "effect": "buff"
+      "effect": "buff",
+      "name": "連閃の魂",
+      "type": "攻撃回数",
+      "color": "#ef893d",
+      "icon": "wind",
+      "chance": 1,
+      "target": "nearest"
     },
     "clockatk": {
       "cost": 130,
@@ -292,28 +662,52 @@
       "period": 3,
       "buff": true,
       "trigger": "time",
-      "effect": "buff"
+      "effect": "buff",
+      "name": "刻印の魂",
+      "type": "時間経過",
+      "color": "#59ae71",
+      "icon": "fist",
+      "chance": 1,
+      "target": "nearest"
     },
     "opening": {
       "cost": 240,
       "rarity": "UR",
       "legacyArea": 5,
       "trigger": "passive",
-      "effect": "passive"
+      "effect": "passive",
+      "name": "覚醒の魂",
+      "type": "常時",
+      "color": "#dfbd55",
+      "icon": "star",
+      "chance": 1,
+      "target": "nearest"
     },
     "timewarp": {
       "cost": 230,
       "rarity": "UR",
       "legacyArea": 5,
       "trigger": "passive",
-      "effect": "passive"
+      "effect": "passive",
+      "name": "時律の魂",
+      "type": "常時",
+      "color": "#dfbd55",
+      "icon": "moon",
+      "chance": 1,
+      "target": "nearest"
     },
     "shrink": {
       "cost": 230,
       "rarity": "UR",
       "legacyArea": 5,
       "trigger": "passive",
-      "effect": "passive"
+      "effect": "passive",
+      "name": "虚縮の魂",
+      "type": "常時",
+      "color": "#dfbd55",
+      "icon": "arrow",
+      "chance": 1,
+      "target": "nearest"
     },
     "assassin": {
       "cost": 240,
@@ -329,7 +723,13 @@
       "trigger": "count",
       "effect": "damage",
       "delivery": "summon",
-      "falloff": 1
+      "falloff": 1,
+      "name": "影刃の魂",
+      "type": "攻撃回数",
+      "color": "#dfbd55",
+      "icon": "fang",
+      "chance": 1,
+      "target": "nearest"
     },
     "starfall": {
       "cost": 260,
@@ -344,7 +744,13 @@
       "trigger": "count",
       "effect": "damage",
       "delivery": "meteor",
-      "falloff": 1
+      "falloff": 1,
+      "name": "星墜の魂",
+      "type": "攻撃回数",
+      "color": "#ef893d",
+      "icon": "star",
+      "chance": 1,
+      "target": "nearest"
     },
     "fixedbolt": {
       "cost": 110,
@@ -360,21 +766,39 @@
       "trigger": "time",
       "effect": "damage",
       "delivery": "lightning",
-      "falloff": 1
+      "falloff": 1,
+      "name": "固定雷の魂",
+      "type": "時間経過",
+      "color": "#59ae71",
+      "icon": "bolt",
+      "chance": 1,
+      "target": "nearest"
     },
     "flatAtk": {
       "cost": 90,
       "rarity": "N",
       "legacyArea": 1,
       "trigger": "passive",
-      "effect": "passive"
+      "effect": "passive",
+      "name": "剛力の魂",
+      "type": "常時",
+      "color": "#4c86d2",
+      "icon": "fist",
+      "chance": 1,
+      "target": "nearest"
     },
     "flatSpeed": {
       "cost": 90,
       "rarity": "N",
       "legacyArea": 1,
       "trigger": "passive",
-      "effect": "passive"
+      "effect": "passive",
+      "name": "迅速の魂",
+      "type": "常時",
+      "color": "#4c86d2",
+      "icon": "wind",
+      "chance": 1,
+      "target": "nearest"
     },
     "tempoPct": {
       "cost": 130,
@@ -383,7 +807,13 @@
       "every": 10,
       "buff": true,
       "trigger": "count",
-      "effect": "buff"
+      "effect": "buff",
+      "name": "加速の魂",
+      "type": "攻撃回数",
+      "color": "#ef893d",
+      "icon": "wind",
+      "chance": 1,
+      "target": "nearest"
     },
     "rageFlat": {
       "cost": 110,
@@ -392,7 +822,13 @@
       "every": 5,
       "buff": true,
       "trigger": "count",
-      "effect": "buff"
+      "effect": "buff",
+      "name": "鍛錬の魂",
+      "type": "攻撃回数",
+      "color": "#ef893d",
+      "icon": "fist",
+      "chance": 1,
+      "target": "nearest"
     },
     "clockSpeed": {
       "cost": 125,
@@ -401,7 +837,13 @@
       "period": 3,
       "buff": true,
       "trigger": "time",
-      "effect": "buff"
+      "effect": "buff",
+      "name": "時速の魂",
+      "type": "時間経過",
+      "color": "#59ae71",
+      "icon": "wind",
+      "chance": 1,
+      "target": "nearest"
     },
     "clockFlat": {
       "cost": 110,
@@ -410,7 +852,13 @@
       "period": 3,
       "buff": true,
       "trigger": "time",
-      "effect": "buff"
+      "effect": "buff",
+      "name": "時力の魂",
+      "type": "時間経過",
+      "color": "#59ae71",
+      "icon": "fist",
+      "chance": 1,
+      "target": "nearest"
     },
     "plane": {
       "cost": 145,
@@ -426,7 +874,13 @@
       "trigger": "time",
       "effect": "damage",
       "delivery": "flyby",
-      "falloff": 1
+      "falloff": 1,
+      "name": "飛翔の魂",
+      "type": "時間経過",
+      "color": "#59ae71",
+      "icon": "arrow",
+      "chance": 1,
+      "target": "nearest"
     },
     "pillar": {
       "cost": 140,
@@ -441,7 +895,13 @@
       "trigger": "time",
       "effect": "damage",
       "delivery": "flame",
-      "falloff": 1
+      "falloff": 1,
+      "name": "炎柱の魂",
+      "type": "時間経過",
+      "color": "#59ae71",
+      "icon": "flame",
+      "chance": 1,
+      "target": "nearest"
     },
     "dragon": {
       "cost": 220,
@@ -456,7 +916,13 @@
       "trigger": "time",
       "effect": "damage",
       "delivery": "dragon",
-      "falloff": 1
+      "falloff": 1,
+      "name": "竜撃の魂",
+      "type": "時間経過",
+      "color": "#59ae71",
+      "icon": "flame",
+      "chance": 1,
+      "target": "nearest"
     },
     "sniper": {
       "cost": 180,
@@ -471,7 +937,13 @@
       "trigger": "time",
       "effect": "damage",
       "delivery": "snipe",
-      "falloff": 1
+      "falloff": 1,
+      "name": "狙撃の魂",
+      "type": "時間経過",
+      "color": "#59ae71",
+      "icon": "arrow",
+      "chance": 1,
+      "target": "nearest"
     },
     "ufo": {
       "cost": 180,
@@ -486,7 +958,13 @@
       "trigger": "time",
       "effect": "damage",
       "delivery": "ufo",
-      "falloff": 1
+      "falloff": 1,
+      "name": "星船の魂",
+      "type": "時間経過",
+      "color": "#59ae71",
+      "icon": "star",
+      "chance": 1,
+      "target": "nearest"
     }
   },
   "enemySizes": [
@@ -536,6 +1014,20 @@
     ],
     "extraCap": 80,
     "gap": 5,
+    "eliteHP": 1.65,
+    "crowdHP": 0.65,
+    "initialHP": 38,
+    "earlyGrowth": 1.22,
+    "lateStart": 20,
+    "lateScale": 60,
+    "lateExponent": 0.65,
+    "commonGrowth": {
+      "firstPhase": 9,
+      "midEnd": 30,
+      "midRate": 1.12,
+      "lateScale": 40,
+      "lateExponent": 0.85
+    },
     "swarmCount": 310,
     "barrierCount": 4,
     "sprintLimit": 6,
@@ -544,13 +1036,6 @@
     "barrierFrontHP": 6,
     "barrierRearHP": 0.6,
     "sprintHP": 1.65,
-    "eliteHP": 1.65,
-    "crowdHP": 0.65,
-    "initialHP": 38,
-    "earlyGrowth": 1.22,
-    "lateStart": 20,
-    "lateScale": 60,
-    "lateExponent": 0.65,
     "oneHitStart": 500,
     "oneHitGrowth": 2000,
     "oneHitSpan": 3000,
@@ -567,12 +1052,13 @@
       "barrier",
       "sprint"
     ],
-    "commonGrowth": {
-      "firstPhase": 9,
-      "midEnd": 30,
-      "midRate": 1.12,
-      "lateScale": 40,
-      "lateExponent": 0.85
+    "advice": {
+      "standard": "単体への高倍率攻撃を重視",
+      "swarm": "広範囲・多段攻撃・虚縮を活用",
+      "onehit": "必要HPを超える一撃を用意",
+      "barrier": "障壁の後ろ3体を遠距離攻撃",
+      "sprint": "覚醒・高速攻撃・短周期を重視",
+      "normal": "攻撃速度と範囲のバランスを確認"
     },
     "enemyPatterns": {
       "normal": [
@@ -604,15 +1090,7 @@
     },
     "lanes": [
       0
-    ],
-    "advice": {
-      "standard": "単体への高倍率攻撃を重視",
-      "swarm": "広範囲・多段攻撃・虚縮を活用",
-      "onehit": "必要HPを超える一撃を用意",
-      "barrier": "障壁の後ろ3体を遠距離攻撃",
-      "sprint": "覚醒・高速攻撃・短周期を重視",
-      "normal": "攻撃速度と範囲のバランスを確認"
-    }
+    ]
   },
   "reward": {
     "initial": 90,
