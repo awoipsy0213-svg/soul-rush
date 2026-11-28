@@ -21,7 +21,7 @@ test("migration awards historical boss chest and gems only once",()=>{
 });
 test("v1 import and invalid backup protection",()=>{
  const x=run(`(()=>{const s=fresh();s.version=1;s.money=812;s.unlocked=2;delete s.gems;delete s.presets;delete s.firstClears;delete s.missionRecords;delete s.materials;return parseBackup(JSON.stringify(s))})()`);
- assert.equal(x.money,812);assert.equal(x.version,8);assert.equal(x.gems,5);assert.throws(()=>run("parseBackup('{}')"));assert.throws(()=>run("parseBackup('bad JSON')"));assert.throws(()=>run(`parseBackup(JSON.stringify({...fresh(),version:999}))`))
+ assert.equal(x.money,812);assert.equal(x.version,9);assert.equal(x.gems,5);assert.throws(()=>run("parseBackup('{}')"));assert.throws(()=>run("parseBackup('bad JSON')"));assert.throws(()=>run(`parseBackup(JSON.stringify({...fresh(),version:999}))`))
 });
 test("historic counts and mission records survive changed enemy definitions",()=>{
  const x=run(`(()=>{const s=fresh();s.version=2;s.unlocked=11;s.records[5]={attempts:1,last:{stage:5,kills:3,count:3,clear:true,elapsed:29,reward:500,monster:'moss'},bestTime:29};s.missionRecords['4:collect']={attempts:3,successes:2,bestRank:'A',lastRank:'A',lastKills:25,lastReward:100,lastElapsed:29.7};const v=validate(s);return {record:v.records[5],side:v.missionRecords['4:collect']}})()`);
