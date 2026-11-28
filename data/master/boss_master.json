@@ -1,0 +1,34 @@
+{
+  "swarmCount": 310,
+  "barrierCount": 4,
+  "sprintLimit": 6,
+  "standardBossHP": 15,
+  "swarmHP": 0.065,
+  "barrierFrontHP": 6,
+  "barrierRearHP": 0.6,
+  "sprintHP": 1.65,
+  "oneHitStart": 500,
+  "oneHitGrowth": 2000,
+  "oneHitSpan": 3000,
+  "bossKinds": {
+    "20": "swarm",
+    "40": "onehit",
+    "60": "barrier",
+    "80": "sprint"
+  },
+  "randomBossKinds": [
+    "standard",
+    "swarm",
+    "onehit",
+    "barrier",
+    "sprint"
+  ],
+  "advice": {
+    "standard": "単体への高倍率攻撃を重視",
+    "swarm": "広範囲・多段攻撃・虚縮を活用",
+    "onehit": "必要HPを超える一撃を用意",
+    "barrier": "障壁の後ろ3体を遠距離攻撃",
+    "sprint": "覚醒・高速攻撃・短周期を重視",
+    "normal": "攻撃速度と範囲のバランスを確認"
+  }
+}

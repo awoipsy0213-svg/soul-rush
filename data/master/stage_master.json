@@ -1,0 +1,30 @@
+{
+  "pattern": [
+    12,
+    17,
+    9,
+    25,
+    15,
+    13,
+    18,
+    11,
+    26,
+    15
+  ],
+  "extraCap": 80,
+  "gap": 5,
+  "eliteHP": 1.65,
+  "crowdHP": 0.65,
+  "initialHP": 38,
+  "earlyGrowth": 1.22,
+  "lateStart": 20,
+  "lateScale": 60,
+  "lateExponent": 0.65,
+  "commonGrowth": {
+    "firstPhase": 9,
+    "midEnd": 30,
+    "midRate": 1.12,
+    "lateScale": 40,
+    "lateExponent": 0.85
+  }
+}

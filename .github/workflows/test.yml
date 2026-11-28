@@ -10,6 +10,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - run: node scripts/sync-balance.cjs --check
       - run: node --test tests/*.test.cjs
       - name: Browser UI smoke test
         run: node tests/browser-smoke.cjs
@@ -18,5 +19,19 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: soul-rush-v09-ui-screenshots
+          name: soul-rush-v018-ui-screenshots
           path: ui-screenshots/
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: soul-rush-v018-playable
+          path: |
+            index.html
+            manifest.webmanifest
+            sw.js
+            icons/
+            assets/
+            README.md
+            data/
+            scripts/
+            docs/

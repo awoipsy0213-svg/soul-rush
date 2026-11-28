@@ -1,0 +1,80 @@
+{
+  "normal": "slash",
+  "focus": "critical",
+  "assassin": "summon",
+  "echo": "slash",
+  "spark": "bolt",
+  "fixedbolt": "bolt",
+  "meteor": "meteor",
+  "starfall": "meteor",
+  "plane": "flyby",
+  "sniper": "snipe",
+  "ufo": "ufo",
+  "burst": "flame",
+  "pillar": "flame",
+  "dragon": "dragon",
+  "frost": "ice",
+  "maxNodes": 36,
+  "maxDraw": 4,
+  "poolSize": 36,
+  "presentation": {
+    "motions": {
+      "moss": {
+        "kind": "sweep",
+        "label": "薙ぎ払い",
+        "color": "#5aab83",
+        "duration": 300,
+        "tone": 220
+      },
+      "fang": {
+        "kind": "dash",
+        "label": "高速突進",
+        "color": "#a38bdb",
+        "duration": 190,
+        "tone": 330
+      },
+      "golem": {
+        "kind": "slam",
+        "label": "重撃",
+        "color": "#d39b60",
+        "duration": 460,
+        "tone": 98
+      },
+      "wyrm": {
+        "kind": "breath",
+        "label": "広域ブレス",
+        "color": "#d98065",
+        "duration": 330,
+        "tone": 147
+      },
+      "lancet": {
+        "kind": "thrust",
+        "label": "鋭い突き",
+        "color": "#62b4c7",
+        "duration": 240,
+        "tone": 280
+      },
+      "saw": {
+        "kind": "spin",
+        "label": "回転斬撃",
+        "color": "#c69067",
+        "duration": 240,
+        "tone": 185
+      },
+      "cross": {
+        "kind": "radiance",
+        "label": "光の波動",
+        "color": "#a78bd5",
+        "duration": 350,
+        "tone": 262
+      }
+    },
+    "traceSeconds": 0.32,
+    "flashSeconds": 0.28,
+    "streakSpeed": 4,
+    "surgeSpeed": 8,
+    "traceTargets": 12,
+    "normalTtlMin": 100,
+    "normalTtlMax": 420
+  }
+}
