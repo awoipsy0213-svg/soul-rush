@@ -1,0 +1,83 @@
+{
+  "edition": "classic-reference-v1",
+  "version": "0.1.0",
+  "combat": {
+    "limit": 24
+  },
+  "stage": {
+    "initialHP": 29
+  },
+  "weapons": {
+    "moss": {
+      "name": "包丁",
+      "role": "万能型",
+      "trait": "初期武器・ルーン5枠。攻撃力、速度、範囲のバランス型。"
+    },
+    "fang": {
+      "name": "黒い短剣",
+      "role": "高速型",
+      "trait": "最速の通常攻撃。攻撃回数型ルーンを活かす。"
+    },
+    "lancet": {
+      "name": "注射器",
+      "role": "速撃型",
+      "trait": "包丁より高い攻撃力・攻撃速度、4枠。"
+    },
+    "wyrm": {
+      "name": "青龍偃月刀",
+      "role": "長柄型",
+      "trait": "長い射程と広い範囲。"
+    },
+    "saw": {
+      "name": "ノコギリ",
+      "role": "連撃型",
+      "trait": "速度と範囲を両立。"
+    },
+    "golem": {
+      "name": "エレキギター",
+      "role": "重撃型",
+      "trait": "高攻撃力・低攻撃速度。時間型ルーン向き。"
+    },
+    "cross": {
+      "name": "十字架",
+      "role": "多枠型",
+      "trait": "最多のルーン枠。複数効果を組み合わせる。"
+    }
+  },
+  "runeNames": {
+    "might": "攻撃力UP",
+    "haste": "攻撃速度UP",
+    "spark": "ゼウスの怒り",
+    "burst": "爆弾",
+    "feast": "撃破強化",
+    "pierce": "貫通",
+    "pulse": "月光",
+    "focus": "強打",
+    "frost": "氷撃",
+    "fortune": "ゴールドUP",
+    "echo": "衝撃波",
+    "meteor": "時間隕石",
+    "giant": "巨人特攻",
+    "rage": "累積攻撃力",
+    "tempo": "累積攻撃速度",
+    "clockatk": "時間攻撃力",
+    "opening": "黄金の剣",
+    "timewarp": "時間歪曲装置",
+    "shrink": "小型化装置",
+    "assassin": "匿名の刺客",
+    "starfall": "隕石",
+    "fixedbolt": "時間雷撃",
+    "flatAtk": "固定攻撃力",
+    "flatSpeed": "固定攻撃速度",
+    "tempoPct": "累積加速",
+    "rageFlat": "累積固定攻撃",
+    "clockSpeed": "時間攻撃速度",
+    "clockFlat": "時間固定攻撃",
+    "plane": "飛行機",
+    "pillar": "火柱",
+    "dragon": "ドラゴン",
+    "sniper": "狙撃手",
+    "ufo": "UFO"
+  },
+  "sourceNote": "通常24秒・特殊6秒・武器7種・確認済みルーン効果・5ビルドは資料に基づく。未確認の数値・名称・ドロップ率・ステージ配置は既存エンジンを基にした仮値。"
+}
