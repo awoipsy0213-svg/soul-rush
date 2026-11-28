@@ -10,6 +10,13 @@ Version 0.18.0 — モンスター別戦闘演出・ボスHUD・ゴール進捗
 - [変更履歴](CHANGELOG.md)
 - [素材台帳](docs/ASSETS.md)
 
+## CLASSIC 参考再構築版
+
+- [CLASSIC 仕様と起動方法](classic/README.md)
+- [CLASSIC 起動ページ](classic/index.html)
+
+通常24秒・武器装着UIの独立版です。v0.18のゲームと保存領域は分離しています。
+
 ## 遊び方
 
 タイトル→ビルド→30秒戦闘→報酬→編成・重複強化→次のステージ。
