@@ -15,6 +15,11 @@ for(const rarity of ['N','R','SR','UR']){positive(workshop.salvage[rarity],'salv
 if(Object.values(workshop.salvage).some(v=>v>Number.MAX_SAFE_INTEGER/workshop.batchLimit)||Object.values(workshop.craft).some(v=>v>Number.MAX_SAFE_INTEGER/workshop.batchLimit/workshop.unlockMultiplier))throw Error('Workshop exchange overflow');
 for(const k of ['budget','batch','passes','beam']){positive(optimizer[k],'optimizer.'+k);if(!Number.isSafeInteger(optimizer[k]))throw Error('Invalid optimizer '+k)}
 if(optimizer.budget>500||optimizer.batch>10||optimizer.beam>10||optimizer.passes>10)throw Error('Optimizer safety bound');
+const presentation=f.presentation;
+for(const k of ['traceSeconds','flashSeconds','streakSpeed','surgeSpeed','traceTargets','normalTtlMin','normalTtlMax'])positive(presentation[k],'presentation.'+k);
+if(presentation.traceTargets>24||!Number.isSafeInteger(presentation.traceTargets)||presentation.normalTtlMin>presentation.normalTtlMax||presentation.surgeSpeed<presentation.streakSpeed||presentation.normalTtlMax>1000)throw Error('Invalid presentation bounds');
+const kinds=new Set();
+for(const id of Object.keys(w)){const p=presentation.motions[id];if(!p||!['sweep','dash','slam','breath','thrust','spin','radiance'].includes(p.kind)||kinds.has(p.kind)||!/^#[0-9a-f]{6}$/i.test(p.color)||typeof p.label!=='string'||!p.label.trim())throw Error('Invalid motion profile '+id);positive(p.duration,id+'.duration');positive(p.tone,id+'.tone');kinds.add(p.kind)}
 for(const x of c.buildTemplates){if(x.monsters.some(k=>!w[k])||x.souls.some(k=>!r.souls[k]))throw Error('Unknown build master ID '+x.id)}
 const file=path.join(root,'index.html'),json=path.join(root,'data/balance.json'),marker=/\/\* BALANCE_MASTER_BEGIN \*\/\nconst BALANCE_MASTER=[^\n]+;\n\/\* BALANCE_MASTER_END \*\//,old=fs.readFileSync(file,'utf8');
 if(!marker.test(old))throw Error('Missing balance master marker');
