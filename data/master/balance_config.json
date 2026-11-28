@@ -1,0 +1,131 @@
+{
+  "combat": {
+    "limit": 30,
+    "walkSpeed": 720,
+    "singleReach": 240,
+    "goalGap": 12,
+    "speedCap": 40,
+    "eventCap": 12000,
+    "openingSeconds": 3,
+    "hitDelay": 0.16,
+    "minPeriod": 0.2,
+    "maxMultiplier": 1000000000,
+    "heightRatio": 0.35,
+    "defaultShape": "forward",
+    "maxChain": 32
+  },
+  "cosmetics": {
+    "secretTaps": 20
+  },
+  "buildTemplates": [
+    {
+      "id": "speed",
+      "name": "高速攻撃",
+      "monsters": [
+        "fang",
+        "lancet",
+        "saw",
+        "moss"
+      ],
+      "souls": [
+        "opening",
+        "tempo",
+        "rage",
+        "haste",
+        "spark",
+        "tempoPct",
+        "assassin"
+      ]
+    },
+    {
+      "id": "timed",
+      "name": "時間発動",
+      "monsters": [
+        "golem",
+        "cross",
+        "moss"
+      ],
+      "souls": [
+        "timewarp",
+        "clockatk",
+        "clockFlat",
+        "sniper",
+        "dragon",
+        "burst",
+        "might"
+      ]
+    },
+    {
+      "id": "crowd",
+      "name": "範囲殲滅",
+      "monsters": [
+        "wyrm",
+        "saw",
+        "cross",
+        "moss"
+      ],
+      "souls": [
+        "shrink",
+        "assassin",
+        "meteor",
+        "plane",
+        "pillar",
+        "burst",
+        "echo"
+      ]
+    },
+    {
+      "id": "burst",
+      "name": "瞬間火力",
+      "monsters": [
+        "golem",
+        "fang",
+        "moss"
+      ],
+      "souls": [
+        "opening",
+        "giant",
+        "sniper",
+        "pulse",
+        "might",
+        "spark",
+        "fixedbolt"
+      ]
+    },
+    {
+      "id": "hybrid",
+      "name": "複合型",
+      "monsters": [
+        "cross",
+        "moss",
+        "wyrm"
+      ],
+      "souls": [
+        "might",
+        "haste",
+        "timewarp",
+        "clockFlat",
+        "burst",
+        "spark",
+        "echo"
+      ]
+    }
+  ],
+  "lab": {
+    "levels": [
+      1,
+      5,
+      15
+    ],
+    "areas": [
+      1,
+      10,
+      20,
+      40,
+      60,
+      80,
+      100
+    ],
+    "sampleSeed": 20261128
+  }
+}
