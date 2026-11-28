@@ -8,6 +8,13 @@ for(const [id,m] of Object.entries(w)){for(const k of ['atk','speed','range','sl
 for(const [id,x] of Object.entries(r.souls)){positive(x.cost,id+'.cost');if(!Number.isFinite(x.chance)||x.chance<0||x.chance>1)throw Error('Invalid trigger chance '+id);if(x.every)positive(x.every,id+'.every');if(x.period)positive(x.period,id+'.period');if(x.shape==='blast'||x.shape==='circle')positive(x.radius,id+'.radius');if(x.hits&&(!Number.isInteger(x.hits)||x.hits>32||x.hits<1))throw Error('Invalid hits '+id)}
 if(!Array.isArray(e.lanes)||!e.lanes.length||e.lanes.some(x=>!Number.isFinite(x)))throw Error('Invalid enemy lanes');
 for(const k of ['limit','walkSpeed','speedCap','eventCap','minPeriod'])positive(c.combat[k],k);
+const workshop=u.workshop,optimizer=c.lab.optimizer;
+for(const k of ['recentAreas','base','clearBonus','killsPerBonus','maxPerBattle','batchLimit','unlockMultiplier']){positive(workshop[k],'workshop.'+k);if(!Number.isSafeInteger(workshop[k]))throw Error('Invalid workshop integer '+k)}
+if(workshop.batchLimit>100)throw Error('Workshop batch limit exceeds safety bound');
+for(const rarity of ['N','R','SR','UR']){positive(workshop.salvage[rarity],'salvage '+rarity);positive(workshop.craft[rarity],'craft '+rarity);if(!Number.isSafeInteger(workshop.salvage[rarity])||!Number.isSafeInteger(workshop.craft[rarity])||workshop.craft[rarity]<=workshop.salvage[rarity])throw Error('Invalid workshop exchange '+rarity)}
+if(Object.values(workshop.salvage).some(v=>v>Number.MAX_SAFE_INTEGER/workshop.batchLimit)||Object.values(workshop.craft).some(v=>v>Number.MAX_SAFE_INTEGER/workshop.batchLimit/workshop.unlockMultiplier))throw Error('Workshop exchange overflow');
+for(const k of ['budget','batch','passes','beam']){positive(optimizer[k],'optimizer.'+k);if(!Number.isSafeInteger(optimizer[k]))throw Error('Invalid optimizer '+k)}
+if(optimizer.budget>500||optimizer.batch>10||optimizer.beam>10||optimizer.passes>10)throw Error('Optimizer safety bound');
 for(const x of c.buildTemplates){if(x.monsters.some(k=>!w[k])||x.souls.some(k=>!r.souls[k]))throw Error('Unknown build master ID '+x.id)}
 const file=path.join(root,'index.html'),json=path.join(root,'data/balance.json'),marker=/\/\* BALANCE_MASTER_BEGIN \*\/\nconst BALANCE_MASTER=[^\n]+;\n\/\* BALANCE_MASTER_END \*\//,old=fs.readFileSync(file,'utf8');
 if(!marker.test(old))throw Error('Missing balance master marker');
