@@ -48,7 +48,7 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   await click('#classicWeaponHeader [data-index="0"][data-action="slot"]');await scene('souls');
   assert.equal(await evaluate('document.querySelectorAll(".soul-tile").length'),33);
   assert.equal(await evaluate('getComputedStyle(document.getElementById("soulGrid")).gridTemplateColumns.split(" ").length'),4);
-  await noOverflow('soulsScene');await screenshot('classic-runes');
+  assert.equal(await evaluate('document.querySelectorAll(".soul-tile .classic-level").length'),33);assert.equal(await evaluate('document.querySelectorAll(".soul-tile .classic-copies").length'),33);assert.ok(await evaluate('document.querySelectorAll(".classic-equipped").length>=1'));await noOverflow('soulsScene');await screenshot('classic-runes');
   await screen(320,568);await noOverflow('soulsScene');await navVisible();await screenshot('classic-runes-small');
   await click('#backBtn');await scene('terminal');
   await evaluate('state.souls.haste=1;state.copies.haste=2;state.money=1000;save();renderHome()');
@@ -64,6 +64,7 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   await screen(390,844);await click('#classicNav [data-action="start"]');await scene('battle');
   assert.equal(await evaluate('battle.limit'),24);assert.equal(await evaluate('document.getElementById("classicNav").hidden'),true);
   assert.equal(await evaluate('document.querySelectorAll("#classicBattleWeapon .classic-static-socket").length'),5);
+  assert.ok(await evaluate('(()=>{const a=document.getElementById("arena").getBoundingClientRect(),b=document.querySelector(".battle-bottom").getBoundingClientRect(),t=document.getElementById("timer").getBoundingClientRect(),l=document.querySelector(".classic-battle-left").getBoundingClientRect(),w=document.getElementById("classicBattleWeapon").getBoundingClientRect();return a.bottom<=b.top+1&&t.top>=a.top&&t.bottom<a.bottom&&l.left<w.left&&a.height/(a.height+b.height)>.40&&a.height/(a.height+b.height)<.48})()'),'reference split composition');
   await evaluate('cancelAnimationFrame(raf);advanceBattle(battle,2);updateBattle();attackEffect(battle)');
   await noOverflow('battleScene');await screenshot('classic-battle');
   await screen(320,568);await noOverflow('battleScene');await screenshot('classic-battle-small');
