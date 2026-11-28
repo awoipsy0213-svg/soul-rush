@@ -817,7 +817,6 @@ function openClassicRuneTrial(){
  if(scene!=='souls'||!classicDetailOpen||!sdef(selectedSoul))return;
  const r=classicRuneTrial(state,selectedSoul,slotIndex);if(!r)return;const a=r.selected,tr=TRIGGERS[r.id],rows=[['現在の装備',r.base],[r.equipped?'装着中 Lv'+r.level:'仮装着 Lv'+r.level,a],...(r.next?[['次Lv '+(r.level+1),r.next]]:[])],moneyNote=r.removed?' / 交換: '+sdef(r.removed).name:'';
  const rate=tr?.period?'基本 '+tr.period+'秒 → 実効 '+a.period.toFixed(2)+'秒':tr?.every?'通常攻撃 '+tr.every+'回ごと':r.id==='opening'?'開幕 '+BALANCE_MASTER.combat.openingSeconds+'秒':'常時 / 条件付き補助';
- const end=a.samples.at(-1);
  $('infoTitle').textContent=sdef(r.id).name+' · 発動と性能';
  $('infoContent').innerHTML='<div class="classic-trial"><div class="classic-trial-head"><strong>AREA '+r.area+' · '+mdef(r.weapon).name+'</strong><p>'+rate+moneyNote+(r.owned?'':' / 未所持Lv1を仮使用')+'</p></div><p>'+soulDescription(r.id,r.level)+'</p><div class="classic-trial-metrics"><div><small>発動</small><b>'+a.activations+'回</b></div><div><small>実命中</small><b>'+a.hits+'回</b></div><div><small>ルーン実DMG</small><b>'+shortNum(a.damage)+'</b></div><div><small>無効 / 空振り</small><b>'+a.blocked+' / '+a.misses+'</b></div></div><div class="classic-trial-chart"><strong>ATK '+shortNum(a.atk)+' → 最大 '+shortNum(a.summary.peakAtk)+'</strong>'+classicRuneTrialChart(a.samples,'atk',a.limit)+'<strong>SPD '+a.spd.toFixed(2)+' → 最大 '+a.summary.peakSpeed.toFixed(2)+'</strong>'+classicRuneTrialChart(a.samples,'spd',a.limit)+'</div><div class="classic-trial-compare">'+rows.map(([name,x])=>'<div><strong>'+name+'</strong><small>'+(x.summary.clear?'CLEAR':'TIME UP')+' · '+x.summary.kills+'/'+x.summary.count+'体 · '+x.summary.elapsed.toFixed(2)+'秒</small><small>総DMG '+shortNum(x.summary.damage)+' / 攻撃 '+x.summary.hits+'回 / ルーン発動 '+x.activations+'回</small><small>ゴールド '+shortNum(x.reward)+(x.safetyStop?' · 安全上限停止':'')+'</small></div>').join('')+'</div><p>同一AREA・ボス種類・乱数シードで比較。グラフは1秒間隔と終了時の値、最大値・発動数は実戦計算。補助ルーンの寄与は総DMGや撃破数で比較します。報酬・装備・所持品は変更しません。原作の未確認数値は暫定です。</p></div>';
  openDialog('infoDialog');
@@ -921,8 +920,8 @@ function classicGaugeState(b,id){
  const tr=TRIGGERS[id],stopped=b.done||front(b)<0,count=b.sourceStats[id]?.activations||0,flash=BALANCE_MASTER.effects.presentation.flashSeconds;
  if(id==='opening'){const remain=stopped?0:Math.max(0,BALANCE_MASTER.combat.openingSeconds-b.elapsed);return {ratio:remain/BALANCE_MASTER.combat.openingSeconds,text:remain>0?remain.toFixed(1)+'s':'END',live:remain>0,count:0}}
  if(!tr)return null;
- const activation=b.visuals.findLast(v=>v.source===id&&(v.buff||!v.special||v.t<=b.elapsed+1e-9));
- // A later multi-hit must not independently count as a new proc: use sourceStats and the last observed activation time.
+ const activation=b.events.findLast(e=>e.special&&e.text===sdef(id).name+' 発動');
+ // The engine logs only actual activations, not delayed multi-hit impacts.
  if(stopped)return {ratio:0,text:'END',live:false,count,activationTime:null};
  const period=tr.period?soulPeriod(b,id):null,remain=period?Math.max(0,(b.next[id]??b.elapsed)-b.elapsed):null,n=tr.every?b.hits%tr.every:0;
  return {ratio:period?clamp(1-remain/period,0,1):n/tr.every,text:period?remain.toFixed(1)+'s':n+'/'+tr.every,live:false,count,activationTime:activation?.t??null,flash};
@@ -930,7 +929,7 @@ function classicGaugeState(b,id){
 function updateSoulGauges(b){
  for(const id of Object.keys(b.stats.levels)){
   const g=classicGaugeState(b,id),node=$('bs-'+id);if(!g||!node)continue;const socket=$('classic-battle-rune-'+id),opening=id==='opening';
-  if(!opening&&g.count>(lastGaugeActivations[id]||0)){lastGaugeActivations[id]=g.count;if(g.activationTime!=null)node.dataset.flashUntil=String(g.activationTime+g.flash)}
+  if(!opening&&g.count>(lastGaugeActivations[id]||0)){lastGaugeActivations[id]=g.count;node.dataset.flashUntil=String(g.activationTime==null?0:g.activationTime+g.flash)}
   const live=opening?g.live:g.text!=='END'&&b.elapsed<Number(node.dataset.flashUntil||0);
   if(socket)socket.dataset.live=live?'1':'0';node.dataset.activations=String(g.count);node.dataset.opening=opening&&live?'1':'0';
   node.classList.toggle('trigger',live&&!opening&&state.options.fx!=='low');writeWidth('gauge-'+id,(g.ratio*100).toFixed(1)+'%');

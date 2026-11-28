@@ -81,3 +81,9 @@ test('locked rune trial is read-only, shows replacement and actual shortened per
 test('stopped gauges end and do not keep a false live socket',()=>{
  const e=environment({},false,'?demo=29'),a=e.api;a.dispatch('enter');e.advance(30000);const b=a.battle();if(b){for(const id of Object.keys(b.stats.levels)){const g=a.classicGaugeState(b,id);if(g){assert.equal(g.live,false);assert.equal(g.text,'END')}}}
 });
+
+test('gauge uses actual activation log instead of delayed impact timestamp',()=>{
+ const a=environment().api,b=run("(()=>{const s=fresh();s.souls.assassin=1;s.monsters.moss.equip=['assassin'];return createBattle(s)})()");
+ b.events=[{special:true,text:'匿名の刺客 発動',t:1}];b.visuals=[{source:'assassin',t:1.16}];b.elapsed=1.2;b.sourceStats.assassin={activations:1};
+ assert.equal(a.classicGaugeState(b,'assassin').activationTime,1)
+});
