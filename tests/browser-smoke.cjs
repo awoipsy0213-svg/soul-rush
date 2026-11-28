@@ -65,6 +65,8 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   assert.equal(await evaluate('JSON.stringify(state)'),beforeCompare);
   await screenshot('five-build-comparison');await click('[data-action="close-info"]');
   const beforeLab=await evaluate('JSON.stringify(state)');await click('[data-action="lab-open"]');assert.equal(await evaluate('document.querySelectorAll(".lab-card").length'),5);await screenshot('build-lab');await click('[data-action="lab-bench"]');assert.equal(await evaluate('document.querySelectorAll(".lab-matrix tbody tr").length'),7);await screenshot('balance-lab');assert.equal(await evaluate('JSON.stringify(state)'),beforeLab);await click('[data-action="close-info"]');
+  await click('[data-action="lab-open"]');await click('[data-action="lab-optimize"]');await until(()=>evaluate('document.querySelectorAll("[data-action=optimizer-use]").length>0'));assert.equal(await evaluate('JSON.stringify(state)'),beforeLab);await screenshot('build-search');await click('[data-action="lab-upgrade"]');assert.equal(await evaluate('document.querySelectorAll("[data-action=diagnostic-upgrade]").length'),2);assert.equal(await evaluate('JSON.stringify(state)'),beforeLab);await screenshot('upgrade-diagnosis');await click('[data-action="close-info"]');
+  await evaluate('state.copies.might=6;save();renderHome()');await click('#heroSockets [data-index="0"]');await scene('souls');await click('[data-action="workshop-open"]');assert.ok(await evaluate('document.getElementById("workshopDialog").open'));await screenshot('workshop');await send('Emulation.setDeviceMetricsOverride',{width:320,height:568,deviceScaleFactor:1,mobile:true,screenWidth:320,screenHeight:568});await sleep(120);assert.ok(await evaluate('(()=>{const r=document.getElementById("workshopDialog").getBoundingClientRect();return r.width<=innerWidth&&r.height<=innerHeight+1})()'));await screenshot('workshop-small');await click('[data-action="workshop-close"]');await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true,screenWidth:390,screenHeight:844});await click('#backBtn');await scene('terminal');
   // Synthetic test-only data in this isolated browser profile.
   await evaluate('state.unlocked=4;state.selectedStage=4;state.souls.spark=1;state.souls.burst=1;state.monsters.moss.equip=["might","spark","burst"];capturePreset(state);save();renderHome()');
   await click('#startBtn');await scene('battle');
@@ -72,7 +74,7 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   assert.ok(await evaluate('document.getElementById("enemyTrack").scrollWidth>document.getElementById("arena").clientWidth'));
   assert.ok(await evaluate('!!document.getElementById("gauge-spark")&&!!document.getElementById("count-spark")&&!!document.getElementById("gauge-burst")&&!document.getElementById("gauge-might")'));
   assert.ok(await evaluate('battle.limit===30&&!!document.getElementById("time-burst")&&!!document.getElementById("goalMarker")&&document.getElementById("engageGuide").style.width==="10px"'));
-  await noOverflow('battleScene');await screenshot('battle-all-enemies');
+  await noOverflow('battleScene');assert.ok(await evaluate('document.getElementById("growthAtk").textContent.startsWith("×")'));await screenshot('battle-all-enemies');
   await evaluate('cancelAnimationFrame(raf);startedAt=performance.now()-8000;pauseBattle()');
   assert.equal(await evaluate('paused&&!running&&document.getElementById("pauseDialog").open'),true);
   const elapsed=await evaluate('battle.elapsed');
@@ -151,12 +153,12 @@ async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){
   await evaluate('state.unlocked=Math.max(state.unlocked,20);state.selectedStage=20;state.monsters.moss.level=100;state.souls.burst=10;state.souls.shrink=1;state.monsters.moss.equip=["might","burst","shrink"];capturePreset(state);save();renderHome()');await click('#startBtn');await scene('battle');assert.equal(await evaluate('document.querySelectorAll("#enemyTrack .enemy").length'),310);assert.ok(await evaluate('Array.from(document.querySelectorAll("#enemyTrack .enemy")).filter(n=>n.dataset.offscreen==="0").length<50'));await evaluate('cancelAnimationFrame(raf);advanceBattle(battle,5);updateBattle();floatEffects(battle);attackEffect(battle)');assert.ok(await evaluate('fxCreated<=BALANCE_MASTER.effects.poolSize&&document.getElementById("effects").children.length<=BALANCE_MASTER.effects.maxNodes'));await screenshot('swarm-battle');await evaluate('cancelAnimationFrame(raf);advanceBattle(battle,battle.limit);updateBattle();settleBattle()');await scene('result');await click('#resultActions [data-action="home"]');await scene('terminal');
   const saved=await evaluate('localStorage.getItem(SAVE_KEY)');
   assert.ok(await until(()=>evaluate('navigator.serviceWorker.controller!==null'),15000));
-  assert.ok(await evaluate('caches.keys().then(keys=>keys.some(k=>k.endsWith(":0.16.0")))'));
+  assert.ok(await evaluate('caches.keys().then(keys=>keys.some(k=>k.endsWith(":0.17.0")))'));
   await send('Network.emulateNetworkConditions',{offline:true,latency:0,downloadThroughput:0,uploadThroughput:0});
   await send('Page.reload');await until(()=>evaluate('document.getElementById("titleScreen")&&!document.getElementById("titleScreen").hidden'),15000);
   await click('#enterBtn');await scene('terminal');
   assert.equal(await evaluate('JSON.parse(localStorage.getItem(SAVE_KEY)).gems'),JSON.parse(saved).gems);
   await send('Network.emulateNetworkConditions',{offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1});
   assert.equal(errors.length,0,errors.join('\n'));
-  console.log('v0.16 browser smoke passed: four home viewports, horizontal character list, soul grid, full enemy track, pause/abort, boss chest, scatter bounds, arena entry/fight/claim, nine supplies, AREA3040 jump, gifts, cosmetics, combat breakdown and offline save.');
+  console.log('v0.17 browser smoke passed: four home viewports, horizontal character list, soul grid, full enemy track, pause/abort, boss chest, scatter bounds, arena entry/fight/claim, nine supplies, AREA3040 jump, gifts, cosmetics, combat breakdown and offline save.');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(()=>{ws?.close();proc?.kill('SIGTERM');server.close();setTimeout(()=>{try{fs.rmSync(profiles,{recursive:true,force:true})}catch{}},250).unref()});
